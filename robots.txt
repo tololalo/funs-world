@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://tololalo.github.io/funs-platform/sitemap.xml
+Sitemap: https://funs.world/sitemap.xml
