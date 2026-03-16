@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — FunS Platform</title>
+<meta name="description" content="FunS Platform에 대해 알아보세요. Web3 게이밍의 새로운 기준을 만들어가는 미션, 비전을 소개합니다.">
+<meta name="keywords" content="FunS About, Web3 게임 회사, 블록체인 플랫폼, DEX, 게이밍 생태계">
+<meta property="og:title" content="About — FunS Platform">
+<meta property="og:description" content="FunS Platform 미션, 로드맵 및 기술 스택에 대해 알아보세요.">
+<meta property="og:image" content="https://tololalo.github.io/funs-platform/funs-nugi.png">
+<meta property="og:url" content="https://tololalo.github.io/funs-platform/about.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="funs-nugi.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common.css">
+<style>
+  /* Hero Section Enhancements */
+  .page-hero {
+    padding: 120px 5%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-hero .section-title span {
+    background: linear-gradient(135deg, var(--primary), #ff9a00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+
+  /* Roadmap Section */
+  .roadmap-section {
+    padding: 100px 5%;
+  }
+
+  .roadmap-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .timeline {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--primary), transparent);
+    transform: translateX(-1px);
+  }
+
+  .timeline-item {
+    margin-bottom: 50px;
+    opacity: 0;
+    animation: slideInUp 0.6s ease forwards;
+  }
+
+  .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+  .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+  .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+  .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+
+  .timeline-item:nth-child(odd) {
+    text-align: right;
+    padding-right: 52%;
+  }
+
+  .timeline-item:nth-child(even) {
+    text-align: left;
+    padding-left: 52%;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--dark);
+    border: 3px solid var(--primary);
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  .timeline-item.completed .timeline-dot {
+    background: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 255, 200, 0.6);
+  }
+
+  .timeline-content {
+    padding: 20px;
+    background: rgba(0, 255, 200, 0.05);
+    border: 1px solid rgba(0, 255, 200, 0.2);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }
+
+  .timeline-item.completed .timeline-content {
+    background: rgba(0, 255, 200, 0.1);
+    border-color: rgba(0, 255, 200, 0.4);
+  }
+
+  .timeline-quarter {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+
+  .timeline-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .timeline-desc {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .timeline-status {
+    display: inline-block;
+    font-size: 12px;
+    margin-top: 10px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .timeline-item.completed .timeline-status {
+    background: rgba(0, 255, 200, 0.2);
+    color: var(--primary);
+  }
+
+  .timeline-item.in-progress .timeline-status {
+    background: rgba(255, 154, 0, 0.2);
+    color: #ff9a00;
+  }
+
+  .timeline-item.upcoming .timeline-status {
+    background: rgba(155, 155, 155, 0.2);
+    color: var(--muted);
+  }
+
+  /* Animations */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Mission Card Enhancements */
+  .info-card {
+    background: rgba(0, 255, 200, 0.05);
+    border: 1px solid rgba(0, 255, 200, 0.2);
+    border-radius: 12px;
+    padding: 40px 30px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .info-card:hover {
+    background: rgba(0, 255, 200, 0.1);
+    border-color: rgba(0, 255, 200, 0.4);
+    transform: translateY(-5px);
+  }
+
+  .info-card .icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .info-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+
+  .info-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Tech Stack Enhancements */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .stat-box {
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(0, 255, 200, 0.1), rgba(255, 154, 0, 0.05));
+    border: 1px solid rgba(0, 255, 200, 0.2);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .stat-box:hover {
+    background: linear-gradient(135deg, rgba(0, 255, 200, 0.15), rgba(255, 154, 0, 0.1));
+    border-color: rgba(0, 255, 200, 0.4);
+    transform: translateY(-5px);
+  }
+
+  .stat-box .num {
+    font-size: 28px;
+    font-weight: 900;
+    font-family: 'Orbitron', monospace;
+    background: linear-gradient(135deg, var(--primary), #ff9a00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .stat-box .label {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    padding: 80px 5%;
+    text-align: center;
+    background: var(--dark2);
+  }
+
+  .cta-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    margin-bottom: 20px;
+  }
+
+  .cta-btn {
+    background: linear-gradient(135deg, var(--primary), #ff9a00);
+    color: #fff;
+    padding: 16px 40px;
+    border-radius: 50px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 255, 200, 0.3);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .timeline::before {
+      left: 20px;
+    }
+
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+      text-align: left;
+      padding-left: 80px;
+      padding-right: 0;
+    }
+
+    .timeline-dot {
+      left: 20px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .page-hero {
+      padding: 80px 5%;
+    }
+
+    .stat-row {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .timeline {
+      padding-left: 30px;
+    }
+
+    .timeline::before {
+      left: 10px;
+    }
+
+    .timeline-dot {
+      left: 10px;
+    }
+
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+      padding-left: 50px;
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .page-hero {
+      padding: 60px 5%;
+    }
+
+    .stat-row {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .info-card {
+      padding: 30px 20px;
+    }
+
+    .cta-title {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+    }
+  }
+
+  @media (max-width: 380px) {
+    html { font-size: 14px; }
+
+    .page-hero {
+      padding: 40px 4%;
+    }
+
+    .page-hero .section-tag {
+      font-size: 0.65rem;
+      padding: 3px 10px;
+    }
+
+    .page-hero .section-title {
+      font-size: 1.2rem;
+    }
+
+    .page-hero .section-desc {
+      font-size: 0.8rem;
+    }
+
+    section {
+      padding: 40px 4%;
+    }
+
+    .reveal {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .section-tag {
+      font-size: 0.65rem;
+      padding: 3px 10px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      font-size: 0.8rem;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .info-card {
+      padding: 16px 12px;
+    }
+
+    .info-card .icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .info-card h3 {
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .info-card p {
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .roadmap-section {
+      padding: 40px 4%;
+    }
+
+    .roadmap-header {
+      margin-bottom: 32px;
+    }
+
+    .timeline {
+      padding-left: 0;
+      margin-left: 0;
+    }
+
+    .timeline::before {
+      left: 0;
+      display: none;
+    }
+
+    .timeline-item {
+      margin-bottom: 24px;
+      opacity: 1 !important;
+      animation: none !important;
+    }
+
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+      text-align: left;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .timeline-dot {
+      display: none;
+    }
+
+    .timeline-content {
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(0, 255, 200, 0.02) !important;
+    }
+
+    .timeline-quarter {
+      font-size: 0.7rem;
+    }
+
+    .timeline-title {
+      font-size: 0.9rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.75rem;
+    }
+
+    .timeline-status {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      margin-top: 6px;
+    }
+
+    .stat-row {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .stat-box {
+      padding: 16px 12px;
+      border-radius: 12px;
+    }
+
+    .stat-box .num {
+      font-size: 1.4rem;
+    }
+
+    .stat-box .label {
+      font-size: 0.7rem;
+      margin-top: 4px;
+    }
+
+    .cta-section {
+      padding: 60px 4%;
+    }
+
+    .cta-title {
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      margin-bottom: 8px;
+    }
+
+    .cta-btn {
+      padding: 10px 20px;
+      font-size: 0.85rem;
+    }
+
+    footer {
+      padding: 24px 4%;
+    }
+  }
+
+  .lang-switch { display: flex; gap: 2px; background: var(--dark3); border-radius: 8px; padding: 2px; }
+  .lang-btn { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: all .2s; }
+  .lang-btn.active { background: var(--primary); color: #fff; }
+  .lang-btn:hover:not(.active) { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="funs-nugi.png" alt="FunS Logo" height="44">
+    <span>FunS</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games/index.html">Games</a></li>
+    <li><a href="dex/index.html">DEX</a></li>
+    <li><a href="nft/index.html">NFT</a></li>
+    <li><a href="staking/index.html">Staking</a></li>
+    <li><a href="wallet/index.html">지갑</a></li>
+    <li><a href="dashboard/index.html">대시보드</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+  </ul>
+  <div class="lang-switch">
+    <a href="about.html" class="lang-btn active">KR</a>
+    <a href="en/about.html" class="lang-btn">EN</a>
+  </div>
+  <a href="download.html" class="nav-cta">앱 다운로드</a>
+  <button class="menu-toggle">☰</button>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="hero-bg"></div>
+  <span class="section-tag">About</span>
+  <h2 class="section-title">About <span>FunS</span></h2>
+  <p class="section-desc" style="margin:0 auto;">Web3 게이밍의 새로운 기준을 만들어갑니다</p>
+</section>
+
+<!-- MISSION -->
+<section style="padding:100px 5%; background:var(--dark2);">
+  <div class="reveal" style="text-align:center;">
+    <span class="section-tag">Mission</span>
+    <h2 class="section-title">우리의 <span>미션</span></h2>
+    <p class="section-desc" style="margin:0 auto 48px;">게임을 통해 누구나 블록체인 경제에 자연스럽게 참여할 수 있는 세상을 만듭니다.</p>
+  </div>
+  <div class="info-grid" style="max-width:1100px; margin:0 auto;">
+    <div class="info-card reveal">
+      <span class="icon">🎮</span>
+      <h3>게임 중심 생태계</h3>
+      <p>복잡한 블록체인 기술을 게임이라는 친숙한 형태로 제공합니다. 누구나 쉽게 시작하고 즐길 수 있습니다.</p>
+    </div>
+    <div class="info-card reveal">
+      <span class="icon">⚖️</span>
+      <h3>공정한 경제 구조</h3>
+      <p>스마트 컨트랙트 기반의 투명한 운영으로, 모든 거래와 보상이 블록체인에 기록됩니다.</p>
+    </div>
+    <div class="info-card reveal">
+      <span class="icon">🌍</span>
+      <h3>글로벌 접근성</h3>
+      <p>전 세계 어디서든, 어떤 기기에서든 접근할 수 있는 크로스 플랫폼 환경을 구축합니다.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ROADMAP -->
+<section class="roadmap-section">
+  <div class="roadmap-header reveal">
+    <span class="section-tag">로드맵</span>
+    <h2 class="section-title">Roadmap <span>2026</span></h2>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item completed">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-quarter">2025 Q3-Q4</div>
+        <div class="timeline-title">Phase 1 - Platform Launch ✅</div>
+        <div class="timeline-desc">플랫폼 런칭, DEX 베타, 초기 게임 출시</div>
+        <span class="timeline-status">완료됨</span>
+      </div>
+    </div>
+    <div class="timeline-item in-progress">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-quarter">2026 Q1-Q2</div>
+        <div class="timeline-title">Phase 2 - NFT & Staking 🔥</div>
+        <div class="timeline-desc">NFT 마켓플레이스 런칭, 스테이킹 V2, 모바일 앱 출시</div>
+        <span class="timeline-status">진행 중</span>
+      </div>
+    </div>
+    <div class="timeline-item upcoming">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-quarter">2026 Q3-Q4</div>
+        <div class="timeline-title">Phase 3 - Cross-chain & DAO</div>
+        <div class="timeline-desc">크로스체인 브릿지, DAO 거버넌스, 글로벌 파트너십</div>
+        <span class="timeline-status">예정됨</span>
+      </div>
+    </div>
+    <div class="timeline-item upcoming">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="timeline-quarter">2027 Q1+</div>
+        <div class="timeline-title">Phase 4 - Metaverse & AI</div>
+        <div class="timeline-desc">메타버스 통합, AI 게이밍 엔진, IPO 준비</div>
+        <span class="timeline-status">예정됨</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section style="padding:100px 5%;">
+  <div class="reveal" style="text-align:center;">
+    <span class="section-tag">Technology</span>
+    <h2 class="section-title">기술 <span>스택</span></h2>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box reveal">
+      <div class="num">EVM</div>
+      <div class="label">스마트 컨트랙트</div>
+    </div>
+    <div class="stat-box reveal">
+      <div class="num">IPFS</div>
+      <div class="label">분산 스토리지</div>
+    </div>
+    <div class="stat-box reveal">
+      <div class="num">WebGL</div>
+      <div class="label">게임 렌더링</div>
+    </div>
+    <div class="stat-box reveal">
+      <div class="num">AMM</div>
+      <div class="label">DEX 프로토콜</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">함께 미래를 <span style="background:linear-gradient(135deg,var(--primary),#ff9a00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">만들어갑시다</span></h2>
+  <p style="color:var(--muted); max-width:500px; margin:0 auto 40px;">지금 바로 시작하고, FunS 커뮤니티의 일원이 되세요.</p>
+  <a href="download.html" class="cta-btn">지금 시작하기</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo">
+        <img src="funs-nugi.png" alt="FunS" height="44">
+        <span>FunS</span>
+      </a>
+      <p>차세대 Web3 게임 & DEX 플랫폼. 블록체인 기반의 게임과 탈중앙화 거래소를 경험하세요.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="index.html#features">게임 소개</a></li>
+        <li><a href="dex/index.html">FunSwap DEX</a></li>
+        <li><a href="download.html">앱 다운로드</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="index.html#roadmap">Roadmap</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:hello@funs.land">hello@funs.land</a></li>
+        <li><a href="https://telegram.org/">Telegram</a></li>
+        <li><a href="https://www.instagram.com/">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 FunS Platform. All rights reserved.</span>
+    <div class="socials">
+      <a href="https://telegram.org/" class="social-btn">✈️</a>
+      <a href="https://www.instagram.com/" class="social-btn">📸</a>
+      <a href="#" class="social-btn">🐦</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/common.js"></script>
+</body>
+</html>

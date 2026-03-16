@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download — FunS Platform</title>
+<meta name="description" content="Download FunS Platform app for Android or play in your web browser. Get started with Web3 gaming and decentralized trading today.">
+<meta name="keywords" content="download app, Web3 gaming, Android app, blockchain game, FunS platform, crypto gaming, DEX trading">
+<meta property="og:title" content="Download FunS Platform">
+<meta property="og:description" content="Download FunS Platform app for Android or play in your web browser. Get started with Web3 gaming and decentralized trading today.">
+<meta property="og:image" content="https://tololalo.github.io/funs-platform/funs-nugi.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tololalo.github.io/funs-platform/en/download.html">
+<meta property="og:site_name" content="FunS Platform">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../funs-nugi.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/common.css">
+<style>
+  /* Download Cards */
+  .dl-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px; max-width: 900px; margin: 48px auto 0;
+  }
+  .dl-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 24px; padding: 48px 36px; text-align: center;
+    transition: transform .2s, border-color .2s;
+  }
+  .dl-card:hover { transform: translateY(-8px); border-color: rgba(255,107,53,.5); }
+  .dl-card .icon { font-size: 4rem; margin-bottom: 24px; display: block; }
+  .dl-card h3 {
+    font-family: 'Orbitron', monospace; font-size: 1.2rem;
+    color: var(--secondary); margin-bottom: 12px;
+  }
+  .dl-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 28px; }
+  .dl-card .dl-link {
+    display: inline-block; padding: 14px 36px; border-radius: 50px;
+    font-weight: 700; text-decoration: none; font-size: 0.9rem;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .dl-card .dl-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,.4); }
+  .dl-link.primary {
+    background: linear-gradient(135deg, var(--primary), #ff9a00); color: #fff;
+  }
+  .dl-link.outline {
+    border: 2px solid var(--accent); color: var(--accent);
+    background: rgba(79,195,247,.05);
+  }
+
+  /* Install Steps */
+  .install-steps {
+    max-width: 600px; margin: 0 auto;
+  }
+  .install-step {
+    display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px;
+  }
+  .install-step .num {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary), #ff9a00);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-weight: 900; font-size: 0.8rem; color: #fff;
+  }
+  .install-step p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+  .install-step strong { color: var(--text); }
+
+  /* App Stats */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px; max-width: 1000px; margin: 48px auto 0;
+  }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px 24px; text-align: center;
+    transition: transform .2s, border-color .2s;
+  }
+  .stat-card:hover { transform: translateY(-4px); border-color: rgba(255,107,53,.4); }
+  .stat-card .stat-value {
+    font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--primary), #ff9a00);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 12px;
+  }
+  .stat-card .stat-label {
+    color: var(--muted); font-size: 0.95rem; font-weight: 500;
+  }
+
+  /* Preview Cards */
+  .preview-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px; max-width: 1000px; margin: 48px auto 0;
+    overflow-x: auto; padding-bottom: 12px;
+  }
+  .preview-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden; min-width: 260px;
+    transition: transform .2s, border-color .2s;
+  }
+  .preview-card:hover { transform: translateY(-6px); border-color: rgba(255,107,53,.4); }
+  .preview-card .preview-img {
+    width: 100%; height: 280px; background: linear-gradient(135deg, rgba(255,107,53,.1), rgba(79,195,247,.1));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3.5rem; border-bottom: 1px solid var(--border);
+  }
+  .preview-card .preview-content {
+    padding: 24px;
+  }
+  .preview-card .preview-title {
+    font-weight: 700; color: var(--text); margin-bottom: 8px; font-size: 1rem;
+  }
+  .preview-card .preview-desc {
+    color: var(--muted); font-size: 0.85rem; line-height: 1.6;
+  }
+
+  /* Review Cards */
+  .reviews-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px; max-width: 1000px; margin: 48px auto 0;
+  }
+  .review-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px; transition: transform .2s, border-color .2s;
+  }
+  .review-card:hover { transform: translateY(-4px); border-color: rgba(255,107,53,.4); }
+  .review-stars {
+    font-size: 0.95rem; margin-bottom: 16px; letter-spacing: 2px;
+  }
+  .review-text {
+    color: var(--text); font-size: 0.95rem; line-height: 1.7;
+    font-style: italic; margin-bottom: 16px;
+  }
+  .review-author {
+    color: var(--muted); font-size: 0.85rem; font-weight: 500;
+  }
+
+  /* FAQ Section */
+  .faq-container {
+    max-width: 700px; margin: 48px auto 0;
+  }
+  .faq-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; margin-bottom: 16px; overflow: hidden;
+    transition: border-color .2s;
+  }
+  .faq-item.active { border-color: rgba(255,107,53,.5); }
+  .faq-question {
+    padding: 24px; cursor: pointer; display: flex;
+    justify-content: space-between; align-items: center;
+    color: var(--text); font-weight: 600; font-size: 0.95rem;
+    transition: color .2s;
+  }
+  .faq-question:hover { color: var(--primary); }
+  .faq-toggle {
+    display: inline-block; font-size: 1.2rem; transition: transform .3s;
+    font-weight: 300;
+  }
+  .faq-item.active .faq-toggle { transform: rotate(45deg); }
+  .faq-answer {
+    max-height: 0; overflow: hidden; transition: max-height .3s ease;
+    padding: 0 24px;
+  }
+  .faq-item.active .faq-answer {
+    max-height: 300px; padding: 0 24px 24px;
+  }
+  .faq-answer p {
+    color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .preview-grid {
+      grid-template-columns: 1fr;
+    }
+    .reviews-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .stat-card .stat-value {
+      font-size: 1.6rem;
+    }
+    .preview-card .preview-img {
+      height: 200px; font-size: 2.5rem;
+    }
+    .faq-question {
+      padding: 18px;
+    }
+    .faq-answer {
+      padding: 0 18px;
+    }
+    .faq-item.active .faq-answer {
+      padding: 0 18px 18px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="../funs-nugi.png" alt="FunS Logo" height="44">
+    <span>FunS</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="games/index.html">Games</a></li>
+    <li><a href="../dex/en.html">DEX</a></li>
+    <li><a href="nft/index.html">NFT</a></li>
+    <li><a href="staking/index.html">Staking</a></li>
+    <li><a href="wallet/index.html">Wallet</a></li>
+    <li><a href="dashboard/index.html">Dashboard</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <div style="display: flex; gap: 8px; border: 1px solid rgba(0, 255, 200, 0.3); border-radius: 8px; padding: 4px;">
+      <a href="download.html" style="padding: 6px 12px; color: #fff; text-decoration: none; border-radius: 6px; background: rgba(0, 255, 200, 0.1);">EN</a>
+      <a href="../download.html" style="padding: 6px 12px; color: var(--muted); text-decoration: none; border-radius: 6px;">KR</a>
+    </div>
+    <a href="download.html" class="nav-cta">Download</a>
+  </div>
+  <button class="menu-toggle">☰</button>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero" style="position: relative;">
+  <div class="hero-bg"></div>
+  <div style="text-align: center; position: relative; z-index: 1;">
+    <div style="font-size: 5rem; margin-bottom: 24px; animation: bounce 2s infinite;">⬇️</div>
+    <h1 style="font-family: 'Orbitron', monospace; font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 900; margin: 0 0 16px; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Download FunS</h1>
+    <p style="font-size: clamp(1rem, 3vw, 1.3rem); color: var(--muted); margin: 0 auto; max-width: 600px;">Enjoy Web3 gaming anywhere</p>
+  </div>
+  <style>
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
+</section>
+
+<!-- DOWNLOAD OPTIONS -->
+<section style="padding:100px 5%;">
+  <div class="dl-grid">
+    <div class="dl-card reveal">
+      <span class="icon">🤖</span>
+      <h3>Android</h3>
+      <p>Supports Android 8.0 and above. Install APK directly.</p>
+      <a href="../apk/funs-land.apk" class="dl-link primary">Download APK</a>
+    </div>
+    <div class="dl-card reveal">
+      <span class="icon">🌐</span>
+      <h3>Web Browser</h3>
+      <p>No installation needed. Access via web browser on PC or mobile.</p>
+      <a href="https://funsworld.com/" class="dl-link outline">Play in Browser</a>
+    </div>
+  </div>
+</section>
+
+<!-- APP STATS -->
+<section style="padding:80px 5%; background:var(--dark2);">
+  <div class="reveal" style="text-align:center; margin-bottom: 48px;">
+    <span class="section-tag">App Stats</span>
+    <h2 class="section-title">FunS <span>Statistics</span></h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card reveal">
+      <div class="stat-value">50K+</div>
+      <div class="stat-label">Downloads</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="stat-value">4.6★</div>
+      <div class="stat-label">Average Rating</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="stat-value">98MB</div>
+      <div class="stat-label">App Size</div>
+    </div>
+    <div class="stat-card reveal">
+      <div class="stat-value">8.0+</div>
+      <div class="stat-label">Supported Devices</div>
+    </div>
+  </div>
+</section>
+
+<!-- APP SCREENSHOTS/PREVIEW -->
+<section style="padding:80px 5%;">
+  <div class="reveal" style="text-align:center; margin-bottom: 48px;">
+    <span class="section-tag">Preview</span>
+    <h2 class="section-title">App <span>Preview</span></h2>
+  </div>
+  <div class="preview-grid">
+    <div class="preview-card reveal">
+      <div class="preview-img">🎮</div>
+      <div class="preview-content">
+        <div class="preview-title">Game Lobby</div>
+        <div class="preview-desc">Multiple Web3 games at a glance</div>
+      </div>
+    </div>
+    <div class="preview-card reveal">
+      <div class="preview-img">💰</div>
+      <div class="preview-content">
+        <div class="preview-title">Wallet & Rewards</div>
+        <div class="preview-desc">Manage FUNS tokens and check rewards</div>
+      </div>
+    </div>
+    <div class="preview-card reveal">
+      <div class="preview-img">🔄</div>
+      <div class="preview-content">
+        <div class="preview-title">DEX Trading</div>
+        <div class="preview-desc">Swap tokens directly in the app</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL GUIDE -->
+<section style="padding:80px 5%; background:var(--dark2);">
+  <div class="reveal" style="text-align:center;">
+    <span class="section-tag">Install Guide</span>
+    <h2 class="section-title">Android <span>Installation Guide</span></h2>
+    <p class="section-desc" style="margin:0 auto 48px;">New to installing APK files? Follow the steps below.</p>
+  </div>
+  <div class="install-steps">
+    <div class="install-step reveal">
+      <div class="num">1</div>
+      <p><strong>Download APK</strong> — Click the button above to download the APK file.</p>
+    </div>
+    <div class="install-step reveal">
+      <div class="num">2</div>
+      <p><strong>Allow Unknown Sources</strong> — Go to Settings → Security → enable "Allow installation from unknown sources". (One time only)</p>
+    </div>
+    <div class="install-step reveal">
+      <div class="num">3</div>
+      <p><strong>Run Installation</strong> — Tap the downloaded APK file and proceed with installation.</p>
+    </div>
+    <div class="install-step reveal">
+      <div class="num">4</div>
+      <p><strong>Launch App</strong> — After installation, open the app and complete registration. You can start playing immediately!</p>
+    </div>
+  </div>
+</section>
+
+<!-- REQUIREMENTS -->
+<section style="padding:80px 5%;">
+  <div class="reveal" style="text-align:center;">
+    <span class="section-tag">Requirements</span>
+    <h2 class="section-title">System <span>Requirements</span></h2>
+  </div>
+  <div class="stat-row">
+    <div class="stat-box reveal">
+      <div class="num">8.0+</div>
+      <div class="label">Android OS</div>
+    </div>
+    <div class="stat-box reveal">
+      <div class="num">2GB+</div>
+      <div class="label">RAM</div>
+    </div>
+    <div class="stat-box reveal">
+      <div class="num">100MB</div>
+      <div class="label">Storage Space</div>
+    </div>
+    <div class="stat-box reveal">
+      <div class="num">Wi-Fi</div>
+      <div class="label">Internet Connection</div>
+    </div>
+  </div>
+</section>
+
+<!-- USER REVIEWS -->
+<section style="padding:80px 5%; background:var(--dark2);">
+  <div class="reveal" style="text-align:center; margin-bottom: 48px;">
+    <span class="section-tag">Reviews</span>
+    <h2 class="section-title">User <span>Reviews</span></h2>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card reveal">
+      <div class="review-stars">⭐⭐⭐⭐⭐</div>
+      <div class="review-text">"Great to earn tokens while gaming!"</div>
+      <div class="review-author">— User A</div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">⭐⭐⭐⭐⭐</div>
+      <div class="review-text">"DEX is convenient to use within the app"</div>
+      <div class="review-author">— User B</div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">⭐⭐⭐⭐</div>
+      <div class="review-text">"Would love to see more game varieties"</div>
+      <div class="review-author">— User C</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding:80px 5%;">
+  <div class="reveal" style="text-align:center; margin-bottom: 48px;">
+    <span class="section-tag">FAQ</span>
+    <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
+  </div>
+  <div class="faq-container">
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+        <span>Is the FunS app free?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">
+        <p>Yes, the FunS app is completely free to download and use. There are no in-app purchases or hidden fees. You can enjoy games and earn tokens at no cost.</p>
+      </div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+        <span>What devices are supported?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">
+        <p>FunS supports Android 8.0 and above. You can install the APK directly or access via web browser on both PC and mobile devices.</p>
+      </div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+        <span>How do I use tokens earned from games?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">
+        <p>FUNS tokens earned from games can be swapped for other cryptocurrencies via FunSwap DEX in the app, stored in your wallet, or used whenever needed.</p>
+      </div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+        <span>Is it secure?</span>
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-answer">
+        <p>FunS is built on blockchain technology and securely protects your wallet and assets. Your private keys are stored only on your device, and we have no access to them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo">
+        <img src="../funs-nugi.png" alt="FunS" height="44">
+        <span>FunS</span>
+      </a>
+      <p>Next-generation Web3 gaming & DEX platform. Experience blockchain-based games and decentralized exchange.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="index.html#features">Games</a></li>
+        <li><a href="../dex/en.html">FunSwap DEX</a></li>
+        <li><a href="download.html">Download App</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="index.html#roadmap">Roadmap</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:hello@funs.land">hello@funs.land</a></li>
+        <li><a href="https://telegram.org/">Telegram</a></li>
+        <li><a href="https://www.instagram.com/">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 FunS Platform. All rights reserved.</span>
+    <div class="socials">
+      <a href="https://telegram.org/" class="social-btn">✈️</a>
+      <a href="https://www.instagram.com/" class="social-btn">📸</a>
+      <a href="#" class="social-btn">🐦</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/common.js"></script>
+</body>
+</html>

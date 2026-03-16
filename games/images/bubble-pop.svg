@@ -1,0 +1,117 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="400" height="300" fill="#0D1120"/>
+
+  <!-- Defs for gradients -->
+  <defs>
+    <radialGradient id="bubbleShine1" cx="35%" cy="35%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="bubbleShine2" cx="35%" cy="35%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Honeycomb arrangement of colored bubbles -->
+  <!-- Row 1 (top) -->
+  <circle cx="60" cy="40" r="18" fill="#FF6B35" stroke="#ff5500" stroke-width="1"/>
+  <circle cx="60" cy="40" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="7" cy="8" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="120" cy="40" r="18" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="1"/>
+  <circle cx="120" cy="40" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="127" cy="8" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="180" cy="40" r="18" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+  <circle cx="180" cy="40" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="187" cy="8" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="240" cy="40" r="18" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <circle cx="240" cy="40" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="247" cy="8" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="300" cy="40" r="18" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <circle cx="300" cy="40" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="307" cy="8" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="360" cy="40" r="18" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <circle cx="360" cy="40" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="367" cy="8" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <!-- Row 2 (middle staggered) -->
+  <circle cx="90" cy="95" r="18" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="1"/>
+  <circle cx="90" cy="95" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="97" cy="63" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="150" cy="95" r="18" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+  <circle cx="150" cy="95" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="157" cy="63" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="210" cy="95" r="18" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <circle cx="210" cy="95" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="217" cy="63" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="270" cy="95" r="18" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <circle cx="270" cy="95" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="277" cy="63" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="330" cy="95" r="18" fill="#FF6B35" stroke="#ff5500" stroke-width="1"/>
+  <circle cx="330" cy="95" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="337" cy="63" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <!-- Row 3 (bottom staggered) -->
+  <circle cx="60" cy="150" r="18" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <circle cx="60" cy="150" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="67" cy="118" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="120" cy="150" r="18" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <circle cx="120" cy="150" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="127" cy="118" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="180" cy="150" r="18" fill="#FF6B35" stroke="#ff5500" stroke-width="1"/>
+  <circle cx="180" cy="150" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="187" cy="118" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="240" cy="150" r="18" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="1"/>
+  <circle cx="240" cy="150" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="247" cy="118" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="300" cy="150" r="18" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+  <circle cx="300" cy="150" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="307" cy="118" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <circle cx="360" cy="150" r="18" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <circle cx="360" cy="150" r="15" fill="url(#bubbleShine1)"/>
+  <circle cx="367" cy="118" r="3" fill="#ffffff" opacity="0.6"/>
+
+  <!-- Some bubbles mid-pop (dashed circles fading out) -->
+  <circle cx="100" cy="110" r="18" fill="none" stroke="#FFD700" stroke-width="2" stroke-dasharray="4,4" opacity="0.5"/>
+  <circle cx="100" cy="110" r="14" fill="none" stroke="#FFD700" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.3"/>
+
+  <circle cx="280" cy="75" r="18" fill="none" stroke="#4FC3F7" stroke-width="2" stroke-dasharray="4,4" opacity="0.5"/>
+  <circle cx="280" cy="75" r="14" fill="none" stroke="#4FC3F7" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.3"/>
+
+  <!-- Pop particles -->
+  <circle cx="95" cy="95" r="1.5" fill="#FFD700" opacity="0.7"/>
+  <circle cx="110" cy="105" r="1" fill="#FFD700" opacity="0.5"/>
+  <circle cx="105" cy="115" r="1.5" fill="#FFD700" opacity="0.6"/>
+
+  <circle cx="270" cy="60" r="1.5" fill="#4FC3F7" opacity="0.7"/>
+  <circle cx="290" cy="70" r="1" fill="#4FC3F7" opacity="0.5"/>
+  <circle cx="275" cy="80" r="1.5" fill="#4FC3F7" opacity="0.6"/>
+
+  <!-- Aiming line from bottom center -->
+  <line x1="200" y1="200" x2="200" y2="250" stroke="#FFD700" stroke-width="1.5" opacity="0.6" stroke-dasharray="2,2"/>
+  <line x1="200" y1="200" x2="180" y2="180" stroke="#FFD700" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,2"/>
+  <line x1="200" y1="200" x2="220" y2="180" stroke="#FFD700" stroke-width="1.5" opacity="0.4" stroke-dasharray="2,2"/>
+
+  <!-- One bubble ready to shoot at bottom -->
+  <circle cx="200" cy="210" r="20" fill="#FFD700" stroke="#ffa500" stroke-width="2"/>
+  <circle cx="200" cy="210" r="17" fill="url(#bubbleShine2)"/>
+  <circle cx="207" cy="203" r="4" fill="#ffffff" opacity="0.7"/>
+
+  <!-- Title at bottom -->
+  <text x="200" y="290" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFD700" text-anchor="middle">BUBBLE POP</text>
+</svg>

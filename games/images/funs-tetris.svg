@@ -1,0 +1,110 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="400" height="300" fill="#0D1120"/>
+
+  <!-- Faint grid lines for tetris board -->
+  <defs>
+    <pattern id="gridPattern" width="30" height="30" patternUnits="userSpaceOnUse">
+      <rect width="30" height="30" fill="none" stroke="#1a2847" stroke-width="0.5"/>
+    </pattern>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Grid background for bottom 2/3 -->
+  <rect x="50" y="100" width="300" height="180" fill="url(#gridPattern)" stroke="#2a3f5f" stroke-width="2"/>
+
+  <!-- Stacked placed blocks (6-7 rows) -->
+  <!-- Row 6 (bottom) -->
+  <rect x="50" y="250" width="30" height="30" fill="#FF6B35" stroke="#ff5500" stroke-width="1"/>
+  <rect x="80" y="250" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="1"/>
+  <rect x="110" y="250" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="1"/>
+  <rect x="140" y="250" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="1"/>
+  <rect x="170" y="250" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+  <rect x="200" y="250" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+  <rect x="230" y="250" width="30" height="30" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <rect x="260" y="250" width="30" height="30" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <rect x="290" y="250" width="30" height="30" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <rect x="320" y="250" width="30" height="30" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+
+  <!-- Row 5 (complete line - glowing) -->
+  <g filter="url(#glow)">
+    <rect x="50" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="80" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="110" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="140" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="170" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="200" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="230" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="260" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="290" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+    <rect x="320" y="220" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+  </g>
+
+  <!-- Row 4 -->
+  <rect x="50" y="190" width="30" height="30" fill="#42A5F5" stroke="#1e88e5" stroke-width="1"/>
+  <rect x="80" y="190" width="30" height="30" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <rect x="110" y="190" width="30" height="30" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <rect x="140" y="190" width="30" height="30" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <rect x="170" y="190" width="30" height="30" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <rect x="200" y="190" width="30" height="30" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <rect x="230" y="190" width="30" height="30" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <rect x="260" y="190" width="30" height="30" fill="#FF6B35" stroke="#ff5500" stroke-width="1"/>
+  <rect x="290" y="190" width="30" height="30" fill="#FF6B35" stroke="#ff5500" stroke-width="1"/>
+  <rect x="320" y="190" width="30" height="30" fill="#42A5F5" stroke="#1e88e5" stroke-width="1"/>
+
+  <!-- Row 3 -->
+  <rect x="50" y="160" width="30" height="30" fill="#42A5F5" stroke="#1e88e5" stroke-width="1"/>
+  <rect x="110" y="160" width="30" height="30" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <rect x="140" y="160" width="30" height="30" fill="#81C784" stroke="#66bb6a" stroke-width="1"/>
+  <rect x="170" y="160" width="30" height="30" fill="#FFD700" stroke="#ffa500" stroke-width="1"/>
+  <rect x="200" y="160" width="30" height="30" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <rect x="230" y="160" width="30" height="30" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <rect x="260" y="160" width="30" height="30" fill="#FF6B35" stroke="#ff5500" stroke-width="1"/>
+  <rect x="320" y="160" width="30" height="30" fill="#42A5F5" stroke="#1e88e5" stroke-width="1"/>
+
+  <!-- Row 2 -->
+  <rect x="80" y="130" width="30" height="30" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <rect x="110" y="130" width="30" height="30" fill="#CE93D8" stroke="#ab47bc" stroke-width="1"/>
+  <rect x="170" y="130" width="30" height="30" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <rect x="200" y="130" width="30" height="30" fill="#ef5350" stroke="#d32f2f" stroke-width="1"/>
+  <rect x="230" y="130" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="1"/>
+
+  <!-- Falling I-piece (cyan) from top -->
+  <g filter="url(#motion)">
+    <rect x="155" y="60" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="2"/>
+    <rect x="155" y="90" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="2"/>
+    <rect x="155" y="120" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="2"/>
+    <rect x="155" y="150" width="30" height="30" fill="#4FC3F7" stroke="#2fa8d8" stroke-width="2"/>
+  </g>
+
+  <!-- Motion trail (fading) -->
+  <rect x="155" y="45" width="30" height="30" fill="#4FC3F7" opacity="0.3"/>
+  <rect x="155" y="30" width="30" height="30" fill="#4FC3F7" opacity="0.15"/>
+
+  <!-- Particle sparkles from line clear -->
+  <circle cx="100" cy="210" r="2" fill="#FFD700" opacity="0.8"/>
+  <circle cx="150" cy="200" r="2" fill="#FFD700" opacity="0.8"/>
+  <circle cx="200" cy="215" r="2" fill="#FFD700" opacity="0.8"/>
+  <circle cx="270" cy="205" r="2" fill="#FFD700" opacity="0.8"/>
+  <circle cx="320" cy="210" r="2" fill="#FFD700" opacity="0.8"/>
+
+  <!-- Score display top-right -->
+  <rect x="300" y="15" width="85" height="50" fill="rgba(0,0,0,0.5)" stroke="#4FC3F7" stroke-width="2" rx="5"/>
+  <text x="342" y="30" font-family="Arial, sans-serif" font-size="12" fill="#4FC3F7" text-anchor="middle">SCORE</text>
+  <text x="342" y="50" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#FFD700" text-anchor="middle">12,850</text>
+
+  <!-- Title at bottom -->
+  <text x="200" y="290" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFD700" text-anchor="middle">FUNS TETRIS</text>
+
+  <defs>
+    <filter id="motion">
+      <feGaussianBlur stdDeviation="0.5"/>
+    </filter>
+  </defs>
+</svg>

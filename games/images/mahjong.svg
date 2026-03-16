@@ -1,0 +1,151 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="400" height="300" fill="#0D1120"/>
+
+  <!-- Cherry blossom petals floating -->
+  <circle cx="50" cy="60" r="3" fill="#FFB6C1" opacity="0.6"/>
+  <circle cx="120" cy="45" r="3" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="200" cy="70" r="3" fill="#FFB6C1" opacity="0.6"/>
+  <circle cx="330" cy="50" r="3" fill="#FFB6C1" opacity="0.5"/>
+  <circle cx="80" cy="150" r="2.5" fill="#FFB6C1" opacity="0.4"/>
+  <circle cx="320" cy="160" r="2.5" fill="#FFB6C1" opacity="0.4"/>
+
+  <!-- Defs for gradients and filters -->
+  <defs>
+    <linearGradient id="tileGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0.3"/>
+    </linearGradient>
+    <filter id="goldGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Pyramid of mahjong tiles -->
+  <!-- Bottom row (6 tiles) -->
+  <g>
+    <!-- Tile 1 -->
+    <rect x="60" y="210" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="62" y="212" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <circle cx="80" cy="232" r="4" fill="#FFD700"/>
+    <circle cx="80" cy="245" r="4" fill="#FFD700"/>
+
+    <!-- Tile 2 -->
+    <rect x="105" y="210" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="107" y="212" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="125" y="245" font-family="Arial" font-size="20" fill="#FFD700" text-anchor="middle" font-weight="bold">一</text>
+
+    <!-- Tile 3 -->
+    <rect x="150" y="210" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="152" y="212" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <line x1="160" y1="225" x2="180" y2="225" stroke="#FFD700" stroke-width="3"/>
+    <line x1="160" y1="235" x2="180" y2="235" stroke="#FFD700" stroke-width="3"/>
+    <line x1="160" y1="245" x2="180" y2="245" stroke="#FFD700" stroke-width="3"/>
+
+    <!-- Tile 4 -->
+    <rect x="195" y="210" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="197" y="212" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="215" y="245" font-family="Arial" font-size="20" fill="#FFD700" text-anchor="middle" font-weight="bold">万</text>
+
+    <!-- Tile 5 - HIGHLIGHTED with gold glow -->
+    <g filter="url(#goldGlow)">
+      <rect x="240" y="210" width="40" height="50" fill="#3a5a8f" stroke="#FFD700" stroke-width="2.5" rx="3"/>
+      <rect x="242" y="212" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+      <circle cx="260" cy="232" r="5" fill="#FFD700"/>
+      <circle cx="260" cy="247" r="5" fill="#FFD700"/>
+    </g>
+
+    <!-- Tile 6 -->
+    <rect x="285" y="210" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="287" y="212" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="305" y="245" font-family="Arial" font-size="18" fill="#FFD700" text-anchor="middle" font-weight="bold">索</text>
+  </g>
+
+  <!-- Second row (5 tiles) -->
+  <g>
+    <!-- Tile 1 -->
+    <rect x="82" y="150" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="84" y="152" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <circle cx="102" cy="172" r="4" fill="#FF6B35"/>
+    <circle cx="102" cy="185" r="4" fill="#FF6B35"/>
+
+    <!-- Tile 2 -->
+    <rect x="127" y="150" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="129" y="152" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="147" y="185" font-family="Arial" font-size="20" fill="#FF6B35" text-anchor="middle" font-weight="bold">二</text>
+
+    <!-- Tile 3 -->
+    <rect x="172" y="150" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="174" y="152" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <line x1="182" y1="165" x2="202" y2="165" stroke="#81C784" stroke-width="3"/>
+    <line x1="182" y1="175" x2="202" y2="175" stroke="#81C784" stroke-width="3"/>
+
+    <!-- Tile 4 - HIGHLIGHTED with gold glow -->
+    <g filter="url(#goldGlow)">
+      <rect x="217" y="150" width="40" height="50" fill="#3a5a8f" stroke="#FFD700" stroke-width="2.5" rx="3"/>
+      <rect x="219" y="152" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+      <circle cx="237" cy="172" r="5" fill="#FFD700"/>
+      <circle cx="237" cy="187" r="5" fill="#FFD700"/>
+    </g>
+
+    <!-- Tile 5 -->
+    <rect x="262" y="150" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="264" y="152" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="282" y="185" font-family="Arial" font-size="18" fill="#CE93D8" text-anchor="middle" font-weight="bold">東</text>
+  </g>
+
+  <!-- Third row (4 tiles) -->
+  <g>
+    <!-- Tile 1 -->
+    <rect x="104" y="90" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="106" y="92" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="124" y="125" font-family="Arial" font-size="20" fill="#CE93D8" text-anchor="middle" font-weight="bold">三</text>
+
+    <!-- Tile 2 -->
+    <rect x="149" y="90" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="151" y="92" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <line x1="159" y1="105" x2="179" y2="105" stroke="#4FC3F7" stroke-width="2"/>
+    <line x1="159" y1="115" x2="179" y2="115" stroke="#4FC3F7" stroke-width="2"/>
+    <line x1="159" y1="125" x2="179" y2="125" stroke="#4FC3F7" stroke-width="2"/>
+
+    <!-- Tile 3 -->
+    <rect x="194" y="90" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="196" y="92" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <circle cx="214" cy="110" r="4" fill="#81C784"/>
+    <circle cx="214" cy="125" r="4" fill="#81C784"/>
+
+    <!-- Tile 4 -->
+    <rect x="239" y="90" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="241" y="92" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="259" y="125" font-family="Arial" font-size="18" fill="#FF6B35" text-anchor="middle" font-weight="bold">南</text>
+  </g>
+
+  <!-- Top row (3 tiles) -->
+  <g>
+    <!-- Tile 1 -->
+    <rect x="126" y="30" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="128" y="32" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="146" y="65" font-family="Arial" font-size="20" fill="#FFD700" text-anchor="middle" font-weight="bold">白</text>
+
+    <!-- Tile 2 -->
+    <rect x="171" y="30" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="173" y="32" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="191" y="65" font-family="Arial" font-size="20" fill="#FF6B35" text-anchor="middle" font-weight="bold">發</text>
+
+    <!-- Tile 3 -->
+    <rect x="216" y="30" width="40" height="50" fill="#2a4a7f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+    <rect x="218" y="32" width="36" height="46" fill="url(#tileGrad)" rx="2"/>
+    <text x="236" y="65" font-family="Arial" font-size="20" fill="#81C784" text-anchor="middle" font-weight="bold">中</text>
+  </g>
+
+  <!-- Gold glow line between matched tiles -->
+  <line x1="260" y1="210" x2="237" y2="200" stroke="#FFD700" stroke-width="2" opacity="0.7"/>
+  <circle cx="248" cy="205" r="3" fill="#FFD700" opacity="0.8"/>
+
+  <!-- Title at bottom -->
+  <text x="200" y="290" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFD700" text-anchor="middle">사천성</text>
+</svg>

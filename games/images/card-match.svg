@@ -1,0 +1,110 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="400" height="300" fill="#0D1120"/>
+
+  <!-- Defs for gradients and filters -->
+  <defs>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a4a7f;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#1a2a5f;stop-opacity:1"/>
+    </linearGradient>
+    <filter id="sparkle">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 4x3 grid of cards -->
+  <!-- Row 1 -->
+  <!-- Card 1 (face-down) -->
+  <rect x="30" y="30" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="52.5" y="62" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 2 (face-up - Star) -->
+  <rect x="85" y="30" width="45" height="55" fill="#3a5a9f" stroke="#FFD700" stroke-width="1.5" rx="3"/>
+  <polygon points="107.5,40 111,50 121,50 113,56 116,66 107.5,60 99,66 102,56 94,50 104,50" fill="#FFD700"/>
+
+  <!-- Card 3 (face-down) -->
+  <rect x="140" y="30" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="162.5" y="62" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 4 (face-up - Heart) -->
+  <rect x="195" y="30" width="45" height="55" fill="#3a5a9f" stroke="#ef5350" stroke-width="1.5" rx="3"/>
+  <path d="M217.5 40 Q220 35 224 35 Q227 35 229 38 Q227 35 224 35 Q220 35 217.5 40 M217.5 40 L210 50 Q217.5 58 217.5 62 Q217.5 58 225 50 L217.5 40" fill="#ef5350"/>
+
+  <!-- Card 5 (face-down) -->
+  <rect x="250" y="30" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="272.5" y="62" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 6 (face-up - Diamond) -->
+  <rect x="305" y="30" width="45" height="55" fill="#3a5a9f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <polygon points="327.5,40 335,57.5 327.5,75 320,57.5" fill="#4FC3F7"/>
+
+  <!-- Row 2 -->
+  <!-- Card 7 (face-down) -->
+  <rect x="30" y="100" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="52.5" y="132" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 8 (face-up - Crown) -->
+  <rect x="85" y="100" width="45" height="55" fill="#3a5a9f" stroke="#CE93D8" stroke-width="1.5" rx="3"/>
+  <path d="M100 130 L115 130 M102 125 L104 118 M107.5 115 L107.5 122 M113 118 L115 125" stroke="#CE93D8" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Card 9 (face-down) -->
+  <rect x="140" y="100" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="162.5" y="132" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 10 (face-up - Star - MATCHING PAIR) -->
+  <g filter="url(#sparkle)">
+    <rect x="195" y="100" width="45" height="55" fill="#3a5a9f" stroke="#FFD700" stroke-width="2" rx="3"/>
+    <polygon points="217.5,110 221,120 231,120 223,126 226,136 217.5,130 209,136 212,126 204,120 214,120" fill="#FFD700"/>
+  </g>
+
+  <!-- Card 11 (face-down) -->
+  <rect x="250" y="100" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="272.5" y="132" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 12 (face-up - Heart) -->
+  <rect x="305" y="100" width="45" height="55" fill="#3a5a9f" stroke="#ef5350" stroke-width="1.5" rx="3"/>
+  <path d="M327.5 110 Q330 105 334 105 Q337 105 339 108 Q337 105 334 105 Q330 105 327.5 110 M327.5 110 L320 120 Q327.5 128 327.5 132 Q327.5 128 335 120 L327.5 110" fill="#ef5350"/>
+
+  <!-- Row 3 -->
+  <!-- Card 13 (face-down) -->
+  <rect x="30" y="170" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="52.5" y="202" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 14 (face-up - Diamond) -->
+  <rect x="85" y="170" width="45" height="55" fill="#3a5a9f" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <polygon points="107.5,180 115,197.5 107.5,215 100,197.5" fill="#4FC3F7"/>
+
+  <!-- Card 15 (face-down) -->
+  <rect x="140" y="170" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="162.5" y="202" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 16 (face-up - Crown) -->
+  <rect x="195" y="170" width="45" height="55" fill="#3a5a9f" stroke="#CE93D8" stroke-width="1.5" rx="3"/>
+  <path d="M210 200 L225 200 M212 195 L214 188 M217.5 185 L217.5 192 M223 188 L225 195" stroke="#CE93D8" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Card 17 (face-down) -->
+  <rect x="250" y="170" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="272.5" y="202" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Card 18 (face-down) -->
+  <rect x="305" y="170" width="45" height="55" fill="url(#cardGrad)" stroke="#4FC3F7" stroke-width="1.5" rx="3"/>
+  <text x="327.5" y="202" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#4FC3F7" text-anchor="middle" dominant-baseline="middle">?</text>
+
+  <!-- Glowing line connecting matched stars (Card 2 and Card 10) -->
+  <line x1="107.5" y1="85" x2="217.5" y2="100" stroke="#FFD700" stroke-width="2" opacity="0.7"/>
+  <circle cx="162.5" cy="92" r="3" fill="#FFD700" opacity="0.8"/>
+
+  <!-- Sparkle effects around matched pair -->
+  <circle cx="100" cy="80" r="2" fill="#FFD700" opacity="0.8"/>
+  <circle cx="225" cy="90" r="2" fill="#FFD700" opacity="0.8"/>
+  <circle cx="115" cy="75" r="1.5" fill="#FFD700" opacity="0.6"/>
+  <circle cx="210" cy="95" r="1.5" fill="#FFD700" opacity="0.6"/>
+
+  <!-- Title at bottom -->
+  <text x="200" y="290" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFD700" text-anchor="middle">CARD MATCH</text>
+</svg>

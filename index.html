@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunS Platform - Web3 Game & DEX</title>
+<meta name="description" content="FunS Platform - Web3 게이밍 플랫폼. 게임 플레이로 실제 가치를 얻고, FunSwap DEX에서 토큰을 교환하세요.">
+<meta name="keywords" content="FunS, Web3, blockchain, gaming, DEX, NFT, BNB Chain, crypto games, play to earn">
+<meta property="og:title" content="FunS Platform - Web3 Game & DEX">
+<meta property="og:description" content="Web3 게이밍 플랫폼. 게임, DEX, NFT 마켓플레이스.">
+<meta property="og:image" content="https://tololalo.github.io/funs-platform/funs-nugi.png">
+<meta property="og:url" content="https://tololalo.github.io/funs-platform/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="funs-nugi.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/common.css">
+<style>
+/* Floating Particle Animation */
+.hero-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #00ff88, #00aa55);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.6;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+}
+
+.particle-1 {
+  top: 15%;
+  left: 10%;
+  animation: float-particle 8s ease-in-out infinite;
+}
+
+.particle-2 {
+  top: 30%;
+  right: 15%;
+  animation: float-particle 10s ease-in-out infinite 1s;
+}
+
+.particle-3 {
+  top: 50%;
+  left: 5%;
+  animation: float-particle 12s ease-in-out infinite 2s;
+}
+
+.particle-4 {
+  bottom: 20%;
+  right: 10%;
+  animation: float-particle 9s ease-in-out infinite 1.5s;
+}
+
+.particle-5 {
+  top: 60%;
+  right: 25%;
+  animation: float-particle 11s ease-in-out infinite 0.5s;
+}
+
+@keyframes float-particle {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-30px) translateX(15px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-60px) translateX(-15px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(-30px) translateX(20px);
+    opacity: 0.7;
+  }
+}
+
+/* Ecosystem Card Hover Glow */
+.eco-list li {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.eco-list li:hover {
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.3), 0 0 60px rgba(0, 255, 136, 0.15);
+  border-color: rgba(0, 255, 136, 0.5);
+}
+
+/* Counter Animation */
+.stat-num {
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #00ff88 0%, #00dd77 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: all 0.3s ease;
+}
+
+.stat-num.counting {
+  font-size: 2.8rem;
+}
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+  .stat-num {
+    font-size: 1.8rem;
+  }
+
+  .stat-num.counting {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .stat-num {
+    font-size: 1.5rem;
+  }
+
+  .stat-num.counting {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .stat-num {
+    font-size: 1.2rem;
+  }
+
+  .stat-num.counting {
+    font-size: 1.4rem;
+  }
+}
+
+.lang-switch { display: flex; gap: 2px; background: var(--dark3); border-radius: 8px; padding: 2px; }
+.lang-btn { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: all .2s; }
+.lang-btn.active { background: var(--primary); color: #fff; }
+.lang-btn:hover:not(.active) { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="funs-nugi.png" alt="FunS Logo">
+    <span>FunS</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="games/index.html">Games</a></li>
+    <li><a href="dex/index.html">DEX</a></li>
+    <li><a href="nft/index.html">NFT</a></li>
+    <li><a href="staking/index.html">Staking</a></li>
+    <li><a href="wallet/index.html">지갑</a></li>
+    <li><a href="dashboard/index.html">대시보드</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+  <div class="lang-switch">
+    <a href="index.html" class="lang-btn active">KR</a>
+    <a href="en/index.html" class="lang-btn">EN</a>
+  </div>
+  <a href="#cta" class="nav-cta">앱 다운로드</a>
+  <button class="menu-toggle">☰</button>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap" style="margin-top:72px;">
+  <div class="ticker">
+    <span class="ticker-item">🎮 Web3 Ecosystem</span>
+    <span class="ticker-item">⚡ Play-to-Earn Game</span>
+    <span class="ticker-item">💎 NFT Characters</span>
+    <span class="ticker-item">🔄 Decentralized Exchange</span>
+    <span class="ticker-item">🌐 Crypto Games</span>
+    <span class="ticker-item">🚀 FUNS Coin <span class="pos">+12.4%</span></span>
+    <span class="ticker-item">🎮 Web3 Ecosystem</span>
+    <span class="ticker-item">⚡ Play-to-Earn Game</span>
+    <span class="ticker-item">💎 NFT Characters</span>
+    <span class="ticker-item">🔄 Decentralized Exchange</span>
+    <span class="ticker-item">🌐 Crypto Games</span>
+    <span class="ticker-item">🚀 FUNS Coin <span class="pos">+12.4%</span></span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="grid-overlay"></div>
+  <div class="hero-particle particle-1"></div>
+  <div class="hero-particle particle-2"></div>
+  <div class="hero-particle particle-3"></div>
+  <div class="hero-particle particle-4"></div>
+  <div class="hero-particle particle-5"></div>
+  <div class="hero-badge">🦄 The Global Digital Economy Revolution</div>
+  <div class="hero-logo-wrap">
+    <img src="funs-nugi.png" alt="FunS Logo">
+  </div>
+  <h1 class="hero-title">FunS Platform<br>Web3 Game & DEX</h1>
+  <p class="hero-sub">Web3 게임과 탈중앙화 거래소가 하나로 — 플레이하고, 거래하고, 소유하는 <strong>차세대 블록체인 게임 플랫폼</strong></p>
+  <div class="hero-actions">
+    <a href="https://funsworld.com/" class="btn-primary">🎮 FunS Game 시작</a>
+    <a href="#dex" class="btn-outline">🔄 FunSwap DEX</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">10+</div>
+      <div class="stat-label">서비스 국가</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100+</div>
+      <div class="stat-label">게임 타이틀</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">실시간 거래</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0.3%</div>
+      <div class="stat-label">DEX 수수료</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal">
+    <span class="section-tag">FunS Game</span>
+    <h2 class="section-title">The Global <span>Web3 Game</span> Platform</h2>
+    <p class="section-desc">글로벌 웹3 플랫폼의 미래 가치 — 개발자와 유저 모두가 이기는 생태계를 만듭니다.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <span class="feature-icon">🎮</span>
+      <h3>Play-to-Earn</h3>
+      <p>게임 플레이를 통해 얻은 토큰을 DEX에서 암호화폐나 현금으로 교환하세요. 블록체인 기반 P2E 시스템으로 게임 속 활동이 실제 가치로 이어집니다.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">💎</span>
+      <h3>NFT Characters</h3>
+      <p>판타지, SF, 캐주얼 등 다양한 장르의 고유 NFT 캐릭터를 소유하고 업그레이드하세요. 완전한 디지털 소유권이 보장됩니다.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">🌍</span>
+      <h3>글로벌 배포</h3>
+      <p>개발자는 중개 수수료를 낮추고 전 세계 유저에게 직접 게임을 배포할 수 있습니다. 수익을 공정하게 나누는 개방형 생태계입니다.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">🤝</span>
+      <h3>커뮤니티 허브</h3>
+      <p>전 세계 게이머들과 소통하고 협력하는 커뮤니티. 길드 시스템, 리더보드, 소셜 기능으로 함께 성장하는 생태계를 경험하세요.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">🎰</span>
+      <h3>룰렛 & 미니게임</h3>
+      <p>플랫폼 내 다양한 미니게임과 이벤트로 게임 플레이의 재미를 더합니다. 캐주얼부터 전략형까지 다채로운 콘텐츠를 즐기세요.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-icon">🔐</span>
+      <h3>Web3 보안</h3>
+      <p>블록체인 기반의 투명한 거래 시스템으로 자산을 안전하게 보호합니다. "내 열쇠가 내 코인"이라는 원칙을 실현합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM / VISION -->
+<section id="ecosystem">
+  <div class="content-split">
+    <div class="reveal">
+      <span class="section-tag">Vision</span>
+      <h2 class="section-title">FunS Platform<br><span>Vision</span></h2>
+      <p class="section-desc" style="margin-bottom:40px;">게임과 블록체인 기술을 결합한 차세대 Web3 플랫폼 생태계를 구축합니다.</p>
+      <ul class="eco-list">
+        <li>
+          <span class="eco-num">01</span>
+          <div>
+            <h4>개방형 플랫폼</h4>
+            <p>누구나 자유롭게 참여할 수 있는 개방형 Web3 게임 플랫폼으로 글로벌 유저 기반을 확대합니다</p>
+          </div>
+        </li>
+        <li>
+          <span class="eco-num">02</span>
+          <div>
+            <h4>게임 매출 공유</h4>
+            <p>플랫폼 내 게임 매출을 개발자와 플랫폼이 투명하게 정산하는 구조</p>
+          </div>
+        </li>
+        <li>
+          <span class="eco-num">03</span>
+          <div>
+            <h4>DEX 거래 수수료</h4>
+            <p>FunSwap DEX의 거래 수수료(0.3~0.5%)로 플랫폼 운영과 지속적인 개발을 지원합니다</p>
+          </div>
+        </li>
+        <li>
+          <span class="eco-num">04</span>
+          <div>
+            <h4>아바타 & NFT 경제</h4>
+            <p>아바타 생성, 업그레이드, NFT 마켓플레이스를 통한 활발한 디지털 자산 거래 생태계</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="eco-visual reveal">
+      <div class="eco-ring"></div>
+      <div class="eco-ring"></div>
+      <div class="eco-ring"></div>
+      <div class="eco-center">🦄</div>
+      <div class="orbit-dot dot-1">🎮</div>
+      <div class="orbit-dot dot-2">💰</div>
+      <div class="orbit-dot dot-3">🔄</div>
+      <div class="orbit-dot dot-4">💎</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEX -->
+<section id="dex">
+  <div class="reveal">
+    <span class="section-tag">FunSwap DEX</span>
+    <h2 class="section-title">Decentralized<br><span>Exchange</span></h2>
+    <p class="section-desc">금융의 주권을 사용자에게 돌려주는 탈중앙화 거래소 — FunSwap에서 경험하세요.</p>
+  </div>
+  <div class="dex-cards">
+    <div class="dex-card reveal">
+      <div class="dex-card-glow"></div>
+      <span class="dex-card-icon">🔒</span>
+      <span class="tag-sm">Self-Custody</span>
+      <h3>자산 완전 통제권</h3>
+      <p>거래소의 파산(FTX 사태), 서버 점검, 출금 제한 리스크로부터 자유롭습니다. "내 열쇠가 아니면 내 코인이 아니다"라는 원칙을 실현합니다.</p>
+    </div>
+    <div class="dex-card reveal">
+      <div class="dex-card-glow"></div>
+      <span class="dex-card-icon">⚡</span>
+      <span class="tag-sm">Permissionless</span>
+      <h3>개방형 상장 프로세스</h3>
+      <p>다양한 Web3 프로젝트와 P2E 게임 토큰이 자유롭게 거래됩니다. 중앙 기관의 허가 없이 누구나 토큰을 상장하고 거래할 수 있습니다.</p>
+    </div>
+    <div class="dex-card reveal">
+      <div class="dex-card-glow"></div>
+      <span class="dex-card-icon">💸</span>
+      <span class="tag-sm">Yield Farming</span>
+      <h3>유동성 공급 수익</h3>
+      <p>유동성 풀에 참여하여 탈중앙화 금융(DeFi)을 직접 경험하세요. P2E 토큰을 다양한 암호화폐로 스왑할 수 있습니다.</p>
+    </div>
+  </div>
+
+  <!-- Multi-chain -->
+  <div style="margin-top:80px;" class="reveal">
+    <span class="section-tag">Multi-Chain</span>
+    <h2 class="section-title" style="margin-bottom:40px;">Multi-chain <span>Wallet Support</span></h2>
+    <div class="coins-strip">
+      <div class="coin-chip"><span>₿</span> Bitcoin</div>
+      <div class="coin-chip"><span>Ξ</span> Ethereum</div>
+      <div class="coin-chip"><span>₮</span> Tether</div>
+      <div class="coin-chip"><span>✕</span> XRP</div>
+      <div class="coin-chip"><span>⬡</span> BNB</div>
+      <div class="coin-chip"><span>◎</span> Solana</div>
+      <div class="coin-chip"><span>Ⓢ</span> USDC</div>
+      <div class="coin-chip"><span>⚡</span> TRON</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="reveal" style="text-align:center;margin-bottom:0;">
+    <span class="section-tag">Roadmap</span>
+    <h2 class="section-title">FunS Project <span>Roadmap</span></h2>
+    <p class="section-desc" style="margin:0 auto;">글로벌 메가플랫폼을 향한 단계별 여정</p>
+  </div>
+  <div class="roadmap-wrap">
+    <div class="roadmap-line"></div>
+    <div class="roadmap-items">
+      <div class="roadmap-item reveal">
+        <div class="road-content">
+          <div class="road-date">2025 Q3-Q4</div>
+          <h3>Phase 1 (완료 ✅)</h3>
+          <ul>
+            <li>플랫폼 론칭 및 DEX 베타</li>
+            <li>초기 게임 출시 및 커뮤니티 형성</li>
+          </ul>
+        </div>
+        <div class="road-dot">🚀</div>
+        <div class="road-empty"></div>
+      </div>
+      <div class="roadmap-item reveal">
+        <div class="road-empty"></div>
+        <div class="road-dot">🔥</div>
+        <div class="road-content">
+          <div class="road-date">2026 Q1-Q2</div>
+          <h3>Phase 2 (진행 중 🔥)</h3>
+          <ul>
+            <li>NFT 마켓플레이스 런칭</li>
+            <li>스테이킹 V2 출시</li>
+            <li>모바일 앱 출시</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-item reveal">
+        <div class="road-content">
+          <div class="road-date">2026 Q3-Q4</div>
+          <h3>Phase 3 (예정)</h3>
+          <ul>
+            <li>크로스체인 브릿지 구축</li>
+            <li>DAO 거버넌스 도입</li>
+            <li>글로벌 파트너십 확대</li>
+          </ul>
+        </div>
+        <div class="road-dot">📈</div>
+        <div class="road-empty"></div>
+      </div>
+      <div class="roadmap-item reveal">
+        <div class="road-empty"></div>
+        <div class="road-dot">🏆</div>
+        <div class="road-content">
+          <div class="road-date">2027 Q1+</div>
+          <h3>Phase 4 (미래)</h3>
+          <ul>
+            <li>메타버스 통합</li>
+            <li>AI 게이밍 엔진 개발</li>
+            <li>IPO 준비</li>
+          </ul>
+        </div>
+      </div>
+      <div class="roadmap-item reveal">
+        <div class="road-content">
+          <span class="road-phase">Phase 5</span>
+          <h3>거래소 상장 & 글로벌 확장</h3>
+          <ul>
+            <li>주요 중앙화 거래소(CEX) 상장</li>
+            <li>글로벌 DEX 멀티체인 확장</li>
+            <li>기관 파트너십 체결</li>
+            <li>FUNS 생태계 거버넌스 출시</li>
+          </ul>
+        </div>
+        <div class="road-dot"><span></span></div>
+        <div class="road-empty"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <span class="cta-badge">🌟 지금 시작하세요</span>
+  <h2 class="cta-title">앱을 다운로드하고<br>글로벌 경제에 합류하세요</h2>
+  <p class="cta-sub">Web3 게임과 탈중앙화 거래소를 하나의 플랫폼에서 경험하세요. 지금 바로 시작할 수 있습니다.</p>
+  <div class="download-btns">
+    <a href="apk/funs-land.apk" class="dl-btn">
+      <span class="dl-btn-icon">🤖</span>
+      <div class="dl-btn-text">
+        <div class="small">Download on</div>
+        <div class="big">Android APK</div>
+      </div>
+    </a>
+    <a href="https://funsworld.com/" class="dl-btn">
+      <span class="dl-btn-icon">🌐</span>
+      <div class="dl-btn-text">
+        <div class="small">Play on</div>
+        <div class="big">Web Browser</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">
+        <img src="funs-nugi.png" alt="FunS Logo" style="height:40px;width:40px;">
+        <span>FunS Platform</span>
+      </a>
+      <p>차세대 Web3 게임 & DEX 플랫폼. 블록체인 기반의 게임과 탈중앙화 거래소를 경험하세요.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="https://funsworld.com/">FunS Game</a></li>
+        <li><a href="dex/index.html">FunSwap DEX</a></li>
+        <li><a href="games/index.html">게임</a></li>
+        <li><a href="nft/index.html">NFT 마켓</a></li>
+        <li><a href="download.html">앱 다운로드</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:hello@funs.land">hello@funs.land</a></li>
+        <li><a href="https://telegram.org/">Telegram</a></li>
+        <li><a href="https://www.instagram.com/">Instagram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 FunS Platform. All rights reserved.</span>
+    <div class="socials">
+      <a href="https://telegram.org/" class="social-btn">✈️</a>
+      <a href="https://www.instagram.com/" class="social-btn">📸</a>
+      <a href="#" class="social-btn">🐦</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/common.js"></script>
+
+<script>
+// Scroll-Triggered Counter Animation
+document.addEventListener('DOMContentLoaded', function() {
+  const statsSection = document.querySelector('.hero-stats');
+  let hasAnimated = false;
+
+  // Counter animation function
+  function animateCounter(element, targetText) {
+    // Extract numeric value from text (e.g., "100+" -> 100)
+    const match = targetText.match(/\d+/);
+    if (!match) return;
+
+    const targetNumber = parseInt(match[0]);
+    const suffix = targetText.replace(/\d+/, ''); // Get the suffix (e.g., "+")
+    const duration = 1500; // Animation duration in ms
+    const startTime = Date.now();
+    const startValue = 0;
+
+    function update() {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing function for smooth animation
+      const easeOutQuad = 1 - (1 - progress) * (1 - progress);
+      const currentValue = Math.floor(startValue + (targetNumber - startValue) * easeOutQuad);
+
+      element.textContent = currentValue + suffix;
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        element.textContent = targetText;
+      }
+    }
+
+    update();
+  }
+
+  // IntersectionObserver for scroll-triggered animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !hasAnimated) {
+        hasAnimated = true;
+        const statItems = document.querySelectorAll('.stat-item');
+
+        statItems.forEach(item => {
+          const statNum = item.querySelector('.stat-num');
+          if (statNum) {
+            const text = statNum.textContent.trim();
+            // Only animate numeric values (not "24/7" or similar)
+            if (/\d+/.test(text) && text !== '24/7') {
+              statNum.classList.add('counting');
+              animateCounter(statNum, text);
+            }
+          }
+        });
+      }
+    });
+  }, {
+    threshold: 0.5
+  });
+
+  if (statsSection) {
+    observer.observe(statsSection);
+  }
+});
+</script>
+</body>
+</html>

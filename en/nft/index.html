@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunS NFT Marketplace — Coming Soon</title>
+<meta name="description" content="FunS NFT Marketplace - Trade game items, weapons, armor, and rare NFT collections. Coming soon with P2P decentralized trading.">
+<meta name="keywords" content="NFT marketplace, NFT trading, game items, digital assets, blockchain NFT, P2P trading, gaming NFT">
+<meta property="og:title" content="FunS NFT Marketplace">
+<meta property="og:description" content="FunS NFT Marketplace - Trade game items, weapons, armor, and rare NFT collections. Coming soon with P2P decentralized trading.">
+<meta property="og:image" content="https://tololalo.github.io/funs-platform/funs-nugi.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tololalo.github.io/funs-platform/en/nft/index.html">
+<meta property="og:site_name" content="FunS Platform">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #FF6B35;
+  --secondary: #FFD700;
+  --accent: #4FC3F7;
+  --dark: #080B14;
+  --dark2: #0D1120;
+  --dark3: #141828;
+  --border: rgba(255,107,53,0.2);
+  --text: #e8eaf0;
+  --muted: #8892b0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 17px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+.nft-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 64px;
+  background: rgba(8,11,20,0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.nft-nav .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nft-nav .logo img { height: 36px; width: 36px; object-fit: contain; }
+.nft-nav .logo span { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1rem; color: var(--secondary); letter-spacing: 2px; }
+.nft-nav .logo .sub { font-size: 0.7rem; color: var(--muted); letter-spacing: 1px; margin-left: 4px; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.back-btn {
+  background: var(--dark3); border: 1px solid var(--border);
+  color: var(--text); padding: 8px 16px; border-radius: 12px;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  text-decoration: none; transition: all .2s; font-family: inherit;
+}
+.back-btn:hover { border-color: var(--primary); }
+
+/* ── COMING SOON ── */
+.coming-soon {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: calc(100vh - 64px - 60px);
+  padding: 60px 20px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255,107,53,.08), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(79,195,247,.05), transparent 40%);
+}
+
+.cs-icon {
+  font-size: 5rem;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.cs-badge {
+  display: inline-block;
+  padding: 6px 20px;
+  background: linear-gradient(135deg, var(--primary), #ff9a00);
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  border-radius: 50px;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+
+.cs-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 2.4rem;
+  font-weight: 900;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cs-desc {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 480px;
+  margin-bottom: 40px;
+}
+
+/* Feature Preview Cards */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 600px;
+  width: 100%;
+  margin-bottom: 48px;
+}
+.preview-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+  transition: all .3s;
+}
+.preview-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255,107,53,.1);
+}
+.preview-card .emoji { font-size: 2rem; margin-bottom: 12px; }
+.preview-card .label { font-size: 0.8rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.preview-card .sublabel { font-size: 0.7rem; color: var(--muted); }
+
+/* Notify Form */
+.notify-form {
+  display: flex; gap: 10px;
+  max-width: 420px; width: 100%;
+}
+.notify-input {
+  flex: 1; padding: 14px 18px;
+  background: var(--dark3); border: 1px solid var(--border);
+  border-radius: 14px; color: var(--text);
+  font-size: 0.9rem; outline: none; font-family: inherit;
+}
+.notify-input:focus { border-color: var(--primary); }
+.notify-input::placeholder { color: var(--muted); }
+.notify-btn {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--primary), #ff9a00);
+  color: #fff; border: none; border-radius: 14px;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer;
+  transition: all .2s; font-family: inherit; white-space: nowrap;
+}
+.notify-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255,107,53,.4);
+}
+.notify-success {
+  display: none;
+  color: #4caf50; font-size: 0.85rem; font-weight: 600;
+  margin-top: 12px;
+}
+
+/* ── FOOTER ── */
+.nft-footer {
+  text-align: center; padding: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem; color: var(--muted);
+}
+.nft-footer a { color: var(--accent); text-decoration: none; }
+.nft-footer a:hover { text-decoration: underline; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  .preview-grid { gap: 12px; }
+}
+@media(max-width:600px) {
+  html { font-size: 15px; }
+  .nft-nav { padding: 0 10px; height: 56px; }
+  .nft-nav .logo img { height: 28px; width: 28px; }
+  .nft-nav .logo span { font-size: 0.85rem; }
+  .nft-nav .logo .sub { display: none; }
+  .back-btn { padding: 6px 12px; font-size: 0.75rem; }
+  .coming-soon { padding: 40px 16px; }
+  .cs-icon { font-size: 3.5rem; margin-bottom: 16px; }
+  .cs-badge { font-size: 0.65rem; padding: 5px 16px; letter-spacing: 2px; }
+  .cs-title { font-size: 1.6rem; }
+  .cs-desc { font-size: 0.85rem; margin-bottom: 28px; }
+  .preview-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .preview-card { padding: 16px 10px; border-radius: 12px; }
+  .preview-card .emoji { font-size: 1.5rem; margin-bottom: 8px; }
+  .preview-card .label { font-size: 0.7rem; }
+  .preview-card .sublabel { font-size: 0.6rem; }
+  .notify-form { flex-direction: column; }
+  .notify-btn { padding: 14px; }
+  .nft-footer { padding: 20px 12px; font-size: 0.7rem; }
+}
+@media(max-width:380px) {
+  html { font-size: 14px; }
+  .cs-title { font-size: 1.3rem; }
+  .preview-card { padding: 12px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nft-nav">
+  <a href="../../index.html" class="logo">
+    <img src="../../funs-nugi.png" alt="FunS">
+    <span>FunS NFT</span>
+    <span class="sub">Marketplace</span>
+  </a>
+  <div class="nav-right">
+    <a href="../../index.html" class="back-btn">← Back to Main</a>
+    <a href="../../en/wallet/index.html" class="back-btn">Wallet</a>
+    <a href="../../dashboard/index.html" class="back-btn">Dashboard</a>
+  </div>
+</header>
+
+<!-- COMING SOON -->
+<section class="coming-soon">
+  <div class="cs-icon">🖼️</div>
+  <div class="cs-badge">Coming Soon</div>
+  <h1 class="cs-title">NFT Marketplace</h1>
+  <p class="cs-desc">
+    Trade game items as NFTs on our upcoming marketplace.<br>
+    Buy, sell, and collect weapons, skins, pets, and more from FunS games.
+  </p>
+
+  <div class="preview-grid">
+    <div class="preview-card">
+      <div class="emoji">⚔️</div>
+      <div class="label">Game Items</div>
+      <div class="sublabel">Weapons · Armor · Skins</div>
+    </div>
+    <div class="preview-card">
+      <div class="emoji">🔄</div>
+      <div class="label">P2P Trading</div>
+      <div class="sublabel">Decentralized Market</div>
+    </div>
+    <div class="preview-card">
+      <div class="emoji">💎</div>
+      <div class="label">Rare Collections</div>
+      <div class="sublabel">Limited Edition NFTs</div>
+    </div>
+  </div>
+
+  <form class="notify-form" id="notifyForm">
+    <input type="email" class="notify-input" placeholder="Enter your email" required>
+    <button type="submit" class="notify-btn">Notify Me</button>
+  </form>
+  <div class="notify-success" id="notifySuccess">Success! We'll notify you when we launch.</div>
+</section>
+
+<!-- FOOTER -->
+<footer style="margin-top: auto; background: var(--dark2); border-top: 1px solid var(--border); padding: 40px 20px;">
+  <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px;">
+    <div style="font-family: 'Orbitron', monospace; color: var(--primary); margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+      <a href="../../index.html" style="color: var(--primary); text-decoration: none;">FunS Platform</a>
+    </div>
+    <div style="font-family: 'Orbitron', monospace; color: var(--primary); margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+      <a href="../../dex/en.html" style="color: var(--primary); text-decoration: none;">DEX</a>
+    </div>
+    <div style="font-family: 'Orbitron', monospace; color: var(--primary); margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+      <a href="../games/index.html" style="color: var(--primary); text-decoration: none;">Games</a>
+    </div>
+    <div style="font-family: 'Orbitron', monospace; color: var(--primary); margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+      <a href="../staking/index.html" style="color: var(--primary); text-decoration: none;">Staking</a>
+    </div>
+  </div>
+  <div style="text-align: center; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px;">
+    <p>© 2024 FunS Platform. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+document.getElementById('notifyForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  this.style.display = 'none';
+  document.getElementById('notifySuccess').style.display = 'block';
+});
+</script>
+
+</body>
+</html>
