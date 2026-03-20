@@ -1,0 +1,101 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="castleSky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a1a4a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#5a3a7a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0.6" />
+    </linearGradient>
+    <linearGradient id="stoneDark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a2a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:1" />
+    </linearGradient>
+    <filter id="castleGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="windowGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0.3" />
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#castleSky)"/>
+
+  <!-- Stars and particles -->
+  <g opacity="0.6">
+    <circle cx="50" cy="50" r="1.5" fill="#FFD700"/>
+    <circle cx="100" cy="80" r="1" fill="#FFD700"/>
+    <circle cx="150" cy="40" r="1.5" fill="#FFD700"/>
+    <circle cx="280" cy="70" r="1" fill="#FFD700"/>
+    <circle cx="330" cy="50" r="1.2" fill="#FFD700"/>
+    <circle cx="350" cy="120" r="1" fill="#FFD700"/>
+    <circle cx="70" cy="130" r="1.5" fill="#FFD700" opacity="0.5"/>
+    <circle cx="300" cy="100" r="1.2" fill="#FFD700" opacity="0.7"/>
+  </g>
+
+  <!-- Main castle structure -->
+  <g filter="url(#castleGlow)">
+    <!-- Main tower center -->
+    <rect x="150" y="150" width="100" height="140" fill="url(#stoneDark)" stroke="#FF6B35" stroke-width="2.5"/>
+
+    <!-- Left tower -->
+    <rect x="80" y="170" width="50" height="120" fill="url(#stoneDark)" stroke="#FF6B35" stroke-width="2"/>
+    <polygon points="80,170 105,120 130,170" fill="url(#stoneDark)" stroke="#FF6B35" stroke-width="2"/>
+
+    <!-- Right tower -->
+    <rect x="270" y="170" width="50" height="120" fill="url(#stoneDark)" stroke="#FF6B35" stroke-width="2"/>
+    <polygon points="270,170 295,120 320,170" fill="url(#stoneDark)" stroke="#FF6B35" stroke-width="2"/>
+
+    <!-- Center tower peak -->
+    <polygon points="150,150 200,80 250,150" fill="url(#stoneDark)" stroke="#FF6B35" stroke-width="2.5"/>
+
+    <!-- Main gate -->
+    <rect x="175" y="245" width="50" height="45" fill="#1a1a1a" stroke="#FF6B35" stroke-width="2"/>
+    <path d="M 175 245 L 200 220 L 225 245" fill="#2a2a2a" stroke="#FF6B35" stroke-width="1.5"/>
+  </g>
+
+  <!-- Glowing windows -->
+  <g filter="url(#castleGlow)">
+    <!-- Center tower windows -->
+    <circle cx="175" cy="170" r="6" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.5"/>
+    <circle cx="225" cy="170" r="6" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.5"/>
+    <circle cx="175" cy="210" r="6" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.5"/>
+    <circle cx="225" cy="210" r="6" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.5"/>
+
+    <!-- Left tower window -->
+    <circle cx="105" cy="190" r="5" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.2"/>
+    <circle cx="105" cy="240" r="5" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.2"/>
+
+    <!-- Right tower window -->
+    <circle cx="295" cy="190" r="5" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.2"/>
+    <circle cx="295" cy="240" r="5" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.2"/>
+
+    <!-- Peak tower window -->
+    <circle cx="200" cy="115" r="5" fill="url(#windowGlow)" stroke="#FFD700" stroke-width="1.5"/>
+  </g>
+
+  <!-- Battlements detail -->
+  <g stroke="#FF6B35" stroke-width="1.5" fill="none" opacity="0.7">
+    <rect x="145" y="145" width="110" height="8"/>
+    <line x1="160" y1="145" x2="160" y2="138"/>
+    <line x1="180" y1="145" x2="180" y2="138"/>
+    <line x1="200" y1="145" x2="200" y2="138"/>
+    <line x1="220" y1="145" x2="220" y2="138"/>
+    <line x1="240" y1="145" x2="240" y2="138"/>
+  </g>
+
+  <!-- Mystical aura rings -->
+  <g fill="none" opacity="0.3">
+    <circle cx="200" cy="210" r="120" stroke="#FF6B35" stroke-width="1" stroke-dasharray="5,5"/>
+    <circle cx="200" cy="210" r="90" stroke="#FFD700" stroke-width="0.8" stroke-dasharray="3,3"/>
+    <circle cx="200" cy="210" r="60" stroke="#FF6B35" stroke-width="0.8" stroke-dasharray="4,2" opacity="0.4"/>
+  </g>
+
+  <!-- Glowing flags on towers -->
+  <g filter="url(#castleGlow)" opacity="0.8">
+    <path d="M 105 120 L 120 110 L 115 125 Z" fill="#FF6B35" stroke="#FFD700" stroke-width="1"/>
+    <path d="M 295 120 L 310 110 L 305 125 Z" fill="#FF6B35" stroke="#FFD700" stroke-width="1"/>
+  </g>
+</svg>

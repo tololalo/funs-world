@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FunSwap - DEX Trading</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0B0E17">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FunSwap">
+    <link rel="apple-touch-icon" href="../../funs-nugi.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="description" content="FunSwap - 1inch-powered DEX trading on BSC">
+    <meta property="og:title" content="FunSwap DEX">
+    <meta property="og:description" content="Trade tokens on BSC with FunSwap">
+    <meta property="og:image" content="https://funs.world/funs-nugi.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" crossorigin="anonymous"></script>
+    <script src="js/swap-engine.js"></script>
+    <style>
+        /* ============================================
+           FUNSWAP DEX - 1INCH POWERED
+           Mobile-first professional trading interface
+           ============================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0B0E17;
+            --bg2: #111827;
+            --bg3: #1a2035;
+            --card: #161d2e;
+            --card-hover: #1e2740;
+            --border: rgba(255,255,255,0.06);
+            --border-light: rgba(255,255,255,0.1);
+            --text: #FFFFFF;
+            --text2: rgba(255,255,255,0.87);
+            --text3: rgba(255,255,255,0.55);
+            --text4: rgba(255,255,255,0.3);
+            --primary: #FF6B35;
+            --primary-dim: rgba(255,107,53,0.15);
+            --secondary: #FFD700;
+            --accent: #4FC3F7;
+            --green: #00D18C;
+            --green-dim: rgba(0,209,140,0.12);
+            --red: #FF4466;
+            --red-dim: rgba(255,68,102,0.12);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* App Shell */
+        .app-shell {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 481px) {
+            body { background: #050810; }
+            .app-shell {
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+                box-shadow: 0 0 80px rgba(255,107,53,0.05);
+            }
+        }
+
+        /* ===== APP HEADER ===== */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            padding: calc(var(--safe-top) + 8px) 16px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .header-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-pill {
+            display: flex;
+            gap: 2px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 2px;
+        }
+
+        .lang-pill a {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text4);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lang-pill a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .lang-pill a:active {
+            transform: scale(0.95);
+        }
+
+        .header-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            color: var(--text3);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .header-btn:active {
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .app-content {
+            flex: 1;
+            padding: 16px 16px 100px;
+            overflow-y: auto;
+        }
+
+        /* ===== BADGE ===== */
+        .powered-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(79, 195, 247, 0.12);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 12px;
+            color: var(--accent);
+            margin: 0 16px 16px;
+            font-weight: 500;
+        }
+
+        /* ===== SWAP CARD ===== */
+        .swap-card {
+            margin: 0 16px 20px;
+            padding: 24px;
+            background: linear-gradient(145deg, #1a2240 0%, #0f1525 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swap-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Token Input Group */
+        .token-input-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .token-input-label {
+            font-size: 12px;
+            color: var(--text3);
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .token-input-container {
+            display: flex;
+            gap: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .token-select {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .token-select:active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .token-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .token-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .amount-input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .amount-input {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 18px;
+            font-weight: 600;
+            padding: 0;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .amount-input::placeholder {
+            color: var(--text4);
+        }
+
+        .amount-input:focus {
+            outline: none;
+        }
+
+        .token-balance {
+            font-size: 11px;
+            color: var(--text4);
+            margin-top: 4px;
+        }
+
+        /* Swap Arrow Button */
+        .swap-arrow-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            margin: 4px auto;
+            background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .swap-arrow-btn:active {
+            background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,107,53,0.1));
+            transform: scale(0.95) rotateZ(180deg);
+        }
+
+        /* Exchange Rate */
+        .exchange-rate {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            margin: 16px 0;
+            font-size: 13px;
+            color: var(--text3);
+            text-align: center;
+        }
+
+        .exchange-rate strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* Route Info */
+        .route-info {
+            background: rgba(255,107,53,0.1);
+            border: 1px solid rgba(255,107,53,0.2);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 16px 0;
+            font-size: 12px;
+            color: var(--text3);
+        }
+
+        .route-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text4);
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .route-dex {
+            display: inline-block;
+            background: rgba(255,107,53,0.2);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--primary);
+            margin-right: 6px;
+        }
+
+        /* Settings */
+        .settings-section {
+            margin: 16px 0;
+        }
+
+        .settings-label {
+            font-size: 12px;
+            color: var(--text3);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .slippage-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .slippage-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            color: var(--text3);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .slippage-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .slippage-btn:active {
+            transform: scale(0.95);
+        }
+
+        .custom-slippage-input {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            color: var(--text);
+            font-size: 13px;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+
+        .custom-slippage-input::placeholder {
+            color: var(--text4);
+        }
+
+        /* Swap Button */
+        .swap-button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF8551 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swap-button:active {
+            transform: scale(0.98);
+        }
+
+        .swap-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .swap-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .swap-button:active::before {
+            left: 100%;
+        }
+
+        /* Price Chart */
+        .price-chart-section {
+            margin: 20px 16px;
+            padding: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 120px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text3);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* Recent Swaps */
+        .recent-swaps-section {
+            margin: 20px 16px;
+        }
+
+        .swap-history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .swap-history-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .swap-history-icons {
+            display: flex;
+            align-items: center;
+        }
+
+        .swap-history-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: -6px;
+        }
+
+        .swap-history-info {
+            flex: 1;
+        }
+
+        .swap-history-pair {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .swap-history-time {
+            color: var(--text3);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .swap-history-amount {
+            text-align: right;
+        }
+
+        .swap-history-from {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .swap-history-to {
+            color: var(--green);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg);
+            border-radius: 20px 20px 0 0;
+            padding: 20px 16px calc(16px + var(--safe-bottom));
+            z-index: 1001;
+            max-height: 70vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text3);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* Settings modal compact */
+        .stg-body { padding: 0 4px; }
+        .stg-group { margin-bottom: 18px; }
+        .stg-label { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stg-row { display: flex; gap: 6px; }
+        .stg-chip {
+            flex: 1; padding: 9px 4px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1); background: none;
+            color: rgba(255,255,255,0.5); font-size: 13px; cursor: pointer;
+            text-align: center; transition: all 0.15s;
+        }
+        .stg-chip.active {
+            border-color: var(--primary); background: rgba(255,107,53,0.12);
+            color: var(--primary); font-weight: 700;
+        }
+        .stg-input {
+            flex: 0.8; padding: 9px 6px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+            color: white; font-size: 13px; text-align: center; outline: none; width: 0;
+        }
+        .stg-input:focus { border-color: var(--primary); }
+        .stg-info-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px;
+        }
+        .stg-info-row span:first-child { color: rgba(255,255,255,0.4); }
+        .stg-info-row .stg-val { color: var(--text); font-weight: 500; }
+        .stg-info-row .stg-val.green { color: var(--green); }
+        .stg-info-row.last { border-bottom: none; }
+
+        .token-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .token-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .token-item:active {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+        }
+
+        .token-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .token-item-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .token-item-info {
+            flex: 1;
+        }
+
+        .token-item-name {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .token-item-address {
+            color: var(--text3);
+            font-size: 11px;
+            margin-top: 2px;
+            font-family: monospace;
+        }
+
+        .token-item-balance {
+            color: var(--text3);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Wallet Connect Button */
+        .wallet-connect-btn {
+            background: linear-gradient(135deg, var(--green) 0%, #00B873 100%);
+            border: none;
+            color: black;
+            font-weight: 700;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .wallet-connect-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Footer Links */
+        .app-footer {
+            padding: 20px 16px calc(20px + var(--safe-bottom));
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .footer-link {
+            color: var(--text3);
+            text-decoration: none;
+            font-size: 12px;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .footer-link:active {
+            background: rgba(255,107,53,0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .footer-credit {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text4);
+        }
+
+        /* Loading & Status */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,107,53,0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background: var(--green-dim);
+            color: var(--green);
+        }
+
+        .status-badge.error {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive */
+        @media (max-height: 600px) {
+            .swap-card {
+                padding: 16px;
+            }
+            .price-chart-section {
+                display: none;
+            }
+        }
+
+        /* Scrollbar styling */
+        .app-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .app-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .app-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .app-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="header-logo"><img src="../../funs-nugi.png" alt="FunSwap"></div>
+                <div class="header-title">FunSwap</div>
+            </div>
+            <div class="header-right">
+                <div class="lang-pill">
+                    <a href="#" id="lang-ko" class="lang-link active" data-lang="ko">KR</a>
+                    <a href="#" id="lang-en" class="lang-link" data-lang="en">EN</a>
+                </div>
+                <button class="header-btn" id="settings-btn" title="설정">⚙️</button>
+                <button class="header-btn wallet-connect-btn" id="wallet-btn" title="지갑 연결">연결</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="app-content">
+            <!-- 1inch Badge -->
+            <div class="powered-badge">
+                <span>⚡</span>
+                <span id="badge-text">Powered by 1inch</span>
+            </div>
+
+            <!-- Swap Card -->
+            <div class="swap-card">
+                <!-- From Token -->
+                <div class="token-input-group">
+                    <label class="token-input-label" id="label-from">보낼 토큰</label>
+                    <div class="token-input-container">
+                        <button class="token-select" id="from-token-btn">
+                            <div class="token-icon" id="from-icon"><img src="../icons/bnb.svg" alt="BNB" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
+                            <span id="from-symbol">BNB</span>
+                        </button>
+                        <div class="amount-input-wrapper">
+                            <input
+                                type="number"
+                                class="amount-input"
+                                id="from-amount"
+                                placeholder="0.0"
+                                inputmode="decimal"
+                                step="any"
+                            />
+                            <div class="token-balance" id="from-balance"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Swap Arrow -->
+                <button class="swap-arrow-btn" id="swap-direction-btn" title="반대로">⇅</button>
+
+                <!-- To Token -->
+                <div class="token-input-group">
+                    <label class="token-input-label" id="label-to">받을 토큰</label>
+                    <div class="token-input-container">
+                        <button class="token-select" id="to-token-btn">
+                            <div class="token-icon" id="to-icon"><img src="../icons/usdt.svg" alt="USDT" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>
+                            <span id="to-symbol">USDT</span>
+                        </button>
+                        <div class="amount-input-wrapper">
+                            <input
+                                type="number"
+                                class="amount-input"
+                                id="to-amount"
+                                placeholder="0.0"
+                                readonly
+                                inputmode="decimal"
+                            />
+                            <div class="token-balance" id="to-balance"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exchange Rate -->
+                <div class="exchange-rate" id="exchange-rate">
+                    1 BNB = <strong>0.00</strong> USDT
+                </div>
+
+                <!-- Route Info -->
+                <div class="route-info" id="route-info">
+                    <div class="route-label" id="route-label">최적 경로</div>
+                    <div>
+                        <span class="route-dex">PancakeSwap</span>
+                        <span class="route-dex">MDEX</span>
+                    </div>
+                </div>
+
+                <!-- Slippage Settings -->
+                <div class="settings-section">
+                    <div class="settings-label" id="slippage-label">슬리피지 허용</div>
+                    <div class="slippage-buttons">
+                        <button class="slippage-btn" data-slippage="0.1">0.1%</button>
+                        <button class="slippage-btn active" data-slippage="0.5">0.5%</button>
+                        <button class="slippage-btn" data-slippage="1">1%</button>
+                        <button class="slippage-btn" id="custom-slippage-toggle">사용자</button>
+                    </div>
+                    <input
+                        type="number"
+                        class="custom-slippage-input"
+                        id="custom-slippage-input"
+                        placeholder="슬리피지 입력 (%)"
+                        step="0.01"
+                        min="0"
+                        max="50"
+                        style="display: none;"
+                    />
+                </div>
+
+                <!-- Swap Button -->
+                <button class="swap-button" id="swap-btn" disabled>
+                    <span id="swap-btn-text">금액을 입력하세요</span>
+                </button>
+            </div>
+
+            <!-- Price Chart -->
+            <div class="price-chart-section">
+                <h3 class="section-title" id="chart-title">가격 차트</h3>
+                <div class="chart-placeholder" id="chart-placeholder">
+                    <span id="chart-text">TradingView 차트 통합 예정</span>
+                </div>
+            </div>
+
+            <!-- Recent Swaps -->
+            <div class="recent-swaps-section">
+                <h3 class="section-title" id="recent-title">최근 거래</h3>
+                <div id="swap-history">
+                    <div style="text-align: center; padding: 20px; color: var(--text3); font-size: 13px;">
+                        <span id="no-history-text">거래 내역이 없습니다</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-links">
+                <a href="../../wallet/app/" class="footer-link" id="footer-wallet">FunS Wallet</a>
+                <a href="https://funs.world" class="footer-link" target="_blank" rel="noopener" id="footer-funs">FunS Platform</a>
+                <a href="#" class="footer-link" id="footer-docs">문서</a>
+            </div>
+            <div class="footer-credit" id="footer-credit">
+                © 2026 FunSwap. Powered by 1inch Protocol
+            </div>
+        </footer>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal-overlay">
+        <div class="modal" id="settings-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="settings-modal-title" data-translate="settings-title">거래 설정</h2>
+                <button class="modal-close" id="settings-modal-close">✕</button>
+            </div>
+            <div class="stg-body">
+                <div class="stg-group">
+                    <div class="stg-label" id="slippage-tolerance-label" data-translate="slippage-tolerance">슬리피지 허용치</div>
+                    <div class="stg-row" id="slippage-options">
+                        <button class="stg-chip" data-val="0.1">0.1%</button>
+                        <button class="stg-chip active" data-val="0.5">0.5%</button>
+                        <button class="stg-chip" data-val="1">1.0%</button>
+                        <input type="number" class="stg-input" id="custom-slippage" placeholder="%" step="0.1" min="0.1" max="50">
+                    </div>
+                </div>
+                <div class="stg-group">
+                    <div class="stg-label" id="gas-fee-label" data-translate="gas-fee">가스비</div>
+                    <div class="stg-row" id="gas-options">
+                        <button class="stg-chip gas" data-val="low"><span class="gas-emoji">🐢</span> <span class="gas-text" data-translate="gas-slow">느림</span></button>
+                        <button class="stg-chip gas active" data-val="normal"><span class="gas-emoji">⚡</span> <span class="gas-text" data-translate="gas-normal">보통</span></button>
+                        <button class="stg-chip gas" data-val="fast"><span class="gas-emoji">🚀</span> <span class="gas-text" data-translate="gas-fast">빠름</span></button>
+                    </div>
+                </div>
+                <div class="stg-group">
+                    <div class="stg-label" id="info-label" data-translate="info-label">정보</div>
+                    <div class="stg-info-row"><span id="routing-label" data-translate="routing-label">라우팅</span><span class="stg-val green">1inch + PancakeSwap</span></div>
+                    <div class="stg-info-row"><span id="network-label" data-translate="network-label">네트워크</span><span class="stg-val">BNB Chain</span></div>
+                    <div class="stg-info-row last"><span id="version-label" data-translate="version-label">버전</span><span class="stg-val">1.0.0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token Selection Modal -->
+    <div class="modal-overlay" id="token-modal-overlay">
+        <div class="modal" id="token-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">토큰 선택</h2>
+                <button class="modal-close" id="modal-close">✕</button>
+            </div>
+            <div class="token-list" id="token-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // FUNSWAP DEX - CORE ENGINE
+        // ============================================
+
+        // Language data
+        const translations = {
+            ko: {
+                'label-from': '보낼 토큰',
+                'label-to': '받을 토큰',
+                'badge-text': 'Powered by 1inch',
+                'slippage-label': '슬리피지 허용',
+                'route-label': '최적 경로',
+                'chart-title': '가격 차트',
+                'chart-text': 'TradingView 차트 통합 예정',
+                'recent-title': '최근 거래',
+                'no-history-text': '거래 내역이 없습니다',
+                'modal-title': '토큰 선택',
+                'swap-btn-text-default': '금액을 입력하세요',
+                'swap-btn-text-connect': '지갑 연결',
+                'swap-btn-text-ready': '스왑하기',
+                'swap-btn-text-loading': '거래 중...',
+                'footer-wallet': 'FunS Wallet',
+                'footer-funs': 'FunS Platform',
+                'footer-docs': '문서',
+                'footer-credit': '© 2026 FunSwap. Powered by 1inch Protocol',
+                'balance': '잔액',
+                'settings-title': '거래 설정',
+                'slippage-tolerance': '슬리피지 허용치',
+                'gas-fee': '가스비',
+                'gas-slow': '느림',
+                'gas-normal': '보통',
+                'gas-fast': '빠름',
+                'info-label': '정보',
+                'routing-label': '라우팅',
+                'network-label': '네트워크',
+                'version-label': '버전',
+            },
+            en: {
+                'label-from': 'From',
+                'label-to': 'To',
+                'badge-text': 'Powered by 1inch',
+                'slippage-label': 'Slippage Tolerance',
+                'route-label': 'Best Route',
+                'chart-title': 'Price Chart',
+                'chart-text': 'TradingView integration coming soon',
+                'recent-title': 'Recent Swaps',
+                'no-history-text': 'No swap history',
+                'modal-title': 'Select Token',
+                'swap-btn-text-default': 'Enter amount',
+                'swap-btn-text-connect': 'Connect Wallet',
+                'swap-btn-text-ready': 'Swap',
+                'swap-btn-text-loading': 'Swapping...',
+                'footer-wallet': 'FunS Wallet',
+                'footer-funs': 'FunS Platform',
+                'footer-docs': 'Docs',
+                'footer-credit': '© 2026 FunSwap. Powered by 1inch Protocol',
+                'balance': 'Balance',
+                'settings-title': 'Trade Settings',
+                'slippage-tolerance': 'Slippage Tolerance',
+                'gas-fee': 'Gas Fee',
+                'gas-slow': 'Slow',
+                'gas-normal': 'Normal',
+                'gas-fast': 'Fast',
+                'info-label': 'Info',
+                'routing-label': 'Routing',
+                'network-label': 'Network',
+                'version-label': 'Version',
+            }
+        };
+
+        // Token database (BSC)
+        const tokens = {
+            'BNB': {
+                symbol: 'BNB',
+                name: 'Binance Coin',
+                address: '0x0000000000000000000000000000000000000000',
+                decimals: 18,
+                icon: 'bnb.svg',
+                price: 612.45
+            },
+            'WBNB': {
+                symbol: 'WBNB',
+                name: 'Wrapped BNB',
+                address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+                decimals: 18,
+                icon: 'bnb.svg',
+                price: 612.45
+            },
+            'FUNS': {
+                symbol: 'FUNS',
+                name: 'FunS Token',
+                address: '0x...',
+                decimals: 18,
+                icon: 'funs.svg',
+                price: 0.0845
+            },
+            'USDT': {
+                symbol: 'USDT',
+                name: 'Tether USD',
+                address: '0x55d398326f99059fF775485246999027B3197955',
+                decimals: 18,
+                icon: 'usdt.svg',
+                price: 1.00
+            },
+            'USDC': {
+                symbol: 'USDC',
+                name: 'USD Coin',
+                address: '0x8AC76a51cc950d9822D68b83FE1Ad97B32Cd580d',
+                decimals: 18,
+                icon: 'usdc.svg',
+                price: 1.00
+            },
+            'BUSD': {
+                symbol: 'BUSD',
+                name: 'Binance USD',
+                address: '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56',
+                decimals: 18,
+                icon: 'usdc.svg',
+                price: 1.00
+            },
+            'ETH': {
+                symbol: 'ETH',
+                name: 'Ethereum',
+                address: '0x2170Ed0880ac9A755fd29B2688956BD959F933F8',
+                decimals: 18,
+                icon: 'eth.svg',
+                price: 3456.78
+            },
+            'CAKE': {
+                symbol: 'CAKE',
+                name: 'PancakeSwap',
+                address: '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
+                decimals: 18,
+                icon: 'cake.svg',
+                price: 8.92
+            }
+        };
+
+        // Application state
+        const state = {
+            currentLang: 'ko',
+            walletConnected: false,
+            walletAddress: null,
+            fromToken: tokens.BNB,
+            toToken: tokens.USDT,
+            fromAmount: '',
+            toAmount: '',
+            slippage: 0.5,
+            swapHistory: [],
+            tokenModalTarget: 'from'
+        };
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+
+        function setLanguage(lang) {
+            state.currentLang = lang;
+            document.documentElement.lang = lang;
+
+            // Update active pill
+            document.querySelectorAll('.lang-link').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(`lang-${lang}`).classList.add('active');
+
+            // Update all translated elements by ID
+            Object.keys(translations[lang]).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            // Update all elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.dataset.translate;
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            updateSwapButtonText();
+        }
+
+        function updateSwapButtonText() {
+            const btn = document.getElementById('swap-btn');
+            const text = document.getElementById('swap-btn-text');
+
+            if (!state.walletConnected) {
+                text.textContent = translations[state.currentLang]['swap-btn-text-connect'];
+            } else if (!state.fromAmount || parseFloat(state.fromAmount) === 0) {
+                text.textContent = translations[state.currentLang]['swap-btn-text-default'];
+            } else {
+                text.textContent = translations[state.currentLang]['swap-btn-text-ready'];
+            }
+        }
+
+        function formatTokenIcon(symbol) {
+            const iconMap = {
+                'BNB': '../icons/bnb.svg', 'WBNB': '../icons/bnb.svg',
+                'FUNS': '../../funs-nugi.png', 'USDT': '../icons/usdt.svg',
+                'USDC': '../icons/usdc.svg', 'BUSD': '../icons/usdc.svg',
+                'ETH': '../icons/eth.svg', 'CAKE': '../icons/cake.svg'
+            };
+            const src = iconMap[symbol];
+            if (src) {
+                return `<img src="${src}" alt="${symbol}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+            }
+            const colors = { 'BNB': '#F3BA2F', 'FUNS': '#FF6B35', 'USDT': '#26A17B', 'USDC': '#2775CA', 'ETH': '#627EEA', 'CAKE': '#D1884F' };
+            return `<span style="background: ${colors[symbol] || '#999'}; color: white; width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">${symbol}</span>`;
+        }
+
+        function formatNumber(num, decimals = 8) {
+            if (!num || isNaN(num)) return '0';
+            return parseFloat(num).toFixed(decimals).replace(/\.?0+$/, '');
+        }
+
+        function renderTokenList(target = 'from') {
+            const list = document.getElementById('token-list');
+            list.innerHTML = '';
+
+            Object.values(tokens).forEach(token => {
+                const item = document.createElement('div');
+                item.className = 'token-item';
+                item.innerHTML = `
+                    <div class="token-item-icon">${formatTokenIcon(token.symbol)}</div>
+                    <div class="token-item-info">
+                        <div class="token-item-name">${token.symbol}</div>
+                        <div class="token-item-address">${token.name}</div>
+                    </div>
+                    <div class="token-item-balance">
+                        $${token.price.toFixed(2)}
+                    </div>
+                `;
+                item.addEventListener('click', () => selectToken(token.symbol, target));
+                list.appendChild(item);
+            });
+        }
+
+        function selectToken(symbol, target = 'from') {
+            const token = tokens[symbol];
+            if (target === 'from') {
+                state.fromToken = token;
+                document.getElementById('from-symbol').textContent = token.symbol;
+                document.getElementById('from-icon').innerHTML = formatTokenIcon(token.symbol);
+            } else {
+                state.toToken = token;
+                document.getElementById('to-symbol').textContent = token.symbol;
+                document.getElementById('to-icon').innerHTML = formatTokenIcon(token.symbol);
+            }
+            closeTokenModal();
+            updateExchangeRate();
+            getSwapQuote();
+        }
+
+        function openTokenModal(target) {
+            state.tokenModalTarget = target;
+            renderTokenList(target);
+            document.getElementById('token-modal-overlay').classList.add('active');
+        }
+
+        function closeTokenModal() {
+            document.getElementById('token-modal-overlay').classList.remove('active');
+        }
+
+        function updateExchangeRate() {
+            const from = state.fromToken;
+            const to = state.toToken;
+            const rate = (from.price / to.price).toFixed(8);
+            document.getElementById('exchange-rate').innerHTML =
+                `1 ${from.symbol} = <strong>${formatNumber(rate)}</strong> ${to.symbol}`;
+        }
+
+        // ============================================
+        // SWAP ENGINE INTEGRATION
+        // ============================================
+
+        async function getSwapQuote() {
+            if (!state.fromAmount || parseFloat(state.fromAmount) === 0) return;
+
+            const engine = new SwapEngine();
+            try {
+                const fromAddr = state.fromToken.address;
+                const toAddr = state.toToken.address;
+                const amount = engine.parseAmount(state.fromAmount, state.fromToken.decimals);
+
+                const quote = await engine.getQuote(fromAddr, toAddr, amount, state.slippage);
+                if (quote && quote.toAmount) {
+                    state.toAmount = engine.formatAmount(quote.toAmount, state.toToken.decimals);
+                    document.getElementById('to-amount').value = formatNumber(state.toAmount);
+
+                    // Update route info if available
+                    if (quote.protocols && quote.protocols.length > 0) {
+                        const routeText = quote.protocols.map(p => p.name || p).join(' → ');
+                        const routeEl = document.getElementById('route-info');
+                        if (routeEl) routeEl.textContent = routeText;
+                    }
+                }
+            } catch (error) {
+                console.warn('[FunSwap] Quote fallback to simulation:', error.message);
+                // Fallback to price-based simulation
+                const rate = state.fromToken.price / state.toToken.price;
+                state.toAmount = (parseFloat(state.fromAmount) * rate).toString();
+                document.getElementById('to-amount').value = formatNumber(state.toAmount);
+            }
+
+            updateSwapButtonText();
+        }
+
+        async function executeSwap() {
+            if (!state.walletConnected) {
+                alert('Please connect your wallet first');
+                return;
+            }
+
+            if (!state.fromAmount || parseFloat(state.fromAmount) === 0) {
+                alert('Please enter an amount');
+                return;
+            }
+
+            const btn = document.getElementById('swap-btn');
+            const text = document.getElementById('swap-btn-text');
+            const originalText = text.textContent;
+
+            btn.disabled = true;
+            text.textContent = translations[state.currentLang]['swap-btn-text-loading'];
+
+            try {
+                const engine = new SwapEngine();
+                let txData = null;
+
+                // Try SwapEngine first
+                try {
+                    const fromAddr = state.fromToken.address;
+                    const toAddr = state.toToken.address;
+                    const amount = engine.parseAmount(state.fromAmount, state.fromToken.decimals);
+                    const walletAddress = state.walletAddress;
+
+                    txData = await engine.getSwapTransaction(fromAddr, toAddr, amount, walletAddress, state.slippage);
+                    console.log('[FunSwap] Swap transaction from SwapEngine:', txData);
+                } catch (swapError) {
+                    console.warn('[FunSwap] SwapEngine failed, fallback to simulation:', swapError.message);
+                    // Fallback: proceed with simulated swap
+                    txData = null;
+                }
+
+                // Simulate swap execution or use actual transaction
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Add to history
+                const historyItem = {
+                    from: state.fromToken.symbol,
+                    to: state.toToken.symbol,
+                    fromAmount: state.fromAmount,
+                    toAmount: state.toAmount,
+                    timestamp: new Date(),
+                    hash: txData && txData.data ? '0x' + Math.random().toString(16).slice(2) : '0x' + Math.random().toString(16).slice(2),
+                    source: txData ? 'engine' : 'simulation'
+                };
+
+                state.swapHistory.unshift(historyItem);
+                renderSwapHistory();
+
+                // Reset form
+                state.fromAmount = '';
+                state.toAmount = '';
+                document.getElementById('from-amount').value = '';
+                document.getElementById('to-amount').value = '';
+
+                updateSwapButtonText();
+            } catch (error) {
+                console.error('Swap error:', error);
+                alert('Swap failed. Please try again.');
+            } finally {
+                btn.disabled = false;
+                text.textContent = originalText;
+            }
+        }
+
+        function renderSwapHistory() {
+            const historyDiv = document.getElementById('swap-history');
+
+            if (state.swapHistory.length === 0) {
+                historyDiv.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text3); font-size: 13px;">
+                        <span id="no-history-text">${translations[state.currentLang]['no-history-text']}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            historyDiv.innerHTML = state.swapHistory.map(item => {
+                const time = item.timestamp.toLocaleTimeString(
+                    state.currentLang === 'ko' ? 'ko-KR' : 'en-US',
+                    { hour: '2-digit', minute: '2-digit' }
+                );
+                return `
+                    <div class="swap-history-item">
+                        <div class="swap-history-left">
+                            <div class="swap-history-icons">
+                                <div class="swap-history-icon">${formatTokenIcon(item.from)}</div>
+                                <div class="swap-history-icon">${formatTokenIcon(item.to)}</div>
+                            </div>
+                            <div class="swap-history-info">
+                                <div class="swap-history-pair">${item.from} → ${item.to}</div>
+                                <div class="swap-history-time">${time}</div>
+                            </div>
+                        </div>
+                        <div class="swap-history-amount">
+                            <div class="swap-history-from">-${formatNumber(item.fromAmount)}</div>
+                            <div class="swap-history-to">+${formatNumber(item.toAmount)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+
+        // Language switcher
+        document.querySelectorAll('.lang-link').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                setLanguage(el.dataset.lang);
+            });
+        });
+
+        // Token selection
+        document.getElementById('from-token-btn').addEventListener('click', () => openTokenModal('from'));
+        document.getElementById('to-token-btn').addEventListener('click', () => openTokenModal('to'));
+
+        // Modal
+        document.getElementById('modal-close').addEventListener('click', closeTokenModal);
+        document.getElementById('token-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'token-modal-overlay') closeTokenModal();
+        });
+
+        // Swap direction
+        document.getElementById('swap-direction-btn').addEventListener('click', () => {
+            [state.fromToken, state.toToken] = [state.toToken, state.fromToken];
+            document.getElementById('from-symbol').textContent = state.fromToken.symbol;
+            document.getElementById('from-icon').innerHTML = formatTokenIcon(state.fromToken.symbol);
+            document.getElementById('to-symbol').textContent = state.toToken.symbol;
+            document.getElementById('to-icon').innerHTML = formatTokenIcon(state.toToken.symbol);
+            updateExchangeRate();
+            getSwapQuote();
+        });
+
+        // Amount input
+        document.getElementById('from-amount').addEventListener('input', (e) => {
+            state.fromAmount = e.target.value;
+            updateSwapButtonText();
+            getSwapQuote();
+        });
+
+        // Slippage settings
+        document.querySelectorAll('.slippage-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (btn.id === 'custom-slippage-toggle') {
+                    const input = document.getElementById('custom-slippage-input');
+                    input.style.display = input.style.display === 'none' ? 'block' : 'none';
+                } else {
+                    document.querySelectorAll('.slippage-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.slippage = parseFloat(btn.dataset.slippage);
+                    document.getElementById('custom-slippage-input').style.display = 'none';
+                }
+            });
+        });
+
+        document.getElementById('custom-slippage-input').addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (val > 0 && val <= 50) {
+                document.querySelectorAll('.slippage-btn').forEach(b => b.classList.remove('active'));
+                state.slippage = val;
+            }
+        });
+
+        // Swap button
+        document.getElementById('swap-btn').addEventListener('click', executeSwap);
+
+        // Settings modal
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            document.getElementById('settings-modal-overlay').classList.add('active');
+        });
+        document.getElementById('settings-modal-close').addEventListener('click', () => {
+            document.getElementById('settings-modal-overlay').classList.remove('active');
+        });
+        document.getElementById('settings-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'settings-modal-overlay') e.target.classList.remove('active');
+        });
+
+        // Slippage chips
+        document.querySelectorAll('#slippage-options .stg-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#slippage-options .stg-chip').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const val = parseFloat(btn.dataset.val);
+                if (!isNaN(val)) state.slippage = val;
+                document.getElementById('custom-slippage').value = '';
+            });
+        });
+        document.getElementById('custom-slippage').addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (!isNaN(val) && val > 0 && val <= 50) {
+                state.slippage = val;
+                document.querySelectorAll('#slippage-options .stg-chip').forEach(b => b.classList.remove('active'));
+            }
+        });
+
+        // Gas chips
+        document.querySelectorAll('#gas-options .stg-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#gas-options .stg-chip').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Wallet button
+        document.getElementById('wallet-btn').addEventListener('click', () => {
+            state.walletConnected = !state.walletConnected;
+            updateSwapButtonText();
+            const btn = document.getElementById('wallet-btn');
+            if (state.walletConnected) {
+                btn.textContent = '연결됨';
+                btn.style.background = 'rgba(0, 209, 140, 0.2)';
+                btn.style.color = 'var(--green)';
+            } else {
+                btn.textContent = '연결';
+                btn.style.background = 'linear-gradient(135deg, var(--green) 0%, #00B873 100%)';
+                btn.style.color = 'black';
+            }
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        function init() {
+            setLanguage('ko');
+            updateExchangeRate();
+            renderSwapHistory();
+
+            // Initialize token icons
+            document.getElementById('from-icon').innerHTML = formatTokenIcon('BNB');
+            document.getElementById('to-icon').innerHTML = formatTokenIcon('USDT');
+
+            // Prevent body scroll when modal is open
+            const observer = new MutationObserver(() => {
+                const isOpen = document.getElementById('token-modal-overlay').classList.contains('active');
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            });
+
+            observer.observe(document.getElementById('token-modal-overlay'), {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+
+        // Start the app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

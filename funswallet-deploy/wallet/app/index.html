@@ -323,17 +323,7 @@
             width: 100%; aspect-ratio: 1; background: var(--bg2);
             display: flex; align-items: center; justify-content: center; overflow: hidden;
         }
-        .nft-img img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        .nft-lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:9999; align-items:center; justify-content:center; flex-direction:column; padding:20px; }
-        .nft-lightbox.active { display:flex; }
-        .nft-lightbox img { max-width:90%; max-height:70vh; border-radius:16px; box-shadow:0 8px 40px rgba(255,107,53,0.3); animation:nftZoomIn 0.3s ease; }
-        .nft-lightbox-info { text-align:center; margin-top:16px; }
-        .nft-lightbox-name { font-size:20px; font-weight:700; color:#fff; font-family:'Orbitron',sans-serif; }
-        .nft-lightbox-collection { font-size:14px; color:var(--text4); margin-top:4px; }
-        .nft-lightbox-price { font-size:16px; color:var(--primary); font-weight:600; margin-top:8px; }
-        .nft-lightbox-close { position:absolute; top:20px; right:24px; font-size:32px; color:#fff; cursor:pointer; opacity:0.7; transition:opacity 0.2s; background:none; border:none; }
-        .nft-lightbox-close:hover { opacity:1; }
-        @keyframes nftZoomIn { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+        .nft-img img { width: 100%; height: 100%; object-fit: cover; }
         .nft-meta { padding: 12px; }
         .nft-name { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .nft-collection { font-size: 11px; color: var(--text4); margin-bottom: 6px; }
@@ -520,371 +510,6 @@
         .token-loading { color: var(--accent); font-size: 13px; margin-top: 6px; animation: pulse 1.5s ease infinite; }
         @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
 
-        /* Token Select with Icon */
-        .token-select-wrap {
-            position: relative;
-        }
-        .token-select-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        .token-select {
-            padding-left: 44px !important;
-        }
-
-        /* ============================================
-           WALLET FLOWS (Onboarding / Import / PIN)
-           Generated dynamically by wallet-ui.js
-           ============================================ */
-
-        /* Base overlay for all flows */
-        .onboarding-overlay,
-        .pin-entry-overlay,
-        .pin-confirmation-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--bg);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .onboarding-container,
-        .pin-entry-container,
-        .pin-confirmation-container {
-            max-width: 420px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .onboarding-header,
-        .pin-entry-header,
-        .pin-confirmation-header {
-            margin-bottom: 32px;
-        }
-
-        .onboarding-header h1,
-        .pin-entry-header h1,
-        .pin-confirmation-header h1 {
-            font-family: 'Orbitron', monospace;
-            font-size: 22px;
-            font-weight: 900;
-            color: var(--text);
-            margin-bottom: 8px;
-        }
-
-        .onboarding-header p,
-        .pin-entry-header p,
-        .pin-confirmation-header p {
-            color: var(--text3);
-            font-size: 14px;
-        }
-
-        .onboarding-logo {
-            margin-bottom: 8px;
-        }
-
-        /* Onboarding options */
-        .onboarding-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .onboarding-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            padding: 18px 20px;
-            background: var(--card);
-            border: 1px solid var(--border-light);
-            border-radius: 16px;
-            color: var(--text);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-        }
-
-        .onboarding-btn:active {
-            background: var(--card-hover);
-            transform: scale(0.98);
-        }
-
-        .onboarding-btn .icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: var(--primary-dim);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: var(--primary);
-            flex-shrink: 0;
-        }
-
-        /* Mnemonic Warning */
-        .mnemonic-warning {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 14px 16px;
-            background: rgba(255,107,53,0.08);
-            border: 1px solid rgba(255,107,53,0.2);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .mnemonic-warning .warning-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
-        .mnemonic-warning p { color: var(--text3); font-size: 13px; line-height: 1.5; margin: 0; }
-
-        /* Mnemonic Grid (seed phrase display) */
-        .mnemonic-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-        .mnemonic-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 14px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            text-align: left;
-        }
-        .word-number {
-            font-size: 11px;
-            color: var(--text4);
-            font-weight: 700;
-            min-width: 18px;
-        }
-        .word-text {
-            font-size: 15px;
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        /* Confirmation inputs */
-        .confirmation-items {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .confirmation-item {
-            text-align: left;
-        }
-        .confirmation-item label {
-            display: block;
-            font-size: 13px;
-            color: var(--text3);
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-        .confirmation-input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-light);
-            border-radius: 14px;
-            color: var(--text);
-            font-size: 16px;
-            outline: none;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        .confirmation-input:focus { border-color: var(--primary); }
-
-        /* Import wallet */
-        .import-options {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        .import-option-btn {
-            padding: 10px 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            background: none;
-            color: var(--text3);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .import-option-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .mnemonic-inputs {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        .mnemonic-input {
-            width: 100%;
-            padding: 12px 14px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 15px;
-            outline: none;
-            text-align: center;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        .mnemonic-input:focus { border-color: var(--primary); }
-        .mnemonic-input::placeholder { color: var(--text4); font-size: 13px; }
-
-        .import-textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-light);
-            border-radius: 14px;
-            color: var(--text);
-            font-size: 15px;
-            outline: none;
-            resize: vertical;
-            margin-bottom: 20px;
-            font-family: 'Noto Sans KR', sans-serif;
-            line-height: 1.6;
-        }
-        .import-textarea:focus { border-color: var(--primary); }
-        .import-textarea::placeholder { color: var(--text4); }
-
-        /* PIN Display */
-        .pin-display {
-            margin-bottom: 24px;
-        }
-        .pin-input {
-            width: 200px;
-            padding: 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-light);
-            border-radius: 14px;
-            color: var(--primary);
-            font-size: 28px;
-            text-align: center;
-            letter-spacing: 8px;
-            outline: none;
-            font-family: 'Orbitron', monospace;
-        }
-        .pin-display.shake {
-            animation: pinShake 0.4s ease;
-        }
-        @keyframes pinShake {
-            0%,100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        /* PIN Numpad */
-        .pin-numpad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 280px;
-            margin: 0 auto 20px;
-        }
-        .numpad-btn {
-            width: 100%;
-            aspect-ratio: 1.4;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            font-size: 22px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-            font-family: 'Orbitron', monospace;
-        }
-        .numpad-btn:active {
-            background: var(--card-hover);
-            transform: scale(0.95);
-        }
-        .numpad-btn.delete-btn,
-        .numpad-btn.clear-btn {
-            background: rgba(255,255,255,0.04);
-            font-size: 18px;
-        }
-        .num-text { pointer-events: none; }
-
-        /* PIN Error */
-        .pin-error {
-            color: var(--red);
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 12px;
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(11,14,23,0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            border-radius: 16px;
-            z-index: 10;
-        }
-        .loading-spinner {
-            width: 36px; height: 36px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text {
-            color: var(--text3);
-            font-size: 14px;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 10000;
-            animation: toastIn 0.3s ease-out;
-        }
-        .toast.success { background: var(--green); color: white; }
-        .toast.error { background: var(--red); color: white; }
-        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-
         /* Utility */
         .hidden { display: none !important; }
         .counter { font-family: 'Orbitron', monospace; font-weight: 700; }
@@ -931,7 +556,7 @@
                         <span style="font-size:10px;">▼</span>
                     </button>
                     <div class="portfolio-label">총 자산</div>
-                    <div class="portfolio-balance" id="portfolioBalance">$28,801.20</div>
+                    <div class="portfolio-balance">$<span class="counter" data-target="12458.32">0.00</span></div>
                     <div class="portfolio-change up">▲ $234.56 (+1.92%)</div>
                     <div class="address-row">
                         <span class="address-text" id="addressDisplay">0x1a2B...3c4D</span>
@@ -1055,7 +680,7 @@
             <div class="tab-page" id="page-nft">
                 <div class="section-header" style="margin-top:8px;"><span class="section-title">내 NFT</span><button class="section-action">6개</button></div>
                 <div class="nft-grid">
-                    <div class="nft-card"><div class="nft-img"><img src="../../founder_nft.png" alt="Funs Founder NFT" style="object-fit:cover;"></div><div class="nft-meta"><div class="nft-name">Funs Founder NFT #001</div><div class="nft-collection">FunS Founders</div><div class="nft-price">5.0 BNB</div></div></div>
+                    <div class="nft-card"><div class="nft-img"><img src="../nft-images/runner.svg" alt="Runner"></div><div class="nft-meta"><div class="nft-name">FunS 런너 #1234</div><div class="nft-collection">FunS Game</div><div class="nft-price">0.5 BNB</div></div></div>
                     <div class="nft-card"><div class="nft-img"><img src="../nft-images/dragon.svg" alt="Dragon"></div><div class="nft-meta"><div class="nft-name">FunS 드래곤 #5678</div><div class="nft-collection">FunS Dragons</div><div class="nft-price">1.2 BNB</div></div></div>
                     <div class="nft-card"><div class="nft-img"><img src="../nft-images/warrior.svg" alt="Warrior"></div><div class="nft-meta"><div class="nft-name">FunS 검사 #2341</div><div class="nft-collection">FunS Warriors</div><div class="nft-price">0.8 BNB</div></div></div>
                     <div class="nft-card"><div class="nft-img"><img src="../nft-images/castle.svg" alt="Castle"></div><div class="nft-meta"><div class="nft-name">FunS 성 #6789</div><div class="nft-collection">FunS Realms</div><div class="nft-price">2.0 BNB</div></div></div>
@@ -1070,8 +695,8 @@
                 <div class="settings-list">
                     <div class="settings-group">
                         <div class="settings-group-title">네트워크</div>
-                        <div class="settings-item"><div class="settings-item-left"><img src="../../dex/icons/bnb.svg" style="width:24px;height:24px;border-radius:50%;" alt="BNB"><div><div class="settings-item-label">BNB Smart Chain</div><div class="settings-item-desc">기본 네트워크</div></div></div><label class="toggle"><input type="checkbox" checked disabled id="bscToggle"><span class="toggle-track"></span></label></div>
-                        <div class="settings-item"><div class="settings-item-left"><img src="../../dex/icons/eth.svg" style="width:24px;height:24px;border-radius:50%;" alt="ETH"><div><div class="settings-item-label">Ethereum</div><div class="settings-item-desc">선택 사항</div></div></div><label class="toggle"><input type="checkbox" id="ethToggle"><span class="toggle-track"></span></label></div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🟡</span><div><div class="settings-item-label">BNB Smart Chain</div><div class="settings-item-desc">기본 네트워크</div></div></div><label class="toggle"><input type="checkbox" checked disabled id="bscToggle"><span class="toggle-track"></span></label></div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔷</span><div><div class="settings-item-label">Ethereum</div><div class="settings-item-desc">선택 사항</div></div></div><label class="toggle"><input type="checkbox" id="ethToggle"><span class="toggle-track"></span></label></div>
                     </div>
                     <div class="settings-group">
                         <div class="settings-group-title">커스텀 토큰</div>
@@ -1083,29 +708,6 @@
                         <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">⚠️</span><div><div class="settings-item-label">시드 구문 백업</div><div class="settings-item-desc">지갑을 안전하게 보호하세요</div></div></div><div class="settings-item-right">›</div></div>
                         <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔐</span><div><div class="settings-item-label">생체 인식 잠금</div><div class="settings-item-desc">지문 또는 얼굴 인식</div></div></div><label class="toggle"><input type="checkbox" checked id="biometricToggle"><span class="toggle-track"></span></label></div>
                         <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🌐</span><div><div class="settings-item-label">연결된 사이트</div><div class="settings-item-desc">3개의 DApp 연결됨</div></div></div><div class="settings-item-right">관리 ›</div></div>
-                    </div>
-                    <div class="settings-group">
-                        <div class="settings-group-title">거래 설정</div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">⛽</span><div><div class="settings-item-label">기본 가스비</div><div class="settings-item-desc">Default Gas</div></div></div><div class="settings-item-right"><select class="form-input" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; padding: 6px 12px; font-size: 13px;"><option>느림</option><option selected>보통</option><option>빠름</option></select></div></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">📊</span><div><div class="settings-item-label">기본 슬리피지</div><div class="settings-item-desc">Default Slippage</div></div></div><div class="settings-item-right"><select class="form-input" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; padding: 6px 12px; font-size: 13px;"><option>0.1%</option><option selected>0.5%</option><option>1%</option><option>3%</option></select></div></div>
-                    </div>
-                    <div class="settings-group">
-                        <div class="settings-group-title">일반 설정</div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🌐</span><div><div class="settings-item-label">언어</div><div class="settings-item-desc">Language</div></div></div><div class="settings-item-right" style="display: flex; align-items: center; gap: 8px;">한국어 <span>›</span></div></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">💱</span><div><div class="settings-item-label">통화</div><div class="settings-item-desc">Currency</div></div></div><div class="settings-item-right" style="display: flex; align-items: center; gap: 8px;">USD <span>›</span></div></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔒</span><div><div class="settings-item-label">자동 잠금</div><div class="settings-item-desc">Auto-Lock</div></div></div><div class="settings-item-right"><select class="form-input" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; padding: 6px 12px; font-size: 13px;"><option>1분</option><option selected>5분</option><option>15분</option><option>30분</option></select></div></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🌙</span><div><div class="settings-item-label">테마</div><div class="settings-item-desc">Theme</div></div></div><label class="toggle"><input type="checkbox" checked id="themeToggle"><span class="toggle-track"></span></label></div>
-                    </div>
-                    <div class="settings-group">
-                        <div class="settings-group-title">알림 설정</div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔔</span><div><div class="settings-item-label">거래 알림</div><div class="settings-item-desc">Transaction Alerts</div></div></div><label class="toggle"><input type="checkbox" checked id="txAlertsToggle"><span class="toggle-track"></span></label></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">💰</span><div><div class="settings-item-label">가격 알림</div><div class="settings-item-desc">Price Alerts</div></div></div><label class="toggle"><input type="checkbox" id="priceAlertsToggle"><span class="toggle-track"></span></label></div>
-                    </div>
-                    <div class="settings-group">
-                        <div class="settings-group-title">기타</div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">💾</span><div><div class="settings-item-label">지갑 백업/내보내기</div><div class="settings-item-desc">Backup/Export Wallet</div></div></div><div class="settings-item-right">›</div></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">📄</span><div><div class="settings-item-label">이용약관</div><div class="settings-item-desc">Terms of Service</div></div></div><div class="settings-item-right">›</div></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔐</span><div><div class="settings-item-label">개인정보 처리방침</div><div class="settings-item-desc">Privacy Policy</div></div></div><div class="settings-item-right">›</div></div>
                     </div>
                     <div class="settings-group">
                         <div class="settings-group-title">정보</div>
@@ -1157,9 +759,9 @@
     <!-- BOTTOM SHEET MODALS -->
     <div class="bottom-sheet-overlay" id="sendModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title">전송</span><button class="sheet-close" id="closeSendModal">✕</button></div><div class="sheet-body"><form id="sendForm"><div class="form-group"><label class="form-label">받는 주소</label><input type="text" class="form-input" placeholder="0x..." required></div><div class="form-group"><label class="form-label">토큰</label><select class="form-input" required><option>FUNS</option><option>BNB</option><option>USDT</option><option>ETH</option><option>CAKE</option></select></div><div class="form-group"><label class="form-label">수량</label><input type="number" class="form-input" placeholder="0.00" step="0.01" required></div><button type="submit" class="form-btn">전송 확인</button></form></div></div></div>
 
-    <div class="bottom-sheet-overlay" id="receiveModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title">수신</span><button class="sheet-close" id="closeReceiveModal">✕</button></div><div class="sheet-body"><div class="qr-section"><div class="qr-box"><canvas id="qrCanvas" width="160" height="160" style="border-radius:8px;"></canvas></div><div class="qr-address">0x742d35Cc6634C0532925a3b844Bc9e7595f2bD38</div><button type="button" class="form-btn" style="margin-top:16px;">주소 복사</button></div></div></div></div>
+    <div class="bottom-sheet-overlay" id="receiveModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title">수신</span><button class="sheet-close" id="closeReceiveModal">✕</button></div><div class="sheet-body"><div class="qr-section"><div class="qr-box"><svg width="160" height="160" style="background:white;"><rect width="160" height="160" fill="white"/><text x="50%" y="50%" text-anchor="middle" font-size="12" fill="#666">QR Code</text></svg></div><div class="qr-address">0x1a2B3c4D5e6F7g8h9i0j1k2l3m4n5o6p7q8r9s0</div><button type="button" class="form-btn" style="margin-top:16px;">주소 복사</button></div></div></div></div>
 
-    <div class="bottom-sheet-overlay" id="swapModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title">스왑</span><button class="sheet-close" id="closeSwapModal">✕</button></div><div class="sheet-body"><form id="swapForm"><div class="form-group"><label class="form-label">판매</label><div class="token-select-wrap"><select class="form-input token-select" id="swapFromToken" required><option value="FUNS" data-icon="../../funs-nugi.png">FUNS</option><option value="BNB" data-icon="../../dex/icons/bnb.svg">BNB</option><option value="USDT" data-icon="../../dex/icons/usdt.svg">USDT</option><option value="ETH" data-icon="../../dex/icons/eth.svg">ETH</option><option value="CAKE" data-icon="../../dex/icons/cake.svg">CAKE</option></select><img class="token-select-icon" id="swapFromIcon" src="../../funs-nugi.png" alt=""></div></div><div class="form-group"><label class="form-label">수량</label><input type="number" class="form-input" placeholder="0.00" step="0.01" required></div><div class="swap-divider"><div class="swap-arrow">⇅</div></div><div class="form-group"><label class="form-label">구매</label><div class="token-select-wrap"><select class="form-input token-select" id="swapToToken" required><option value="BNB" data-icon="../../dex/icons/bnb.svg">BNB</option><option value="FUNS" data-icon="../../funs-nugi.png">FUNS</option><option value="USDT" data-icon="../../dex/icons/usdt.svg">USDT</option><option value="ETH" data-icon="../../dex/icons/eth.svg">ETH</option><option value="CAKE" data-icon="../../dex/icons/cake.svg">CAKE</option></select><img class="token-select-icon" id="swapToIcon" src="../../dex/icons/bnb.svg" alt=""></div></div><div class="form-group"><label class="form-label">예상 수량</label><input type="number" class="form-input" placeholder="0.00" disabled></div><button type="submit" class="form-btn">스왑 확인</button></form></div></div></div>
+    <div class="bottom-sheet-overlay" id="swapModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title">스왑</span><button class="sheet-close" id="closeSwapModal">✕</button></div><div class="sheet-body"><form id="swapForm"><div class="form-group"><label class="form-label">판매</label><select class="form-input" required><option>FUNS</option><option>BNB</option><option>USDT</option><option>ETH</option><option>CAKE</option></select></div><div class="form-group"><label class="form-label">수량</label><input type="number" class="form-input" placeholder="0.00" step="0.01" required></div><div class="swap-divider"><div class="swap-arrow">⇅</div></div><div class="form-group"><label class="form-label">구매</label><select class="form-input" required><option>BNB</option><option>FUNS</option><option>USDT</option><option>ETH</option><option>CAKE</option></select></div><div class="form-group"><label class="form-label">예상 수량</label><input type="number" class="form-input" placeholder="0.00" disabled></div><button type="submit" class="form-btn">스왑 확인</button></form></div></div></div>
 
     <div class="bottom-sheet-overlay" id="buyModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title">구매</span><button class="sheet-close" id="closeBuyModal">✕</button></div><div class="sheet-body"><form id="buyForm"><div class="form-group"><label class="form-label">토큰</label><select class="form-input" required><option>FUNS</option><option>BNB</option><option>USDT</option><option>ETH</option><option>CAKE</option></select></div><div class="form-group"><label class="form-label">구매 금액 (USD)</label><input type="number" class="form-input" placeholder="0.00" step="0.01" required></div><div class="form-group"><label class="form-label">결제 방법</label><select class="form-input" required><option>신용카드</option><option>은행 이체</option><option>페이팔</option></select></div><button type="submit" class="form-btn">구매 확인</button></form></div></div></div>
 
@@ -1231,118 +833,6 @@
             });
         });
 
-        // Token select icon sync
-        document.querySelectorAll('.token-select').forEach(sel => {
-            sel.addEventListener('change', function() {
-                const opt = this.options[this.selectedIndex];
-                const icon = opt.getAttribute('data-icon');
-                const imgEl = this.parentElement.querySelector('.token-select-icon');
-                if (imgEl && icon) imgEl.src = icon;
-            });
-        });
-
-        // Portfolio balance: sum all token USD values
-        function updatePortfolioBalance() {
-            const items = document.querySelectorAll('#page-home .token-list .token-item');
-            let total = 0;
-            items.forEach(t => {
-                const usdEl = t.querySelector('.token-usd');
-                if (usdEl) {
-                    const val = parseFloat(usdEl.textContent.replace(/[$,]/g, ''));
-                    if (!isNaN(val)) total += val;
-                }
-            });
-            const balEl = document.getElementById('portfolioBalance');
-            if (balEl) balEl.textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        }
-        // Run on load and after any changes
-        updatePortfolioBalance();
-        // Watch for dynamic token list changes
-        const tokenListObserver = new MutationObserver(updatePortfolioBalance);
-        const tokenListEl = document.querySelector('#page-home .token-list');
-        if (tokenListEl) tokenListObserver.observe(tokenListEl, { childList: true, subtree: true, characterData: true });
-
-        // Scan button
-        document.getElementById('scanBtn').addEventListener('click', () => {
-            alert('QR 스캐너는 모바일 앱에서 사용 가능합니다');
-        });
-
-        // Notification button
-        document.getElementById('notifBtn').addEventListener('click', () => {
-            alert('알림이 없습니다');
-        });
-
-        // Manage tokens → go to settings
-        const manageBtn = document.getElementById('manageTokensBtn');
-        if (manageBtn) {
-            manageBtn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-bar-item').forEach(t => { if (!t.classList.contains('swap-tab')) t.classList.remove('active'); });
-                document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-                document.getElementById('page-settings').classList.add('active');
-                document.querySelector('[data-page="settings"]').classList.add('active');
-            });
-        }
-
-        // Network selector
-        document.getElementById('networkSelector').addEventListener('click', () => {
-            document.querySelectorAll('.tab-bar-item').forEach(t => { if (!t.classList.contains('swap-tab')) t.classList.remove('active'); });
-            document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-settings').classList.add('active');
-            document.querySelector('[data-page="settings"]').classList.add('active');
-        });
-
-        // Form submit handlers (prevent default, show toast)
-        ['sendForm', 'swapForm', 'buyForm'].forEach(formId => {
-            const form = document.getElementById(formId);
-            if (form) {
-                form.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const overlay = form.closest('.bottom-sheet-overlay');
-                    if (overlay) overlay.classList.remove('active');
-                    // Reset form
-                    form.reset();
-                });
-            }
-        });
-
-        // Receive modal copy button
-        const receiveSheet = document.getElementById('receiveModal');
-        if (receiveSheet) {
-            const copyBtn2 = receiveSheet.querySelector('.form-btn');
-            if (copyBtn2) {
-                copyBtn2.addEventListener('click', () => {
-                    navigator.clipboard.writeText('0x742d35Cc6634C0532925a3b844Bc9e7595f2bD38').then(() => {
-                        copyBtn2.textContent = '✓ 복사됨';
-                        setTimeout(() => copyBtn2.textContent = '주소 복사', 1500);
-                    });
-                });
-            }
-        }
-
-        // Generate QR code on receive modal open
-        const origReceiveClick = document.getElementById('receiveBtn').onclick;
-        document.getElementById('receiveBtn').addEventListener('click', () => {
-            setTimeout(() => {
-                const canvas = document.getElementById('qrCanvas');
-                if (canvas && typeof QRCode !== 'undefined') {
-                    QRCode.toCanvas(canvas, '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD38', {
-                        width: 160, margin: 2, color: { dark: '#000000', light: '#ffffff' }
-                    });
-                }
-            }, 100);
-        });
-
-        // Modal close → reset forms
-        document.querySelectorAll('.bottom-sheet-overlay').forEach(overlay => {
-            const observer = new MutationObserver(() => {
-                if (!overlay.classList.contains('active')) {
-                    const form = overlay.querySelector('form');
-                    if (form) form.reset();
-                }
-            });
-            observer.observe(overlay, { attributes: true, attributeFilter: ['class'] });
-        });
-
         // Copy Address
         const copyBtn = document.getElementById('copyBtn');
         if (copyBtn) {
@@ -1353,40 +843,6 @@
                 });
             });
         }
-    })();
-    </script>
-    <!-- NFT Lightbox -->
-    <div class="nft-lightbox" id="nftLightbox">
-        <button class="nft-lightbox-close" id="nftLightboxClose">&times;</button>
-        <img id="nftLightboxImg" src="" alt="">
-        <div class="nft-lightbox-info">
-            <div class="nft-lightbox-name" id="nftLightboxName"></div>
-            <div class="nft-lightbox-collection" id="nftLightboxCollection"></div>
-            <div class="nft-lightbox-price" id="nftLightboxPrice"></div>
-        </div>
-    </div>
-    <script>
-    (function(){
-        const lightbox = document.getElementById('nftLightbox');
-        const lbImg = document.getElementById('nftLightboxImg');
-        const lbName = document.getElementById('nftLightboxName');
-        const lbCollection = document.getElementById('nftLightboxCollection');
-        const lbPrice = document.getElementById('nftLightboxPrice');
-        document.querySelectorAll('.nft-card').forEach(card => {
-            card.querySelector('.nft-img').addEventListener('click', () => {
-                const img = card.querySelector('.nft-img img');
-                const name = card.querySelector('.nft-name').textContent;
-                const collection = card.querySelector('.nft-collection').textContent;
-                const price = card.querySelector('.nft-price').textContent;
-                lbImg.src = img.src;
-                lbName.textContent = name;
-                lbCollection.textContent = collection;
-                lbPrice.textContent = price;
-                lightbox.classList.add('active');
-            });
-        });
-        document.getElementById('nftLightboxClose').addEventListener('click', () => lightbox.classList.remove('active'));
-        lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('active'); });
     })();
     </script>
     <script>

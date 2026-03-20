@@ -1,0 +1,114 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkBgGem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0015;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a0a2a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gemCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0080FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5500FF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gemEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0.7" />
+    </linearGradient>
+    <filter id="gemGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="innerGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#00FFFF;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#0080FF;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#darkBgGem)"/>
+
+  <!-- Ambient glow halo -->
+  <circle cx="200" cy="200" r="130" fill="url(#innerGlow)"/>
+
+  <!-- Outer glow ring -->
+  <circle cx="200" cy="200" r="125" fill="none" stroke="url(#gemEdge)" stroke-width="2" opacity="0.6" filter="url(#gemGlow)"/>
+
+  <!-- Main gemstone body -->
+  <g filter="url(#gemGlow)">
+    <!-- Top facet -->
+    <polygon points="200,80 240,130 160,130" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2.5"/>
+
+    <!-- Upper middle facets -->
+    <polygon points="240,130 280,170 220,180" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.95"/>
+    <polygon points="160,130 120,170 180,180" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.95"/>
+
+    <!-- Upper sides -->
+    <polygon points="280,170 300,200 260,210" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.9"/>
+    <polygon points="120,170 100,200 140,210" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.9"/>
+
+    <!-- Middle band -->
+    <polygon points="220,180 260,210 240,260 200,280 160,260 140,210 180,180" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2.5"/>
+
+    <!-- Lower facets -->
+    <polygon points="240,260 280,240 300,280" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.92"/>
+    <polygon points="160,260 120,240 100,280" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.92"/>
+
+    <!-- Bottom facets -->
+    <polygon points="200,280 240,260 220,320" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.88"/>
+    <polygon points="200,280 160,260 180,320" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.88"/>
+
+    <!-- Very bottom point -->
+    <polygon points="200,320 220,310 180,310" fill="url(#gemCore)" stroke="url(#gemEdge)" stroke-width="2" opacity="0.85"/>
+  </g>
+
+  <!-- Light refraction highlights -->
+  <g opacity="0.7" filter="url(#gemGlow)">
+    <line x1="200" y1="90" x2="200" y2="250" stroke="#FFD700" stroke-width="2.5" opacity="0.6"/>
+    <line x1="230" y1="110" x2="170" y2="300" stroke="#00FFFF" stroke-width="1.5" opacity="0.5"/>
+    <line x1="170" y1="110" x2="230" y2="300" stroke="#00FFFF" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- Inner light rays -->
+  <g opacity="0.4" fill="none" stroke="#FFD700" stroke-width="1">
+    <line x1="200" y1="130" x2="200" y2="180"/>
+    <line x1="180" y1="140" x2="140" y2="200"/>
+    <line x1="220" y1="140" x2="260" y2="200"/>
+  </g>
+
+  <!-- Floating sparkle particles around gem -->
+  <g filter="url(#gemGlow)" opacity="0.8">
+    <!-- Top right sparkles -->
+    <circle cx="310" cy="140" r="2.5" fill="#FFD700"/>
+    <line x1="310" y1="135" x2="310" y2="145" stroke="#FFD700" stroke-width="1"/>
+    <line x1="305" y1="140" x2="315" y2="140" stroke="#FFD700" stroke-width="1"/>
+
+    <!-- Top left sparkles -->
+    <circle cx="90" cy="140" r="2.5" fill="#FFD700"/>
+    <line x1="90" y1="135" x2="90" y2="145" stroke="#FFD700" stroke-width="1"/>
+    <line x1="85" y1="140" x2="95" y2="140" stroke="#FFD700" stroke-width="1"/>
+
+    <!-- Bottom right sparkles -->
+    <circle cx="320" cy="280" r="2" fill="#00FFFF"/>
+    <line x1="320" y1="276" x2="320" y2="284" stroke="#00FFFF" stroke-width="0.8"/>
+    <line x1="316" y1="280" x2="324" y2="280" stroke="#00FFFF" stroke-width="0.8"/>
+
+    <!-- Bottom left sparkles -->
+    <circle cx="80" cy="280" r="2" fill="#00FFFF"/>
+    <line x1="80" y1="276" x2="80" y2="284" stroke="#00FFFF" stroke-width="0.8"/>
+    <line x1="76" y1="280" x2="84" y2="280" stroke="#00FFFF" stroke-width="0.8"/>
+
+    <!-- Side sparkles -->
+    <circle cx="350" cy="200" r="1.8" fill="#FFD700" opacity="0.7"/>
+    <circle cx="50" cy="200" r="1.8" fill="#FFD700" opacity="0.7"/>
+  </g>
+
+  <!-- Concentric energy circles -->
+  <g fill="none" opacity="0.25">
+    <circle cx="200" cy="200" r="100" stroke="#00FFFF" stroke-width="1" stroke-dasharray="4,4"/>
+    <circle cx="200" cy="200" r="70" stroke="#FFD700" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="200" cy="200" r="140" stroke="#FF6B35" stroke-width="0.8" stroke-dasharray="5,5"/>
+  </g>
+
+  <!-- Pulsing outer aura -->
+  <circle cx="200" cy="200" r="145" fill="none" stroke="url(#gemEdge)" stroke-width="1.5" opacity="0.4"/>
+</svg>
