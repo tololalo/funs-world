@@ -45,18 +45,6 @@ class WalletTransactions {
 
       // Get current gas price
       const feeData = await provider.getFeeData();
-      let gasPrice;
-      let maxFeePerGas;
-      let maxPriorityFeePerGas;
-
-      if (feeData.maxFeePerGas) {
-        // EIP-1559
-        maxFeePerGas = feeData.maxFeePerGas;
-        maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
-      } else {
-        // Legacy gas price
-        gasPrice = feeData.gasPrice;
-      }
 
       // Estimate gas
       const estimateGasParams = {
@@ -65,19 +53,13 @@ class WalletTransactions {
       };
       const gasLimit = await provider.estimateGas(estimateGasParams);
 
-      // Build transaction
+      // Build transaction with user gas preference
       const txParams = {
         to,
         value: parsedAmount,
-        gasLimit: (gasLimit * 120n) / 100n // Add 20% buffer
+        gasLimit: (gasLimit * 120n) / 100n, // Add 20% buffer
+        ...this._buildGasTxParams(feeData)
       };
-
-      if (maxFeePerGas) {
-        txParams.maxFeePerGas = maxFeePerGas;
-        txParams.maxPriorityFeePerGas = maxPriorityFeePerGas;
-      } else {
-        txParams.gasPrice = gasPrice;
-      }
 
       // Send transaction
       const tx = await signer.sendTransaction(txParams);
@@ -181,16 +163,10 @@ class WalletTransactions {
 
       // Get fee data for gas price
       const feeData = await provider.getFeeData();
-      let txParams = {
-        gasLimit: (gasLimit * 120n) / 100n // Add 20% buffer
+      const txParams = {
+        gasLimit: (gasLimit * 120n) / 100n, // Add 20% buffer
+        ...this._buildGasTxParams(feeData)
       };
-
-      if (feeData.maxFeePerGas) {
-        txParams.maxFeePerGas = feeData.maxFeePerGas;
-        txParams.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
-      } else {
-        txParams.gasPrice = feeData.gasPrice;
-      }
 
       // Call transfer
       const tx = await contract.transfer(to, parsedAmount, txParams);
@@ -287,14 +263,7 @@ class WalletTransactions {
 
       // Get fee data
       const feeData = await provider.getFeeData();
-      let txParams = {};
-
-      if (feeData.maxFeePerGas) {
-        txParams.maxFeePerGas = feeData.maxFeePerGas;
-        txParams.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
-      } else {
-        txParams.gasPrice = feeData.gasPrice;
-      }
+      const txParams = this._buildGasTxParams(feeData);
 
       // Call approve
       const tx = await contract.approve(spenderAddress, parsedAmount, txParams);
@@ -474,14 +443,7 @@ class WalletTransactions {
 
       // Get fee data
       const feeData = await provider.getFeeData();
-      let txParams = {};
-
-      if (feeData.maxFeePerGas) {
-        txParams.maxFeePerGas = feeData.maxFeePerGas;
-        txParams.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
-      } else {
-        txParams.gasPrice = feeData.gasPrice;
-      }
+      const txParams = this._buildGasTxParams(feeData);
 
       // Set deadline (20 minutes from now)
       const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
@@ -920,6 +882,36 @@ class WalletTransactions {
     const contract = new ethers.Contract(tokenAddress, erc20ABI, provider);
     const balance = await contract.balanceOf(userAddress);
     return balance >= amount;
+  }
+
+  /**
+   * Get gas price multiplier based on user preference stored in localStorage
+   * @private
+   * @returns {{ num: bigint, den: bigint }} Multiplier as a fraction (result = price * num / den)
+   */
+  _getGasMultiplier() {
+    const pref = localStorage.getItem('funs_gas_preference') || 'normal';
+    if (pref === 'slow') return { num: 80n, den: 100n };
+    if (pref === 'fast') return { num: 150n, den: 100n };
+    return { num: 1n, den: 1n }; // normal
+  }
+
+  /**
+   * Apply gas preference multiplier to fee data
+   * @private
+   * @param {Object} feeData - Fee data from provider.getFeeData()
+   * @returns {Object} txParams with adjusted gas prices
+   */
+  _buildGasTxParams(feeData) {
+    const { num, den } = this._getGasMultiplier();
+    const txParams = {};
+    if (feeData.maxFeePerGas) {
+      txParams.maxFeePerGas = (feeData.maxFeePerGas * num) / den;
+      txParams.maxPriorityFeePerGas = (feeData.maxPriorityFeePerGas * num) / den;
+    } else {
+      txParams.gasPrice = (feeData.gasPrice * num) / den;
+    }
+    return txParams;
   }
 
   /**

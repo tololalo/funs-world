@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "world.funs.wallet",
+    "sha256_cert_fingerprints": [
+      "6F:A8:DC:3C:D0:1B:49:BF:FA:5F:31:E6:25:5E:62:0C:7A:28:4B:ED:35:41:3C:69:63:D3:F4:09:2B:D4:D4:29"
+    ]
+  }
+}]

@@ -1702,11 +1702,12 @@ class WalletUI {
 
           try {
             // Execute swap
+            const slippagePref = parseFloat(localStorage.getItem('funs_slippage') || '0.5');
             const txHash = await this.walletTransactions.swapTokens(
               fromToken.value,
               toToken.value,
               amount,
-              0.5, // Default slippage
+              slippagePref,
               this.walletBlockchain.currentNetwork || WalletConfig.defaultNetwork
             );
 
@@ -1859,23 +1860,24 @@ class WalletUI {
   showSettingsPanel() {
     const enabledNetworks = window.WalletConfig.getEnabledNetworks?.() || ['bsc'];
     const isEthEnabled = enabledNetworks.includes('ethereum');
+    const t = (key) => window.i18n ? window.i18n.t(key) : key;
 
     const overlay = document.createElement('div');
     overlay.className = 'settings-overlay';
     overlay.innerHTML = `
       <div class="settings-panel">
         <div class="settings-header">
-          <h2>Settings</h2>
+          <h2>${t('settings.title')}</h2>
           <button class="settings-close-btn">X</button>
         </div>
         <div class="settings-content">
           <div class="settings-section">
-            <h3>Network Management</h3>
+            <h3>${t('settings.networkManagement')}</h3>
             <div class="network-toggle-list">
               <div class="network-toggle-item">
                 <div class="network-toggle-info">
-                  <span class="network-toggle-name">BNB Smart Chain</span>
-                  <span class="network-toggle-desc">Default Network</span>
+                  <span class="network-toggle-name">${t('settings.bsc')}</span>
+                  <span class="network-toggle-desc">${t('settings.defaultNetwork')}</span>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" checked disabled>
@@ -1884,8 +1886,8 @@ class WalletUI {
               </div>
               <div class="network-toggle-item">
                 <div class="network-toggle-info">
-                  <span class="network-toggle-name">Ethereum</span>
-                  <span class="network-toggle-desc">Optionally Enable</span>
+                  <span class="network-toggle-name">${t('settings.eth')}</span>
+                  <span class="network-toggle-desc">${t('settings.optional')}</span>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="ethToggle" ${isEthEnabled ? 'checked' : ''}>
@@ -1895,10 +1897,10 @@ class WalletUI {
             </div>
           </div>
           <div class="settings-section">
-            <h3>Custom Tokens</h3>
-            <p class="settings-desc">You can add tokens directly by contract address.</p>
+            <h3>${t('settings.customTokens')}</h3>
+            <p class="settings-desc">${t('settings.customTokensDesc')}</p>
             <div class="custom-token-list" id="customTokenList"></div>
-            <button class="add-custom-token-btn" id="addCustomTokenBtn">+ Add Token</button>
+            <button class="add-custom-token-btn" id="addCustomTokenBtn">+ ${t('settings.addToken')}</button>
           </div>
         </div>
       </div>
@@ -1926,19 +1928,20 @@ class WalletUI {
         const enabled = e.target.checked;
         window.WalletConfig.toggleNetwork('ethereum', enabled);
 
+        const t = (key, params) => window.i18n ? window.i18n.t(key, params) : key;
         if (enabled) {
           try {
             await this.walletBlockchain.enableNetwork('ethereum');
-            this.showToast('Ethereum network enabled', 'success');
+            this.showToast(t('toast.networkEnabled'), 'success');
           } catch (err) {
             e.target.checked = false;
             window.WalletConfig.toggleNetwork('ethereum', false);
-            this.showToast(err.message || 'Failed to enable network', 'error');
+            this.showToast(err.message || t('toast.networkEnableFail'), 'error');
           }
         } else {
           try {
             this.walletBlockchain.disableNetwork('ethereum');
-            this.showToast('Ethereum network disabled', 'info');
+            this.showToast(t('toast.networkDisabled'), 'info');
           } catch(err) {
             e.target.checked = true;
             window.WalletConfig.toggleNetwork('ethereum', true);
@@ -2204,16 +2207,17 @@ class WalletUI {
     const tokenData = addressInput.tokenData;
     const currentNetwork = this.walletBlockchain.currentNetwork || 'bsc';
 
+    const t = (key, params) => window.i18n ? window.i18n.t(key, params) : key;
     // Check if already exists
     const existing = window.WalletConfig.getAllTokens(currentNetwork);
     if (existing[tokenData.symbol]) {
-      this.showToast(`${tokenData.symbol} token already exists`, 'warning');
+      this.showToast(t('toast.tokenExists', { symbol: tokenData.symbol }), 'warning');
       return;
     }
 
     const success = window.WalletConfig.addCustomToken(currentNetwork, tokenData);
     if (success) {
-      this.showToast(`${tokenData.symbol} token added`, 'success');
+      this.showToast(t('toast.tokenAdded', { symbol: tokenData.symbol }), 'success');
       this.refreshCustomTokenList();
       const modal = document.querySelector('.custom-token-modal');
       if (modal) modal.remove();
@@ -2223,7 +2227,7 @@ class WalletUI {
         this.loadDashboard();
       }
     } else {
-      this.showToast('Failed to add token', 'error');
+      this.showToast(t('toast.tokenAddFail'), 'error');
     }
   }
 

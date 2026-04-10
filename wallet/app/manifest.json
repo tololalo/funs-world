@@ -2,7 +2,8 @@
   "name": "FunS Wallet",
   "short_name": "FunS",
   "description": "Secure Multi-chain Crypto Wallet",
-  "start_url": "./",
+  "start_url": "/funs-platform/wallet/app/",
+  "scope": "/funs-platform/wallet/app/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0B0E17",
@@ -34,5 +35,6 @@
     }
   ],
   "categories": ["finance", "utilities"],
-  "lang": "ko"
+  "lang": "ko",
+  "prefer_related_applications": false
 }
