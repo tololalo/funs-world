@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download — FunS Platform</title>
+<meta name="description" content="FunS 앱 다운로드 - 곧 출시됩니다.">
+<meta property="og:title" content="Download — FunS Platform">
+<meta property="og:image" content="https://funs.world/funs-nugi.png">
+<link rel="icon" type="image/png" href="funs-nugi.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #0a0a0f;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 32px;
+    overflow: hidden;
+  }
+  .bg-glow {
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    filter: blur(150px);
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .bg-glow.a { top: -200px; left: -100px; background: #FF6B35; }
+  .bg-glow.b { bottom: -200px; right: -100px; background: #FFD700; }
+  .logo {
+    width: 140px; height: 140px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 40px rgba(255,107,53,0.5));
+    animation: float 3s ease-in-out infinite;
+  }
+  .title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #FF6B35, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    letter-spacing: 4px;
+  }
+  .sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 1.1rem;
+    text-align: center;
+    line-height: 1.8;
+  }
+  .home-btn {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 14px 40px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #FF6B35, #ff9a00);
+    border-radius: 50px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .home-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(255,107,53,0.4);
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+</style>
+</head>
+<body>
+<div class="bg-glow a"></div>
+<div class="bg-glow b"></div>
+<img src="funs-nugi.png" alt="FunS Logo" class="logo">
+<div class="title">COMING SOON</div>
+<p class="sub">곧 만나보실 수 있습니다.<br>정식 출시를 기대해 주세요!</p>
+<a href="./" class="home-btn">홈으로 돌아가기</a>
+</body>
+</html>
