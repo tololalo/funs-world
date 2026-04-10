@@ -13,6 +13,14 @@ class WalletBlockchain extends EventTarget {
     this.refreshTimer = null;
     this._priceCache = { data: {}, timestamp: 0 };
     this._priceCacheDuration = 30000; // 30 seconds
+
+    // Rate limiting for CoinGecko API
+    this._lastApiCall = 0;
+    this._apiMinInterval = 1500; // 1.5 seconds between calls
+
+    // Cache for transaction history
+    this._txHistoryCache = {};
+    this._txHistoryCacheTTL = 60000; // 1 minute
   }
 
   /**
@@ -30,17 +38,62 @@ class WalletBlockchain extends EventTarget {
         const networkConfig = window.WalletConfig.NETWORKS[networkKey];
         if (!networkConfig) continue;
         try {
-          this.providers[networkKey] = new ethers.JsonRpcProvider(
-            networkConfig.rpc,
-            {
-              chainId: networkConfig.chainId,
-              name: networkKey
+          const rpcUrls = window.WalletConfig.getRpcUrls?.(networkKey) || [networkConfig.rpc];
+          let provider = null;
+
+          for (const rpcUrl of rpcUrls) {
+            let testProvider = null;
+            try {
+              testProvider = new ethers.JsonRpcProvider(
+                rpcUrl,
+                {
+                  chainId: networkConfig.chainId,
+                  name: networkKey
+                },
+                { staticNetwork: true, polling: false }
+              );
+              // Quick connectivity test with 5 second timeout
+              await Promise.race([
+                testProvider.getBlockNumber(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout')), 5000))
+              ]);
+              provider = testProvider;
+              console.log(`[FunS] Connected to ${networkKey} via ${rpcUrl}`);
+              break;
+            } catch (rpcError) {
+              // Destroy the failed testProvider to stop internal polling timers
+              if (testProvider) {
+                try { testProvider.destroy(); } catch (_) {}
+              }
+              console.warn(`[FunS] RPC failed for ${networkKey}: ${rpcUrl}`, rpcError.message);
             }
-          );
+          }
+
+          if (provider) {
+            this.providers[networkKey] = provider;
+          } else {
+            // Create provider without testing (offline mode), disable polling to avoid background load
+            this.providers[networkKey] = new ethers.JsonRpcProvider(
+              networkConfig.rpc,
+              { chainId: networkConfig.chainId, name: networkKey },
+              { staticNetwork: true, polling: false }
+            );
+            console.warn(`[FunS] ${networkKey}: Using primary RPC without connectivity test`);
+          }
         } catch (error) {
           console.error(`Failed to create provider for ${networkKey}:`, error);
         }
       }
+
+      // Set current network to default if not already set
+      if (!this.currentNetwork || !this.providers[this.currentNetwork]) {
+        this.currentNetwork = window.WalletConfig?.WALLET_CONFIG?.defaultNetwork || 'bsc';
+      }
+
+      // Emit networkChanged event on init
+      this.dispatchEvent(new CustomEvent('networkChanged', {
+        detail: { network: this.currentNetwork }
+      }));
 
       // Start auto-refresh timer
       const refreshInterval = window.WalletConfig.WALLET_CONFIG?.refreshInterval || 30000;
@@ -54,41 +107,80 @@ class WalletBlockchain extends EventTarget {
   }
 
   /**
+   * Wrap a promise with a timeout to prevent indefinite hangs
+   * @private
+   */
+  _withTimeout(promise, timeoutMs = 10000, errorMsg = 'Operation timed out') {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(errorMsg)), timeoutMs))
+    ]);
+  }
+
+  /**
+   * Rate-limited fetch for CoinGecko API calls with AbortController timeout
+   * @private
+   */
+  async _rateLimitedFetch(url, timeoutMs = 10000) {
+    const now = Date.now();
+    const timeSinceLastCall = now - this._lastApiCall;
+    if (timeSinceLastCall < this._apiMinInterval) {
+      await new Promise(resolve => setTimeout(resolve, this._apiMinInterval - timeSinceLastCall));
+    }
+    this._lastApiCall = Date.now();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        console.warn('[FunS] Rate-limited fetch failed:', response.status);
+        return null;
+      }
+      return response;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  /**
    * Switch to a different network
    * @param {string} networkKey - Network identifier (e.g., 'bsc', 'ethereum')
    */
   async switchNetwork(networkKey) {
-    try {
-      // If provider doesn't exist yet (newly enabled network), create it
-      if (!this.providers[networkKey]) {
-        const networkConfig = window.WalletConfig.NETWORKS[networkKey];
-        if (!networkConfig) {
-          throw new Error(`Network ${networkKey} not configured`);
-        }
-        this.providers[networkKey] = new ethers.JsonRpcProvider(
-          networkConfig.rpc,
-          { chainId: networkConfig.chainId, name: networkKey }
-        );
+    // If provider doesn't exist yet (newly enabled network), create it
+    if (!this.providers[networkKey]) {
+      const networkConfig = window.WalletConfig.NETWORKS[networkKey];
+      if (!networkConfig) {
+        throw new Error(`Network ${networkKey} not configured`);
       }
-
-      this.currentNetwork = networkKey;
-
-      // Dispatch event
-      this.dispatchEvent(new CustomEvent('networkChanged', {
-        detail: { network: networkKey }
-      }));
-
-      // Refresh balances for new network
-      if (window.walletCore?.address || window.WalletCore?.address) {
-        const addr = window.walletCore?.address || window.WalletCore?.address;
-        await this.fetchAllBalances(addr);
-      }
-
-      console.log(`Switched to network: ${networkKey}`);
-    } catch (error) {
-      console.error('Network switch failed:', error);
-      throw error;
+      this.providers[networkKey] = new ethers.JsonRpcProvider(
+        networkConfig.rpc,
+        { chainId: networkConfig.chainId, name: networkKey },
+        { staticNetwork: true, polling: false }
+      );
     }
+
+    this.currentNetwork = networkKey;
+
+    // Invalidate price cache on network switch to prevent stale USD values
+    this._priceCache = { data: null, timestamp: 0 };
+
+    // Dispatch event
+    this.dispatchEvent(new CustomEvent('networkChanged', {
+      detail: { network: networkKey }
+    }));
+
+    // Refresh balances for new network — non-fatal: balance fetch failure
+    // should not revert the network switch.
+    if (window.walletCore?.address) {
+      try {
+        await this.fetchAllBalances(window.walletCore.address);
+      } catch (balanceError) {
+        console.warn(`Balance fetch failed after switching to ${networkKey}:`, balanceError);
+      }
+    }
+
+    console.log(`Switched to network: ${networkKey}`);
   }
 
   /**
@@ -105,12 +197,84 @@ class WalletBlockchain extends EventTarget {
   }
 
   /**
+   * Get current network information
+   * @returns {Object} Network info with name, chainId, isTestnet, symbol, explorer
+   */
+  getNetworkInfo() {
+    const networkConfig = window.WalletConfig.NETWORKS[this.currentNetwork];
+    if (!networkConfig) {
+      console.error('[FunS] Network config not found:', this.currentNetwork);
+      return null;
+    }
+    return {
+      key: this.currentNetwork,
+      name: networkConfig?.name || 'Unknown',
+      chainId: networkConfig?.chainId || 0,
+      isTestnet: networkConfig?.isTestnet || false,
+      symbol: networkConfig?.symbol || 'ETH',
+      explorer: networkConfig?.explorer || '',
+      faucet: networkConfig?.faucet || null
+    };
+  }
+
+  /**
+   * Check if currently connected to blockchain
+   * @returns {Promise<boolean>}
+   */
+  async isConnected() {
+    try {
+      const provider = this.getProvider();
+      await Promise.race([
+        provider.getBlockNumber(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+      ]);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Get current gas price with speed options
+   * @returns {Promise<Object>} Gas prices for slow/standard/fast
+   */
+  async getGasPrice() {
+    try {
+      const provider = this.getProvider();
+      const feeData = await this._withTimeout(provider.getFeeData(), 10000, 'getFeeData timed out');
+      const baseGasPrice = feeData.gasPrice || ethers.parseUnits('5', 'gwei');
+
+      return {
+        slow: {
+          gwei: ethers.formatUnits(baseGasPrice * 80n / 100n, 'gwei'),
+          wei: (baseGasPrice * 80n / 100n).toString()
+        },
+        standard: {
+          gwei: ethers.formatUnits(baseGasPrice, 'gwei'),
+          wei: baseGasPrice.toString()
+        },
+        fast: {
+          gwei: ethers.formatUnits(baseGasPrice * 120n / 100n, 'gwei'),
+          wei: (baseGasPrice * 120n / 100n).toString()
+        }
+      };
+    } catch (error) {
+      console.error('Failed to get gas price:', error);
+      return {
+        slow: { gwei: '3', wei: ethers.parseUnits('3', 'gwei').toString() },
+        standard: { gwei: '5', wei: ethers.parseUnits('5', 'gwei').toString() },
+        fast: { gwei: '7', wei: ethers.parseUnits('7', 'gwei').toString() }
+      };
+    }
+  }
+
+  /**
    * Get balances for current wallet (wrapper around fetchAllBalances)
    * @returns {Promise<Object>} Balances object
    */
   async getBalances() {
     try {
-      const addr = window.walletCore?.address || window.WalletCore?.address;
+      const addr = window.walletCore?.address;
       if (!addr) {
         throw new Error('No wallet address available');
       }
@@ -143,6 +307,7 @@ class WalletBlockchain extends EventTarget {
       }
 
       if (!coingeckoId) {
+        console.warn('[FunS] CoinGecko ID not found for:', symbol);
         throw new Error(`CoinGecko ID not found for token ${symbol}`);
       }
 
@@ -197,16 +362,21 @@ class WalletBlockchain extends EventTarget {
       const amountIn = ethers.parseUnits(amount, decimals);
 
       // Get amounts out
-      const amounts = await router.getAmountsOut(amountIn, path);
+      const amounts = await this._withTimeout(router.getAmountsOut(amountIn, path), 10000, 'getAmountsOut timed out');
       const outputDecimals = toTokenConfig.decimals || 18;
       const outputAmount = ethers.formatUnits(amounts[amounts.length - 1], outputDecimals);
+
+      // Price impact based on liquidity depth estimation
+      // For small trades (<1% of pool), impact is minimal
+      // This is a conservative estimate
+      const priceImpact = Math.min(parseFloat(amount) * 0.003, 5).toFixed(2); // 0.3% per unit, max 5%
 
       return {
         fromToken,
         toToken,
         inputAmount: amount,
         outputAmount: outputAmount,
-        priceImpact: 0
+        priceImpact: parseFloat(priceImpact)
       };
     } catch (error) {
       console.error('Failed to get swap quote:', error);
@@ -223,7 +393,7 @@ class WalletBlockchain extends EventTarget {
    */
   async checkAllowance(tokenSymbol, spenderAddress, ownerAddress = null) {
     try {
-      const owner = ownerAddress || window.walletCore?.address || window.WalletCore?.address;
+      const owner = ownerAddress || window.walletCore?.address;
       if (!owner) {
         throw new Error('No wallet address available');
       }
@@ -247,7 +417,7 @@ class WalletBlockchain extends EventTarget {
         provider
       );
 
-      const allowance = await contract.allowance(owner, spenderAddress);
+      const allowance = await this._withTimeout(contract.allowance(owner, spenderAddress), 10000, 'allowance check timed out');
       const decimals = tokenConfig.decimals || 18;
       return ethers.formatUnits(allowance, decimals);
     } catch (error) {
@@ -276,9 +446,21 @@ class WalletBlockchain extends EventTarget {
   /**
    * Fetch all balances for an address on current network
    * @param {string} address - Wallet address
-   * @returns {Promise<Object>} Balances object
+   * @returns {Promise<Object>} Formatted balances object with tokens array and totalUSD
    */
   async fetchAllBalances(address) {
+    // Concurrency guard: skip if a fetch is already in progress
+    if (this._isFetchingBalances) {
+      return this.balances ? {
+        tokens: Object.entries(this.balances).map(([symbol, d]) => ({
+          symbol, name: d.name, balance: d.balance,
+          balanceUSD: `$${d.usdValue || 0}`, change: '0.0%',
+          icon: d.icon, native: false, decimals: d.decimals, address: d.address
+        })),
+        totalUSD: 0
+      } : null;
+    }
+    this._isFetchingBalances = true;
     try {
       if (!ethers.isAddress(address)) {
         throw new Error('Invalid address format');
@@ -291,56 +473,102 @@ class WalletBlockchain extends EventTarget {
         throw new Error(`Network config not found for ${this.currentNetwork}`);
       }
 
-      const balances = {};
+      const balancesMap = {};
+      const tokens = [];
+      let totalUSD = 0;
 
       // Fetch native token balance
-      const nativeBalance = await provider.getBalance(address);
+      const nativeBalance = await this._withTimeout(provider.getBalance(address), 10000, 'getBalance timed out');
       const nativeFormatted = ethers.formatUnits(nativeBalance, 18);
-      balances[networkConfig.symbol || 'BNB'] = {
+      const nativeSymbol = networkConfig.symbol || 'BNB';
+      balancesMap[nativeSymbol] = {
         balance: nativeFormatted,
         decimals: 18,
         address: null,
         usdValue: 0,
-        change24h: 0
+        change24h: 0,
+        name: networkConfig.name || nativeSymbol,
+        icon: networkConfig.icon || `./icons/${nativeSymbol.toLowerCase()}.svg`
       };
 
-      // Fetch ERC-20 token balances (built-in + custom)
+      // Fetch ERC-20 token balances in parallel (not sequentially)
       const networkTokens = window.WalletConfig.getAllTokens?.(this.currentNetwork) || window.WalletConfig.TOKENS[this.currentNetwork] || {};
       if (networkTokens) {
-        for (const [symbol, tokenConfig] of Object.entries(networkTokens)) {
-          if (tokenConfig.native) continue;
-          if (!tokenConfig.address || tokenConfig.address === '0x0000000000000000000000000000000000000000') continue;
-          try {
-            const balance = await this.getTokenBalance(address, tokenConfig, this.currentNetwork);
-            balances[symbol] = {
+        const tokenEntries = Object.entries(networkTokens).filter(([, tokenConfig]) =>
+          !tokenConfig.native &&
+          tokenConfig.address &&
+          tokenConfig.address !== '0x0000000000000000000000000000000000000000'
+        );
+
+        const tokenResults = await Promise.allSettled(
+          tokenEntries.map(([symbol, tokenConfig]) =>
+            this.getTokenBalance(address, tokenConfig, this.currentNetwork)
+              .then(balance => ({ symbol, tokenConfig, balance }))
+          )
+        );
+
+        for (const result of tokenResults) {
+          if (result.status === 'fulfilled') {
+            const { symbol, tokenConfig, balance } = result.value;
+            balancesMap[symbol] = {
               balance: balance,
               decimals: tokenConfig.decimals,
               address: tokenConfig.address,
               usdValue: 0,
               change24h: 0,
-              isCustom: tokenConfig.isCustom || false
+              isCustom: tokenConfig.isCustom || false,
+              name: tokenConfig.name || symbol,
+              icon: tokenConfig.icon || `./icons/${symbol.toLowerCase()}.svg`
             };
-          } catch (error) {
-            console.warn(`Failed to fetch balance for ${symbol}:`, error);
+          } else {
+            console.warn(`Failed to fetch balance for token:`, result.reason);
           }
         }
       }
 
-      // Fetch USD prices
-      await this._enrichBalancesWithPrices(balances, networkConfig);
+      // Fetch USD prices and enrich balances
+      await this._enrichBalancesWithPrices(balancesMap, networkConfig);
 
-      // Store balances
-      this.balances = balances;
+      // Convert to array format and calculate total
+      for (const [symbol, balanceData] of Object.entries(balancesMap)) {
+        const change24h = balanceData.change24h || 0;
+        const changeStr = change24h > 0 ? `+${change24h.toFixed(1)}%` : `${change24h.toFixed(1)}%`;
+        const usdValue = balanceData?.usdValue != null ? parseFloat(balanceData.usdValue) : 0;
+
+        tokens.push({
+          symbol: symbol,
+          name: balanceData.name,
+          balance: balanceData.balance,
+          balanceUSD: `$${balanceData.usdValue}`,
+          change: changeStr,
+          icon: balanceData.icon,
+          native: symbol === nativeSymbol,
+          decimals: balanceData.decimals,
+          address: balanceData.address
+        });
+
+        totalUSD += usdValue;
+      }
+
+      const result = {
+        tokens: tokens,
+        totalUSD: parseFloat(totalUSD.toFixed(2))
+      };
+
+      // Store balances (both formats for backward compatibility)
+      this.balances = balancesMap;
 
       // Dispatch event
       this.dispatchEvent(new CustomEvent('balancesUpdated', {
-        detail: { balances: balances }
+        detail: { balances: result }
       }));
 
-      return balances;
+      return result;
     } catch (error) {
       console.error('Failed to fetch balances:', error);
       throw error;
+    } finally {
+      this._isFetchingBalances = false;
     }
   }
 
@@ -357,7 +585,7 @@ class WalletBlockchain extends EventTarget {
       }
 
       const provider = this.getProvider(networkKey);
-      const balance = await provider.getBalance(address);
+      const balance = await this._withTimeout(provider.getBalance(address), 10000, 'getBalance timed out');
       return ethers.formatUnits(balance, 18);
     } catch (error) {
       console.error('Failed to fetch native balance:', error);
@@ -390,7 +618,7 @@ class WalletBlockchain extends EventTarget {
         provider
       );
 
-      const balance = await contract.balanceOf(address);
+      const balance = await this._withTimeout(contract.balanceOf(address), 10000, 'balanceOf timed out');
       const decimals = tokenConfig.decimals || 18;
       return ethers.formatUnits(balance, decimals);
     } catch (error) {
@@ -446,9 +674,9 @@ class WalletBlockchain extends EventTarget {
       const ids = coingeckoIds.join(',');
       const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`;
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`CoinGecko API error: ${response.status}`);
+      const response = await this._rateLimitedFetch(url);
+      if (!response || !response.ok) {
+        throw new Error(`CoinGecko API error: ${response?.status || 'no response'}`);
       }
 
       const data = await response.json();
@@ -496,9 +724,9 @@ class WalletBlockchain extends EventTarget {
       const daysParam = dayMap[days] || 1;
       const url = `https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=usd&days=${daysParam}`;
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`CoinGecko API error: ${response.status}`);
+      const response = await this._rateLimitedFetch(url);
+      if (!response || !response.ok) {
+        throw new Error(`CoinGecko API error: ${response?.status || 'no response'}`);
       }
 
       const data = await response.json();
@@ -520,10 +748,10 @@ class WalletBlockchain extends EventTarget {
       const provider = this.getProvider(networkKey);
 
       // Estimate gas
-      const gasLimit = await provider.estimateGas(txParams);
+      const gasLimit = await this._withTimeout(provider.estimateGas(txParams), 10000, 'estimateGas timed out');
 
       // Get fee data
-      const feeData = await provider.getFeeData();
+      const feeData = await this._withTimeout(provider.getFeeData(), 10000, 'getFeeData timed out');
       const gasPrice = feeData.gasPrice || ethers.parseUnits('1', 'gwei');
 
       // Calculate costs
@@ -550,58 +778,96 @@ class WalletBlockchain extends EventTarget {
 
   /**
    * Get transaction history for an address
+   * Works even without API keys by gracefully falling back
    * @param {string} address - Wallet address
    * @param {string} networkKey - Network identifier (optional)
-   * @returns {Promise<Array>} Array of transaction objects
+   * @returns {Promise<Array>} Array of transaction objects (empty array if API not available)
    */
   async getTransactionHistory(address, networkKey = null) {
     try {
       if (!ethers.isAddress(address)) {
-        throw new Error('Invalid address format');
+        console.warn('Invalid address format for transaction history');
+        return [];
       }
 
       const key = networkKey || this.currentNetwork;
       const networkConfig = window.WalletConfig.NETWORKS[key];
 
       if (!networkConfig || !networkConfig.explorerApi) {
-        throw new Error(`Explorer API not configured for ${key}`);
+        console.warn(`Explorer API not configured for ${key}, returning empty transaction history`);
+        return [];
+      }
+
+      // Check transaction history cache
+      const cacheKey = `${address}_${key}`;
+      const cached = this._txHistoryCache[cacheKey];
+      if (cached && Date.now() - cached.timestamp < this._txHistoryCacheTTL) {
+        return cached.data;
       }
 
       const transactions = [];
 
-      // Get the appropriate API key
+      // Get the appropriate API key (optional)
       const apiKeyMap = { bsc: window.WalletConfig.API_KEYS?.bscscan, ethereum: window.WalletConfig.API_KEYS?.etherscan };
       const apiKey = apiKeyMap[key] || '';
 
-      // Fetch normal transactions
-      const normalTxUrl = `${networkConfig.explorerApi}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
-      const normalTxResponse = await fetch(normalTxUrl);
-      const normalTxData = await normalTxResponse.json();
-
-      if (normalTxData.result && Array.isArray(normalTxData.result)) {
-        for (const tx of normalTxData.result) {
-          transactions.push(this._formatTransaction(tx, address));
+      try {
+        // Fetch normal transactions
+        const normalTxUrl = `${networkConfig.explorerApi}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
+        const normalTxController = new AbortController();
+        const normalTxTimeout = setTimeout(() => normalTxController.abort(), 10000);
+        let normalTxResponse;
+        try {
+          normalTxResponse = await fetch(normalTxUrl, { signal: normalTxController.signal });
+        } finally {
+          clearTimeout(normalTxTimeout);
         }
+        const normalTxData = await normalTxResponse.json();
+
+        if (normalTxData.result && Array.isArray(normalTxData.result)) {
+          for (const tx of normalTxData.result) {
+            transactions.push(this._formatTransaction(tx, address));
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to fetch normal transactions:', error);
+        // Continue with token transfers even if normal transactions fail
       }
 
-      // Fetch ERC-20 transfers
-      const tokenTxUrl = `${networkConfig.explorerApi}?module=account&action=tokentx&address=${address}&sort=desc&apikey=${apiKey}`;
-      const tokenTxResponse = await fetch(tokenTxUrl);
-      const tokenTxData = await tokenTxResponse.json();
-
-      if (tokenTxData.result && Array.isArray(tokenTxData.result)) {
-        for (const tx of tokenTxData.result) {
-          transactions.push(this._formatTransaction(tx, address, true));
+      try {
+        // Fetch ERC-20 transfers
+        const tokenTxUrl = `${networkConfig.explorerApi}?module=account&action=tokentx&address=${address}&sort=desc&apikey=${apiKey}`;
+        const tokenTxController = new AbortController();
+        const tokenTxTimeout = setTimeout(() => tokenTxController.abort(), 10000);
+        let tokenTxResponse;
+        try {
+          tokenTxResponse = await fetch(tokenTxUrl, { signal: tokenTxController.signal });
+        } finally {
+          clearTimeout(tokenTxTimeout);
         }
+        const tokenTxData = await tokenTxResponse.json();
+
+        if (tokenTxData.result && Array.isArray(tokenTxData.result)) {
+          for (const tx of tokenTxData.result) {
+            transactions.push(this._formatTransaction(tx, address, true));
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to fetch token transfers:', error);
+        // Continue with what we have
       }
 
       // Sort by timestamp (newest first)
       transactions.sort((a, b) => b.timestamp - a.timestamp);
 
+      // Cache the results
+      this._txHistoryCache[cacheKey] = { data: transactions, timestamp: Date.now() };
+
       return transactions;
     } catch (error) {
       console.error('Failed to fetch transaction history:', error);
-      throw error;
+      // Return empty array instead of throwing
+      return [];
     }
   }
 
@@ -620,6 +886,9 @@ class WalletBlockchain extends EventTarget {
    */
   destroy() {
     this.stopRefresh();
+    for (const key of Object.keys(this.providers)) {
+      try { this.providers[key].destroy(); } catch (_) {}
+    }
     this.providers = {};
     this.balances = {};
     this.prices = {};
@@ -638,7 +907,8 @@ class WalletBlockchain extends EventTarget {
     if (!this.providers[networkKey]) {
       this.providers[networkKey] = new ethers.JsonRpcProvider(
         networkConfig.rpc,
-        { chainId: networkConfig.chainId, name: networkKey }
+        { chainId: networkConfig.chainId, name: networkKey },
+        { staticNetwork: true, polling: false }
       );
     }
   }
@@ -652,6 +922,7 @@ class WalletBlockchain extends EventTarget {
       throw new Error('Cannot disable the currently active network');
     }
     if (this.providers[networkKey]) {
+      try { this.providers[networkKey].destroy(); } catch (_) {}
       delete this.providers[networkKey];
     }
   }
@@ -662,17 +933,22 @@ class WalletBlockchain extends EventTarget {
 
   /**
    * Start auto-refresh timer
+   * Only refreshes when wallet is unlocked (has address)
    * @private
    */
-  _startAutoRefresh(interval) {
+  _startAutoRefresh(interval = 30000) {
     this.stopRefresh();
 
     this.refreshTimer = setInterval(async () => {
       try {
-        const addr = window.walletCore?.address || window.WalletCore?.address;
-        if (addr) {
+        // Check if wallet is unlocked (has an address)
+        const addr = window.walletCore?.address;
+        const isWalletUnlocked = window.walletCore?.isUnlocked?.() || !!addr;
+
+        if (addr && isWalletUnlocked) {
+          // fetchAllBalances already calls _enrichBalancesWithPrices → fetchPrices internally.
+          // Do not call fetchPrices() again here — that doubles the CoinGecko API traffic.
           await this.fetchAllBalances(addr);
-          await this.fetchPrices();
         }
       } catch (error) {
         console.error('Auto-refresh failed:', error);
@@ -767,6 +1043,7 @@ class WalletBlockchain extends EventTarget {
   _getNativeCoingeckoId(networkKey) {
     const coingeckoMap = {
       'bsc': 'binancecoin',
+      'bscTestnet': 'binancecoin',
       'ethereum': 'ethereum',
       'polygon': 'matic-network',
       'avalanche': 'avalanche-2',

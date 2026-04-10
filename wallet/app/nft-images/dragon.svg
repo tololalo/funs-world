@@ -1,0 +1,86 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkBgDragon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0f2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2a1a4a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dragonGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="fireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FF4500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B0000;stop-opacity:0.6" />
+    </linearGradient>
+    <filter id="dragonGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="400" height="400" fill="url(#darkBgDragon)"/>
+
+  <!-- Fire breath effect -->
+  <g filter="url(#dragonGlow)" opacity="0.9">
+    <!-- Main fire plume -->
+    <path d="M 140 180 Q 80 120 60 80 Q 75 100 90 95 Q 80 70 95 60 Q 110 85 120 100" fill="url(#fireGrad)" stroke="none"/>
+    <path d="M 140 180 Q 70 140 40 100 Q 60 115 80 110 Q 65 85 85 75 Q 105 105 130 125" fill="#FF6B35" opacity="0.7" stroke="none"/>
+    <!-- Secondary flames -->
+    <path d="M 130 200 Q 90 170 70 140" fill="none" stroke="#FF4500" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 135 190 Q 100 155 75 120" fill="none" stroke="#FFD700" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+  </g>
+
+  <!-- Dragon head profile -->
+  <g filter="url(#dragonGlow)">
+    <!-- Snout/mouth -->
+    <path d="M 160 210 Q 200 200 220 210 Q 210 220 160 225" fill="url(#dragonGold)" stroke="#FF6B35" stroke-width="3"/>
+
+    <!-- Main head shape -->
+    <ellipse cx="180" cy="170" rx="45" ry="50" fill="url(#dragonGold)" stroke="#FF6B35" stroke-width="3"/>
+
+    <!-- Horn -->
+    <path d="M 155 130 L 140 80 L 150 135" fill="url(#dragonGold)" stroke="#FF6B35" stroke-width="2"/>
+
+    <!-- Rear horn -->
+    <path d="M 210 125 L 230 65 L 220 130" fill="#FFD700" stroke="#FF4500" stroke-width="2" opacity="0.8"/>
+
+    <!-- Scale patterns on head -->
+    <g stroke="#FF6B35" stroke-width="1.5" fill="none" opacity="0.6">
+      <path d="M 160 155 Q 170 160 180 155"/>
+      <path d="M 155 175 Q 170 180 185 175"/>
+      <path d="M 165 190 Q 175 195 190 190"/>
+    </g>
+
+    <!-- Glowing left eye -->
+    <circle cx="165" cy="160" r="8" fill="#FF6B35" stroke="#FFD700" stroke-width="2"/>
+    <circle cx="167" cy="158" r="4" fill="#FFD700" opacity="0.9"/>
+    <circle cx="169" cy="156" r="2" fill="white" opacity="0.8"/>
+
+    <!-- Glowing right eye (partial) -->
+    <circle cx="200" cy="155" r="7" fill="#FF6B35" stroke="#FFD700" stroke-width="2" opacity="0.7"/>
+    <circle cx="202" cy="153" r="3" fill="#FFD700" opacity="0.8"/>
+
+    <!-- Jaw line -->
+    <path d="M 160 210 L 200 215 L 210 210" fill="none" stroke="#FF6B35" stroke-width="2.5"/>
+
+    <!-- Head ridge detail -->
+    <polyline points="155,120 165,105 175,115 185,100 195,120" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.7"/>
+  </g>
+
+  <!-- Ambient glow circles -->
+  <g opacity="0.2">
+    <circle cx="100" cy="130" r="60" fill="none" stroke="#FF6B35" stroke-width="1" stroke-dasharray="5,5"/>
+    <circle cx="100" cy="130" r="45" fill="none" stroke="#FFD700" stroke-width="0.8" stroke-dasharray="3,3"/>
+  </g>
+
+  <!-- Corner accents -->
+  <g stroke="#FFD700" stroke-width="1.5" fill="none" opacity="0.5">
+    <path d="M 30 30 L 60 30 L 60 60"/>
+    <path d="M 370 30 L 340 30 L 340 60"/>
+    <path d="M 30 370 L 60 370 L 60 340"/>
+    <path d="M 370 370 L 340 370 L 340 340"/>
+  </g>
+</svg>

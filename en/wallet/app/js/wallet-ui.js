@@ -1,3 +1,14 @@
+// Escape HTML to prevent XSS when inserting user/blockchain data into innerHTML
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 class WalletUI {
   constructor() {
     // WalletCore is a class, create an instance
@@ -238,87 +249,72 @@ class WalletUI {
 
   // PIN setup
   showPinSetup(overlay, mnemonic, flow) {
-    let pin = '';
     let confirmPin = '';
     let confirmingPin = false;
 
     const container = overlay.querySelector('.onboarding-container');
     container.innerHTML = `
       <div class="onboarding-header">
-        <h1>PIN 설정</h1>
-        <p>6자리 PIN 번호를 설정하세요</p>
+        <h1>Set Password</h1>
+        <p>Set a password of at least 8 characters</p>
       </div>
       <div class="pin-display">
-        <input type="password" class="pin-input" readonly maxlength="6">
-      </div>
-      <div class="pin-numpad">
-        ${Array(10).fill(0).map((_, i) => `
-          <button class="numpad-btn" data-num="${i}">
-            <span class="num-text">${i}</span>
+        <div class="pin-keyboard-wrapper">
+          <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="new-password">
+          <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
-        `).join('')}
-        <button class="numpad-btn delete-btn" data-delete>
-          <span class="num-text">⌫</span>
-        </button>
-        <button class="numpad-btn clear-btn" data-clear>
-          <span class="num-text">C</span>
-        </button>
+        </div>
       </div>
       <button class="onboarding-btn pin-confirm-btn" disabled>확인</button>
     `;
 
     const input = container.querySelector('.pin-input');
-    const numpadBtns = container.querySelectorAll('[data-num]');
-    const deleteBtn = container.querySelector('[data-delete]');
-    const clearBtn = container.querySelector('[data-clear]');
     const confirmBtn = container.querySelector('.pin-confirm-btn');
+    const toggleBtn = container.querySelector('.pin-toggle-btn');
 
-    const updateDisplay = () => {
-      input.value = '●'.repeat(pin.length);
-      confirmBtn.disabled = pin.length !== 6;
-    };
-
-    numpadBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (pin.length < 6) {
-          pin += btn.dataset.num;
-          updateDisplay();
-        }
-      });
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+      toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
     });
 
-    deleteBtn.addEventListener('click', () => {
-      pin = pin.slice(0, -1);
-      updateDisplay();
+    input.addEventListener('input', () => {
+      confirmBtn.disabled = input.value.length < 8;
     });
 
-    clearBtn.addEventListener('click', () => {
-      pin = '';
-      updateDisplay();
-    });
-
-    confirmBtn.addEventListener('click', () => {
+    const doConfirm = () => {
+      const pin = input.value;
+      if (pin.length < 8) return;
       if (!confirmingPin) {
         confirmPin = pin;
-        pin = '';
-        updateDisplay();
-        container.querySelector('.onboarding-header h1').textContent = 'PIN 확인';
-        container.querySelector('.onboarding-header p').textContent = 'PIN을 다시 입력하세요';
+        input.value = '';
+        confirmBtn.disabled = true;
+        container.querySelector('.onboarding-header h1').textContent = 'Confirm Password';
+        container.querySelector('.onboarding-header p').textContent = 'Re-enter your password';
         confirmingPin = true;
+        input.focus();
       } else {
         if (pin === confirmPin) {
           this.createWallet(mnemonic, confirmPin, flow, overlay);
         } else {
-          this.showToast('PIN이 일치하지 않습니다', 'error');
-          pin = '';
+          this.showToast('Passwords do not match', 'error');
+          input.value = '';
           confirmPin = '';
           confirmingPin = false;
-          updateDisplay();
-          container.querySelector('.onboarding-header h1').textContent = 'PIN 설정';
-          container.querySelector('.onboarding-header p').textContent = '6자리 PIN 번호를 설정하세요';
+          confirmBtn.disabled = true;
+          container.querySelector('.onboarding-header h1').textContent = 'Set Password';
+          container.querySelector('.onboarding-header p').textContent = 'Set a password of at least 8 characters';
+          input.focus();
         }
       }
-    });
+    };
+
+    confirmBtn.addEventListener('click', doConfirm);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doConfirm(); });
+    setTimeout(() => input.focus(), 100);
   }
 
   // Create or import wallet
@@ -353,25 +349,19 @@ class WalletUI {
     overlay.innerHTML = `
       <div class="pin-entry-container">
         <div class="pin-entry-header">
-          <h1>PIN 입력</h1>
-          <p>지갑을 열기 위해 PIN을 입력하세요</p>
+          <h1>Enter Password</h1>
+          <p>Unlock your wallet</p>
         </div>
         <div class="pin-display">
-          <input type="password" class="pin-input" readonly maxlength="6">
-        </div>
-        <div class="pin-numpad">
-          ${Array(10).fill(0).map((_, i) => `
-            <button class="numpad-btn" data-num="${i}">
-              <span class="num-text">${i}</span>
+          <div class="pin-keyboard-wrapper">
+            <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="current-password">
+            <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
-          `).join('')}
-          <button class="numpad-btn delete-btn" data-delete>
-            <span class="num-text">⌫</span>
-          </button>
-          <button class="numpad-btn clear-btn" data-clear>
-            <span class="num-text">C</span>
-          </button>
+          </div>
         </div>
+        <button class="onboarding-btn pin-unlock-btn" disabled style="margin-top:8px;">Unlock</button>
         <div class="pin-error" style="display: none;"></div>
       </div>
     `;
@@ -379,17 +369,25 @@ class WalletUI {
     document.body.appendChild(overlay);
 
     const input = overlay.querySelector('.pin-input');
-    const numpadBtns = overlay.querySelectorAll('[data-num]');
-    const deleteBtn = overlay.querySelector('[data-delete]');
-    const clearBtn = overlay.querySelector('[data-clear]');
+    const unlockBtn = overlay.querySelector('.pin-unlock-btn');
+    const toggleBtn = overlay.querySelector('.pin-toggle-btn');
     const errorDiv = overlay.querySelector('.pin-error');
-    let pin = '';
 
-    const updateDisplay = () => {
-      input.value = '●'.repeat(pin.length);
-    };
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+      toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
+    });
+
+    input.addEventListener('input', () => {
+      unlockBtn.disabled = input.value.length < 1;
+      errorDiv.style.display = 'none';
+    });
 
     const tryUnlock = () => {
+      const pin = input.value;
+      if (pin.length < 1) return;
       try {
         this.walletCore.unlockWallet(pin);
         this.pinAttempts = 0;
@@ -399,45 +397,24 @@ class WalletUI {
         window.dispatchEvent(new CustomEvent('walletUnlocked'));
       } catch (error) {
         this.pinAttempts++;
-        errorDiv.textContent = `PIN이 잘못되었습니다 (${this.pinAttempts}/${this.maxPinAttempts})`;
+        errorDiv.textContent = `Incorrect password (${this.pinAttempts}/${this.maxPinAttempts})`;
         errorDiv.style.display = 'block';
         input.parentElement.classList.add('shake');
-        setTimeout(() => {
-          input.parentElement.classList.remove('shake');
-        }, 500);
-        pin = '';
-        updateDisplay();
+        setTimeout(() => input.parentElement.classList.remove('shake'), 500);
+        input.value = '';
+        unlockBtn.disabled = true;
 
         if (this.pinAttempts >= this.maxPinAttempts) {
-          errorDiv.textContent = '시도 횟수 초과. 앱을 다시 시작하세요.';
-          overlay.querySelectorAll('button').forEach(btn => btn.disabled = true);
+          errorDiv.textContent = 'Too many attempts. Please restart the app.';
+          input.disabled = true;
+          unlockBtn.disabled = true;
         }
       }
     };
 
-    numpadBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (pin.length < 6) {
-          pin += btn.dataset.num;
-          updateDisplay();
-          if (pin.length === 6) {
-            setTimeout(tryUnlock, 300);
-          }
-        }
-      });
-    });
-
-    deleteBtn.addEventListener('click', () => {
-      pin = pin.slice(0, -1);
-      updateDisplay();
-      errorDiv.style.display = 'none';
-    });
-
-    clearBtn.addEventListener('click', () => {
-      pin = '';
-      updateDisplay();
-      errorDiv.style.display = 'none';
-    });
+    unlockBtn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+    setTimeout(() => input.focus(), 100);
   }
 
   // PIN confirmation for transactions
@@ -448,25 +425,19 @@ class WalletUI {
       overlay.innerHTML = `
         <div class="pin-confirmation-container">
           <div class="pin-confirmation-header">
-            <h1>거래 확인</h1>
-            <p>PIN을 입력하여 거래를 확인하세요</p>
+            <h1>Transaction Confirmation</h1>
+            <p>Enter password to confirm transaction</p>
           </div>
           <div class="pin-display">
-            <input type="password" class="pin-input" readonly maxlength="6">
-          </div>
-          <div class="pin-numpad">
-            ${Array(10).fill(0).map((_, i) => `
-              <button class="numpad-btn" data-num="${i}">
-                <span class="num-text">${i}</span>
+            <div class="pin-keyboard-wrapper">
+              <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="current-password">
+              <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
               </button>
-            `).join('')}
-            <button class="numpad-btn delete-btn" data-delete>
-              <span class="num-text">⌫</span>
-            </button>
-            <button class="numpad-btn clear-btn" data-clear>
-              <span class="num-text">C</span>
-            </button>
+            </div>
           </div>
+          <button class="onboarding-btn pin-confirm-action-btn" disabled style="margin-top:8px;">Confirm</button>
           <div class="pin-error" style="display: none;"></div>
         </div>
       `;
@@ -474,64 +445,51 @@ class WalletUI {
       document.body.appendChild(overlay);
 
       const input = overlay.querySelector('.pin-input');
-      const numpadBtns = overlay.querySelectorAll('[data-num]');
-      const deleteBtn = overlay.querySelector('[data-delete]');
-      const clearBtn = overlay.querySelector('[data-clear]');
+      const confirmBtn = overlay.querySelector('.pin-confirm-action-btn');
+      const toggleBtn = overlay.querySelector('.pin-toggle-btn');
       const errorDiv = overlay.querySelector('.pin-error');
-      let pin = '';
       let attempts = 0;
 
-      const updateDisplay = () => {
-        input.value = '●'.repeat(pin.length);
-      };
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+        toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
+      });
+
+      input.addEventListener('input', () => {
+        confirmBtn.disabled = input.value.length < 1;
+        errorDiv.style.display = 'none';
+      });
 
       const tryConfirm = () => {
+        const pin = input.value;
+        if (pin.length < 1) return;
         try {
           this.walletCore.verifyPin(pin);
           overlay.remove();
+          document.removeEventListener('keydown', closeOnEsc);
           if (callback) callback();
           resolve(true);
         } catch (error) {
           attempts++;
-          errorDiv.textContent = `PIN이 잘못되었습니다 (${attempts}/3)`;
+          errorDiv.textContent = `Incorrect password (${attempts}/3)`;
           errorDiv.style.display = 'block';
           input.parentElement.classList.add('shake');
-          setTimeout(() => {
-            input.parentElement.classList.remove('shake');
-          }, 500);
-          pin = '';
-          updateDisplay();
+          setTimeout(() => input.parentElement.classList.remove('shake'), 500);
+          input.value = '';
+          confirmBtn.disabled = true;
 
           if (attempts >= 3) {
+            document.removeEventListener('keydown', closeOnEsc);
             overlay.remove();
             resolve(false);
           }
         }
       };
 
-      numpadBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (pin.length < 6) {
-            pin += btn.dataset.num;
-            updateDisplay();
-            if (pin.length === 6) {
-              setTimeout(tryConfirm, 300);
-            }
-          }
-        });
-      });
-
-      deleteBtn.addEventListener('click', () => {
-        pin = pin.slice(0, -1);
-        updateDisplay();
-        errorDiv.style.display = 'none';
-      });
-
-      clearBtn.addEventListener('click', () => {
-        pin = '';
-        updateDisplay();
-        errorDiv.style.display = 'none';
-      });
+      confirmBtn.addEventListener('click', tryConfirm);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryConfirm(); });
 
       // Close on ESC
       const closeOnEsc = (e) => {
@@ -542,6 +500,7 @@ class WalletUI {
         }
       };
       document.addEventListener('keydown', closeOnEsc);
+      setTimeout(() => input.focus(), 100);
     });
   }
 
@@ -802,8 +761,18 @@ class WalletUI {
       this.updateTransactionHistory();
     });
     window.addEventListener('transactionFailed', (e) => {
-      this.showToast(`거래 실패: ${e.detail.error}`, 'error');
+      this.showToast(`Transaction failed: ${e.detail.error}`, 'error');
     });
+
+    // Backup buttons
+    const seedBackupBtn = document.getElementById('seedBackupBtn');
+    if (seedBackupBtn) {
+      seedBackupBtn.addEventListener('click', () => this.showBackupModal('seed'));
+    }
+    const walletBackupBtn = document.getElementById('walletBackupBtn');
+    if (walletBackupBtn) {
+      walletBackupBtn.addEventListener('click', () => this.showBackupModal('all'));
+    }
   }
 
   // Setup modals
@@ -1074,7 +1043,9 @@ class WalletUI {
     const enabledNetworks = window.WalletConfig.getEnabledNetworks?.() || ['bsc'];
     const networkNames = {
       'bsc': 'BNB Chain',
-      'ethereum': 'Ethereum'
+      'bscTestnet': 'BSC Testnet',
+      'ethereum': 'Ethereum',
+      'ethereumSepolia': 'Ethereum Sepolia'
     };
 
     const currentNetwork = this.walletBlockchain.currentNetwork || 'bsc';
@@ -1135,6 +1106,7 @@ class WalletUI {
   showSettingsPanel() {
     const enabledNetworks = window.WalletConfig.getEnabledNetworks?.() || ['bsc'];
     const isEthEnabled = enabledNetworks.includes('ethereum');
+    const isSepoliaEnabled = enabledNetworks.includes('ethereumSepolia');
 
     const overlay = document.createElement('div');
     overlay.className = 'settings-overlay';
@@ -1165,6 +1137,16 @@ class WalletUI {
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="ethToggle" ${isEthEnabled ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="network-toggle-item">
+                <div class="network-toggle-info">
+                  <span class="network-toggle-name">Ethereum Sepolia</span>
+                  <span class="network-toggle-desc">테스트넷</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="ethSepoliaToggle" ${isSepoliaEnabled ? 'checked' : ''}>
                   <span class="toggle-slider"></span>
                 </label>
               </div>
@@ -1216,6 +1198,37 @@ class WalletUI {
         }
 
         // Refresh network selector
+        this.setupNetworkSelector();
+      });
+    }
+
+    // Ethereum Sepolia testnet toggle
+    const ethSepoliaToggle = overlay.querySelector('#ethSepoliaToggle');
+    if (ethSepoliaToggle) {
+      ethSepoliaToggle.addEventListener('change', async (e) => {
+        const enabled = e.target.checked;
+        window.WalletConfig.toggleNetwork('ethereumSepolia', enabled);
+
+        if (enabled) {
+          try {
+            await this.walletBlockchain.enableNetwork('ethereumSepolia');
+            this.showToast('Ethereum Sepolia 테스트넷이 활성화되었습니다', 'success');
+          } catch (err) {
+            e.target.checked = false;
+            window.WalletConfig.toggleNetwork('ethereumSepolia', false);
+            this.showToast(err.message || 'Failed to enable network', 'error');
+          }
+        } else {
+          try {
+            this.walletBlockchain.disableNetwork('ethereumSepolia');
+            this.showToast('Ethereum Sepolia 테스트넷이 비활성화되었습니다', 'info');
+          } catch (err) {
+            e.target.checked = true;
+            window.WalletConfig.toggleNetwork('ethereumSepolia', true);
+            this.showToast(err.message, 'error');
+          }
+        }
+
         this.setupNetworkSelector();
       });
     }
@@ -1533,28 +1546,28 @@ class WalletUI {
         <div class="tx-detail">
           <div class="detail-row">
             <span>유형:</span>
-            <strong>${this.getTransactionTypeText(tx.type)}</strong>
+            <strong>${escapeHtml(this.getTransactionTypeText(tx.type))}</strong>
           </div>
           <div class="detail-row">
             <span>금액:</span>
-            <strong>${tx.amount} ${tx.token}</strong>
+            <strong>${escapeHtml(tx.amount)} ${escapeHtml(tx.token)}</strong>
           </div>
           <div class="detail-row">
             <span>상태:</span>
-            <strong>${this.getTransactionStatusText(tx.status)}</strong>
+            <strong>${escapeHtml(this.getTransactionStatusText(tx.status))}</strong>
           </div>
           <div class="detail-row">
             <span>해시:</span>
-            <code>${tx.hash}</code>
+            <code>${escapeHtml(tx.hash)}</code>
           </div>
           <div class="detail-row">
             <span>시간:</span>
-            <strong>${new Date(tx.timestamp * 1000).toLocaleString('ko-KR')}</strong>
+            <strong>${escapeHtml(new Date(tx.timestamp * 1000).toLocaleString('ko-KR'))}</strong>
           </div>
           ${tx.to ? `
             <div class="detail-row">
               <span>수신자:</span>
-              <code>${tx.to}</code>
+              <code>${escapeHtml(tx.to)}</code>
             </div>
           ` : ''}
         </div>
@@ -1731,6 +1744,164 @@ class WalletUI {
       'warning': '⚠'
     };
     return icons[type] || '•';
+  }
+
+  showBackupModal(initialTab = 'seed') {
+    if (this.isLocked) {
+      this.showToast('Please unlock your wallet first', 'warning');
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'pin-confirmation-overlay';
+    overlay.innerHTML = `
+      <div class="pin-confirmation-container" style="max-width:380px;width:90%;">
+        <div class="pin-confirmation-header">
+          <h1>🔐 Wallet Backup</h1>
+          <p>Enter password to view backup information</p>
+        </div>
+        <div class="pin-display">
+          <div class="pin-keyboard-wrapper">
+            <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="current-password">
+            <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="onboarding-btn pin-backup-confirm-btn" disabled style="margin-top:8px;">Confirm</button>
+        <div class="pin-error" style="display:none;color:#ff4444;text-align:center;margin-top:8px;font-size:13px;"></div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector('.pin-input');
+    const confirmBtn = overlay.querySelector('.pin-backup-confirm-btn');
+    const toggleBtn = overlay.querySelector('.pin-toggle-btn');
+    const errorDiv = overlay.querySelector('.pin-error');
+    let attempts = 0;
+
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+      toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
+    });
+
+    input.addEventListener('input', () => {
+      confirmBtn.disabled = input.value.length < 1;
+      errorDiv.style.display = 'none';
+    });
+
+    const tryConfirm = async () => {
+      const pin = input.value;
+      if (pin.length < 1) return;
+      const valid = await this.walletCore.validatePin(pin);
+      if (valid) {
+        overlay.remove();
+        this._showBackupContent(pin, initialTab);
+      } else {
+        attempts++;
+        input.value = '';
+        confirmBtn.disabled = true;
+        errorDiv.textContent = `Incorrect password (${attempts}/3)`;
+        errorDiv.style.display = 'block';
+        if (attempts >= 3) { overlay.remove(); }
+      }
+    };
+
+    confirmBtn.addEventListener('click', tryConfirm);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryConfirm(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    setTimeout(() => input.focus(), 100);
+  }
+
+  async _showBackupContent(pin, initialTab) {
+    let mnemonic = null;
+    let privateKey = null;
+
+    try {
+      mnemonic = await this.walletCore.exportMnemonic(pin);
+    } catch (e) { /* no mnemonic */ }
+
+    try {
+      const encDataStr = localStorage.getItem('funs_wallet_data');
+      if (encDataStr) {
+        const encData = JSON.parse(encDataStr);
+        privateKey = await this.walletCore._decryptPrivateKey(encData, pin);
+      }
+    } catch (e) { /* ignore */ }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'pin-confirmation-overlay';
+    overlay.innerHTML = `
+      <div class="pin-confirmation-container" style="max-width:420px;width:92%;max-height:85vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="font-size:18px;font-weight:700;">🔐 Wallet Backup</h2>
+          <button id="backupCloseBtn" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px;">✕</button>
+        </div>
+        <div style="background:rgba(255,100,50,0.12);border:1px solid rgba(255,100,50,0.3);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#FF6B35;">
+          ⚠️ Never share this with anyone. Anyone with this information has full access to your wallet.
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button class="backup-tab-btn" data-tab="seed" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:${initialTab === 'seed' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'};color:white;font-size:13px;cursor:pointer;">Seed Phrase</button>
+          <button class="backup-tab-btn" data-tab="key" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:${initialTab !== 'seed' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'};color:white;font-size:13px;cursor:pointer;">Private Key</button>
+        </div>
+        <div id="backupSeedPanel" style="display:${initialTab === 'seed' ? 'block' : 'none'};">
+          ${mnemonic ? `
+            <p style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:12px;">Write down these 12 words and store them in a safe place.</p>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+              ${mnemonic.split(' ').map((w, i) => `<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;font-size:13px;"><span style="color:rgba(255,255,255,0.4);font-size:11px;display:block;">${i + 1}</span>${w}</div>`).join('')}
+            </div>
+            <button id="copySeedBtn" style="width:100%;padding:12px;background:var(--primary);border:none;border-radius:12px;color:white;font-size:14px;font-weight:600;cursor:pointer;">Copy Seed Phrase</button>
+          ` : `<p style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">No seed phrase backup available.</p>`}
+        </div>
+        <div id="backupKeyPanel" style="display:${initialTab !== 'seed' ? 'block' : 'none'};">
+          ${privateKey ? `
+            <p style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:12px;">Store your private key in a safe place.</p>
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px;word-break:break-all;font-size:12px;font-family:monospace;margin-bottom:14px;">${privateKey}</div>
+            <button id="copyKeyBtn" style="width:100%;padding:12px;background:var(--primary);border:none;border-radius:12px;color:white;font-size:14px;font-weight:600;cursor:pointer;">Copy Private Key</button>
+          ` : `<p style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Unable to load private key.</p>`}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#backupCloseBtn').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    overlay.querySelectorAll('.backup-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        overlay.querySelectorAll('.backup-tab-btn').forEach(b => {
+          b.style.background = b.dataset.tab === tab ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+        });
+        overlay.querySelector('#backupSeedPanel').style.display = tab === 'seed' ? 'block' : 'none';
+        overlay.querySelector('#backupKeyPanel').style.display = tab !== 'seed' ? 'block' : 'none';
+      });
+    });
+
+    const copySeedBtn = overlay.querySelector('#copySeedBtn');
+    if (copySeedBtn) {
+      copySeedBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(mnemonic).then(() => {
+          copySeedBtn.textContent = 'Copied ✓';
+          setTimeout(() => { copySeedBtn.textContent = 'Copy Seed Phrase'; }, 2000);
+        });
+      });
+    }
+
+    const copyKeyBtn = overlay.querySelector('#copyKeyBtn');
+    if (copyKeyBtn) {
+      copyKeyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(privateKey).then(() => {
+          copyKeyBtn.textContent = 'Copied ✓';
+          setTimeout(() => { copyKeyBtn.textContent = 'Copy Private Key'; }, 2000);
+        });
+      });
+    }
   }
 
   isValidAddress(address) {

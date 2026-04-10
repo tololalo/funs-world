@@ -30,13 +30,41 @@ class WalletBlockchain extends EventTarget {
         const networkConfig = window.WalletConfig.NETWORKS[networkKey];
         if (!networkConfig) continue;
         try {
-          this.providers[networkKey] = new ethers.JsonRpcProvider(
-            networkConfig.rpc,
-            {
-              chainId: networkConfig.chainId,
-              name: networkKey
+          const rpcUrls = window.WalletConfig.getRpcUrls?.(networkKey) || [networkConfig.rpc];
+          let provider = null;
+
+          for (const rpcUrl of rpcUrls) {
+            try {
+              const testProvider = new ethers.JsonRpcProvider(
+                rpcUrl,
+                {
+                  chainId: networkConfig.chainId,
+                  name: networkKey
+                }
+              );
+              // Quick connectivity test
+              await Promise.race([
+                testProvider.getBlockNumber(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout')), 5000))
+              ]);
+              provider = testProvider;
+              console.log(`[FunS] Connected to ${networkKey} via ${rpcUrl}`);
+              break;
+            } catch (rpcError) {
+              console.warn(`[FunS] RPC failed for ${networkKey}: ${rpcUrl}`, rpcError.message);
             }
-          );
+          }
+
+          if (provider) {
+            this.providers[networkKey] = provider;
+          } else {
+            // Create provider without testing (offline mode)
+            this.providers[networkKey] = new ethers.JsonRpcProvider(
+              networkConfig.rpc,
+              { chainId: networkConfig.chainId, name: networkKey }
+            );
+            console.warn(`[FunS] ${networkKey}: Using primary RPC without connectivity test`);
+          }
         } catch (error) {
           console.error(`Failed to create provider for ${networkKey}:`, error);
         }
@@ -102,6 +130,243 @@ class WalletBlockchain extends EventTarget {
       throw new Error(`Provider for network ${key} not found`);
     }
     return this.providers[key];
+  }
+
+  /**
+   * Get current network information
+   * @returns {Object} Network info with name, chainId, isTestnet, symbol, explorer
+   */
+  getNetworkInfo() {
+    const networkConfig = window.WalletConfig.NETWORKS[this.currentNetwork];
+    return {
+      key: this.currentNetwork,
+      name: networkConfig?.name || 'Unknown',
+      chainId: networkConfig?.chainId || 0,
+      isTestnet: networkConfig?.isTestnet || false,
+      symbol: networkConfig?.symbol || 'ETH',
+      explorer: networkConfig?.explorer || '',
+      faucet: networkConfig?.faucet || null
+    };
+  }
+
+  /**
+   * Check if currently connected to blockchain
+   * @returns {Promise<boolean>}
+   */
+  async isConnected() {
+    try {
+      const provider = this.getProvider();
+      await Promise.race([
+        provider.getBlockNumber(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+      ]);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Get current gas price with speed options
+   * @returns {Promise<Object>} Gas prices for slow/standard/fast
+   */
+  async getGasPrice() {
+    try {
+      const provider = this.getProvider();
+      const feeData = await provider.getFeeData();
+      const baseGasPrice = feeData.gasPrice || ethers.parseUnits('5', 'gwei');
+
+      return {
+        slow: {
+          gwei: ethers.formatUnits(baseGasPrice * 80n / 100n, 'gwei'),
+          wei: (baseGasPrice * 80n / 100n).toString()
+        },
+        standard: {
+          gwei: ethers.formatUnits(baseGasPrice, 'gwei'),
+          wei: baseGasPrice.toString()
+        },
+        fast: {
+          gwei: ethers.formatUnits(baseGasPrice * 120n / 100n, 'gwei'),
+          wei: (baseGasPrice * 120n / 100n).toString()
+        }
+      };
+    } catch (error) {
+      console.error('Failed to get gas price:', error);
+      return {
+        slow: { gwei: '3', wei: ethers.parseUnits('3', 'gwei').toString() },
+        standard: { gwei: '5', wei: ethers.parseUnits('5', 'gwei').toString() },
+        fast: { gwei: '7', wei: ethers.parseUnits('7', 'gwei').toString() }
+      };
+    }
+  }
+
+  /**
+   * Get balances for current wallet (wrapper around fetchAllBalances)
+   * @returns {Promise<Object>} Balances object
+   */
+  async getBalances() {
+    try {
+      const addr = window.walletCore?.address || window.WalletCore?.address;
+      if (!addr) {
+        throw new Error('No wallet address available');
+      }
+      return await this.fetchAllBalances(addr);
+    } catch (error) {
+      console.error('Failed to get balances:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get token price by symbol
+   * @param {string} symbol - Token symbol (e.g., 'BNB', 'USDT')
+   * @returns {Promise<Object>} Price object with usd and change24h
+   */
+  async getTokenPrice(symbol) {
+    try {
+      const prices = await this.fetchPrices();
+      const networkConfig = window.WalletConfig.NETWORKS[this.currentNetwork];
+      const networkTokens = window.WalletConfig.getAllTokens?.(this.currentNetwork) || window.WalletConfig.TOKENS[this.currentNetwork] || {};
+
+      let coingeckoId = null;
+
+      // Find coingeckoId for this symbol
+      if (symbol === networkConfig.symbol) {
+        coingeckoId = this._getNativeCoingeckoId(this.currentNetwork);
+      } else {
+        const token = networkTokens?.[symbol];
+        coingeckoId = token?.coingeckoId;
+      }
+
+      if (!coingeckoId) {
+        throw new Error(`CoinGecko ID not found for token ${symbol}`);
+      }
+
+      return prices[coingeckoId] || { usd: 0, change24h: 0 };
+    } catch (error) {
+      console.error(`Failed to get price for ${symbol}:`, error);
+      return { usd: 0, change24h: 0 };
+    }
+  }
+
+  /**
+   * Get swap quote (DEX swap estimation)
+   * @param {string} fromToken - Source token symbol
+   * @param {string} toToken - Destination token symbol
+   * @param {string} amount - Amount to swap
+   * @returns {Promise<Object>} Swap quote with estimated output
+   */
+  async getSwapQuote(fromToken, toToken, amount) {
+    try {
+      const networkConfig = window.WalletConfig.NETWORKS[this.currentNetwork];
+      if (!networkConfig) {
+        throw new Error(`Network config not found for ${this.currentNetwork}`);
+      }
+
+      const networkTokens = window.WalletConfig.getAllTokens?.(this.currentNetwork) || window.WalletConfig.TOKENS[this.currentNetwork] || {};
+      const fromTokenConfig = fromToken === networkConfig.symbol ? networkConfig : networkTokens[fromToken];
+      const toTokenConfig = toToken === networkConfig.symbol ? networkConfig : networkTokens[toToken];
+
+      if (!fromTokenConfig || !toTokenConfig) {
+        throw new Error('Token configuration not found');
+      }
+
+      // Get DEX router based on network
+      const routerConfig = this.currentNetwork === 'bsc'
+        ? window.WalletConfig.DEX_ROUTERS.pancakeswap
+        : window.WalletConfig.DEX_ROUTERS.uniswap;
+
+      if (!routerConfig) {
+        throw new Error(`No DEX router configured for ${this.currentNetwork}`);
+      }
+
+      const provider = this.getProvider();
+      const router = new ethers.Contract(
+        routerConfig.address,
+        window.WalletConfig.ROUTER_ABI,
+        provider
+      );
+
+      // Build path
+      const path = [fromTokenConfig.address, toTokenConfig.address];
+      const decimals = fromTokenConfig.decimals || 18;
+      const amountIn = ethers.parseUnits(amount, decimals);
+
+      // Get amounts out
+      const amounts = await router.getAmountsOut(amountIn, path);
+      const outputDecimals = toTokenConfig.decimals || 18;
+      const outputAmount = ethers.formatUnits(amounts[amounts.length - 1], outputDecimals);
+
+      return {
+        fromToken,
+        toToken,
+        inputAmount: amount,
+        outputAmount: outputAmount,
+        priceImpact: 0
+      };
+    } catch (error) {
+      console.error('Failed to get swap quote:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check token allowance for spending
+   * @param {string} tokenSymbol - Token symbol
+   * @param {string} spenderAddress - Address that will spend tokens
+   * @param {string} ownerAddress - Address that owns tokens (optional, uses wallet address)
+   * @returns {Promise<string>} Allowance amount
+   */
+  async checkAllowance(tokenSymbol, spenderAddress, ownerAddress = null) {
+    try {
+      const owner = ownerAddress || window.walletCore?.address || window.WalletCore?.address;
+      if (!owner) {
+        throw new Error('No wallet address available');
+      }
+
+      if (!ethers.isAddress(spenderAddress)) {
+        throw new Error('Invalid spender address');
+      }
+
+      const networkConfig = window.WalletConfig.NETWORKS[this.currentNetwork];
+      const networkTokens = window.WalletConfig.getAllTokens?.(this.currentNetwork) || window.WalletConfig.TOKENS[this.currentNetwork] || {};
+      const tokenConfig = networkTokens[tokenSymbol];
+
+      if (!tokenConfig || !tokenConfig.address) {
+        throw new Error(`Token ${tokenSymbol} not configured`);
+      }
+
+      const provider = this.getProvider();
+      const contract = new ethers.Contract(
+        tokenConfig.address,
+        this._getERC20ABI(),
+        provider
+      );
+
+      const allowance = await contract.allowance(owner, spenderAddress);
+      const decimals = tokenConfig.decimals || 18;
+      return ethers.formatUnits(allowance, decimals);
+    } catch (error) {
+      console.error('Failed to check allowance:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get explorer URL for a transaction
+   * @param {string} txHash - Transaction hash
+   * @param {string} networkKey - Network identifier (optional, uses current network)
+   * @returns {string} Full explorer URL
+   */
+  getExplorerUrl(txHash, networkKey = null) {
+    const key = networkKey || this.currentNetwork;
+    const networkConfig = window.WalletConfig.NETWORKS[key];
+
+    if (!networkConfig || !networkConfig.explorer) {
+      return '';
+    }
+
+    return `${networkConfig.explorer}/tx/${txHash}`;
   }
 
   /**
@@ -598,6 +863,7 @@ class WalletBlockchain extends EventTarget {
   _getNativeCoingeckoId(networkKey) {
     const coingeckoMap = {
       'bsc': 'binancecoin',
+      'bscTestnet': 'binancecoin',
       'ethereum': 'ethereum',
       'polygon': 'matic-network',
       'avalanche': 'avalanche-2',

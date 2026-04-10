@@ -21,6 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" crossorigin="anonymous"></script>
     <script src="js/swap-engine.js"></script>
+    <script src="js/dca-engine.js"></script>
     <style>
         /* ============================================
            FUNSWAP DEX - 1INCH POWERED
@@ -881,6 +882,343 @@
         .app-content::-webkit-scrollbar-thumb:hover {
             background: rgba(255,255,255,0.2);
         }
+
+        /* ===== TAB SWITCHER ===== */
+        .tab-switcher {
+            display: flex;
+            gap: 8px;
+            margin: 0 16px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 14px;
+            padding: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: var(--text3);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tab-btn:active { transform: scale(0.98); }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, #FF8551 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+        }
+
+        /* ===== DCA CARD ===== */
+        .dca-card {
+            margin: 0 16px 20px;
+            padding: 24px;
+            background: linear-gradient(145deg, #1a2240 0%, #0f1525 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .dca-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(79,195,247,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .dca-section-title {
+            font-size: 12px;
+            color: var(--text3);
+            margin-bottom: 12px;
+            margin-top: 16px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .dca-section-title:first-child { margin-top: 0; }
+        .dca-token-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .dca-token-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .dca-token-col-label {
+            font-size: 11px;
+            color: var(--text4);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding-left: 4px;
+        }
+        .dca-token-col-label.spend { color: var(--primary); }
+        .dca-token-col-label.buy { color: var(--green); }
+        .dca-token-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05));
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--primary);
+            font-size: 16px;
+            margin-top: 18px;
+            flex-shrink: 0;
+        }
+        .dca-token-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .dca-token-selector:active {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--border-light);
+        }
+        .dca-token-selector .token-icon {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700; flex-shrink: 0;
+        }
+        .dca-token-selector .token-icon img { width: 100%; height: 100%; border-radius: 50%; }
+        .dca-token-selector .dropdown-arrow { margin-left: auto; color: var(--text3); font-size: 12px; }
+        .dca-amount-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+        .dca-amount-input::placeholder { color: var(--text4); }
+        .dca-amount-input:focus { outline: none; border-color: var(--border-light); background: rgba(0,0,0,0.5); }
+        .dca-frequency-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .dca-freq-btn {
+            padding: 12px 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text3);
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dca-freq-btn:active { transform: scale(0.95); }
+        .dca-freq-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, #5DD5FF 100%);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79,195,247,0.2);
+        }
+        .dca-orders-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+        .dca-orders-input::placeholder { color: var(--text4); }
+        .dca-orders-input:focus { outline: none; border-color: var(--border-light); }
+        .dca-summary {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(79,195,247,0.2);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .dca-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .dca-summary-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .dca-summary-row .label { color: var(--text3); font-weight: 500; }
+        .dca-summary-row .value { color: var(--text); font-weight: 600; }
+        .dca-summary-row .value.highlight { color: var(--accent); }
+        .dca-start-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 8px;
+            background: linear-gradient(135deg, var(--green) 0%, #00E89C 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .dca-start-btn:active { transform: scale(0.98); }
+        .dca-start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== DCA DASHBOARD ===== */
+        .dca-dashboard { margin: 20px 16px 0; }
+        .dca-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .dca-stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+        }
+        .dca-stat-label {
+            font-size: 11px;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .dca-stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'Orbitron', monospace;
+        }
+        .dca-stat-value.accent { color: var(--accent); }
+        .dca-stat-value.green { color: var(--green); }
+        .dca-plan-list { display: flex; flex-direction: column; gap: 12px; }
+        .dca-plan-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .dca-plan-header {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dca-plan-tokens { display: flex; align-items: center; gap: 8px; }
+        .dca-plan-token-icons { display: flex; align-items: center; }
+        .dca-plan-token-icons .icon {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700;
+            margin-left: -6px; border: 2px solid var(--card);
+            overflow: hidden;
+        }
+        .dca-plan-token-icons .icon:first-child { margin-left: 0; }
+        .dca-plan-token-icons .icon img { width: 100%; height: 100%; border-radius: 50%; }
+        .dca-plan-pair { font-size: 13px; font-weight: 600; color: var(--text); }
+        .dca-plan-status {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 4px 10px; border-radius: 8px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .dca-plan-status.active { background: rgba(0,209,140,0.15); color: var(--green); border: 1px solid rgba(0,209,140,0.3); }
+        .dca-plan-status.paused { background: rgba(255,215,0,0.15); color: var(--secondary); border: 1px solid rgba(255,215,0,0.3); }
+        .dca-plan-status.completed { background: rgba(79,195,247,0.15); color: var(--accent); border: 1px solid rgba(79,195,247,0.3); }
+        .dca-plan-status.cancelled { background: rgba(255,68,102,0.15); color: var(--red); border: 1px solid rgba(255,68,102,0.3); }
+        .dca-plan-progress { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .dca-plan-progress-label { font-size: 10px; color: var(--text4); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+        .dca-plan-progress-bar { width: 100%; height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden; }
+        .dca-plan-progress-fill { height: 100%; background: linear-gradient(90deg, var(--green) 0%, #00E89C 100%); border-radius: 3px; transition: width 0.3s; }
+        .dca-plan-details { padding: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .dca-plan-detail-item { display: flex; flex-direction: column; }
+        .dca-plan-detail-label { font-size: 10px; color: var(--text4); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+        .dca-plan-detail-value { font-size: 12px; font-weight: 600; color: var(--text); }
+        .dca-plan-detail-value.accent { color: var(--accent); }
+        .dca-plan-actions { padding: 10px 12px; display: flex; gap: 6px; border-top: 1px solid rgba(255,255,255,0.03); }
+        .dca-action-btn {
+            flex: 1; padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text3);
+            font-size: 11px; font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dca-action-btn:active { transform: scale(0.95); }
+        .dca-action-btn.pause { background: rgba(255,215,0,0.15); border-color: rgba(255,215,0,0.3); color: var(--secondary); }
+        .dca-action-btn.resume { background: rgba(0,209,140,0.15); border-color: rgba(0,209,140,0.3); color: var(--green); }
+        .dca-action-btn.cancel { background: rgba(255,68,102,0.15); border-color: rgba(255,68,102,0.3); color: var(--red); }
+        .dca-empty { margin: 40px 0; padding: 40px 16px; text-align: center; }
+        .dca-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+        .dca-empty-title { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .dca-empty-message { font-size: 13px; color: var(--text3); line-height: 1.6; }
+        .dca-exec-toast {
+            position: fixed;
+            top: calc(var(--safe-top) + 16px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            background: linear-gradient(135deg, rgba(0,209,140,0.95), rgba(0,209,140,0.85));
+            border-radius: 12px;
+            padding: 12px 16px;
+            max-width: calc(100% - 32px);
+            box-shadow: 0 8px 24px rgba(0,209,140,0.3);
+            animation: slideDown 0.3s ease-out;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @keyframes slideDown { from { transform: translateX(-50%) translateY(-100%); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
@@ -909,6 +1247,14 @@
                 <span id="badge-text">Powered by 1inch</span>
             </div>
 
+            <!-- Tab Switcher -->
+            <div class="tab-switcher">
+                <button class="tab-btn active" data-tab="swap" id="tab-swap">SWAP</button>
+                <button class="tab-btn" data-tab="dca" id="tab-dca">DCA</button>
+            </div>
+
+            <!-- Swap Tab Content -->
+            <div class="tab-content active" id="swap-content">
             <!-- Swap Card -->
             <div class="swap-card">
                 <!-- From Token -->
@@ -1016,6 +1362,97 @@
                     </div>
                 </div>
             </div>
+            </div><!-- end swap-content -->
+
+            <!-- DCA Tab Content -->
+            <div class="tab-content" id="dca-content">
+                <!-- DCA Setup Card -->
+                <div class="dca-card">
+                    <div class="dca-token-row">
+                        <div class="dca-token-col">
+                            <span class="dca-token-col-label spend" id="dca-label-spend">투자할 토큰</span>
+                            <button class="dca-token-selector" id="dca-from-btn">
+                                <div class="token-icon" id="dca-from-icon"></div>
+                                <span id="dca-from-symbol">USDT</span>
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                        </div>
+                        <div class="dca-token-arrow">→</div>
+                        <div class="dca-token-col">
+                            <span class="dca-token-col-label buy" id="dca-label-buy">살 토큰</span>
+                            <button class="dca-token-selector" id="dca-to-btn">
+                                <div class="token-icon" id="dca-to-icon"></div>
+                                <span id="dca-to-symbol">BNB</span>
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="dca-section-title" id="dca-label-amount">주문당 금액</div>
+                    <input type="number" class="dca-amount-input" id="dca-amount" placeholder="0.0" inputmode="decimal" step="any" />
+
+                    <div class="dca-section-title" id="dca-label-freq">실행 주기</div>
+                    <div class="dca-frequency-grid">
+                        <button class="dca-freq-btn active" data-freq="daily" id="dca-freq-daily">매일</button>
+                        <button class="dca-freq-btn" data-freq="weekly" id="dca-freq-weekly">매주</button>
+                        <button class="dca-freq-btn" data-freq="monthly" id="dca-freq-monthly">매월</button>
+                    </div>
+
+                    <div class="dca-section-title" id="dca-label-orders">총 주문 횟수</div>
+                    <input type="number" class="dca-orders-input" id="dca-orders" placeholder="30" inputmode="numeric" min="1" max="365" />
+
+                    <div class="dca-summary" id="dca-summary">
+                        <div class="dca-summary-row">
+                            <span class="label" id="dca-sum-total-label">총 투자금액</span>
+                            <span class="value highlight" id="dca-sum-total">-</span>
+                        </div>
+                        <div class="dca-summary-row">
+                            <span class="label" id="dca-sum-duration-label">예상 기간</span>
+                            <span class="value" id="dca-sum-duration">-</span>
+                        </div>
+                        <div class="dca-summary-row">
+                            <span class="label" id="dca-sum-freq-label">실행 빈도</span>
+                            <span class="value" id="dca-sum-freq">-</span>
+                        </div>
+                    </div>
+
+                    <button class="dca-start-btn" id="dca-start-btn" disabled>
+                        <span id="dca-start-text">DCA 시작하기</span>
+                    </button>
+                </div>
+
+                <!-- DCA Dashboard -->
+                <div class="dca-dashboard" id="dca-dashboard">
+                    <h3 class="section-title" id="dca-dashboard-title">내 DCA 플랜</h3>
+
+                    <div class="dca-stats-grid" id="dca-stats">
+                        <div class="dca-stat-card">
+                            <div class="dca-stat-label" id="dca-stat-active-label">활성 플랜</div>
+                            <div class="dca-stat-value green" id="dca-stat-active">0</div>
+                        </div>
+                        <div class="dca-stat-card">
+                            <div class="dca-stat-label" id="dca-stat-executed-label">실행된 주문</div>
+                            <div class="dca-stat-value accent" id="dca-stat-executed">0</div>
+                        </div>
+                        <div class="dca-stat-card">
+                            <div class="dca-stat-label" id="dca-stat-invested-label">총 투자금</div>
+                            <div class="dca-stat-value" id="dca-stat-invested">$0</div>
+                        </div>
+                        <div class="dca-stat-card">
+                            <div class="dca-stat-label" id="dca-stat-plans-label">전체 플랜</div>
+                            <div class="dca-stat-value" id="dca-stat-plans">0</div>
+                        </div>
+                    </div>
+
+                    <div class="dca-plan-list" id="dca-plan-list">
+                        <div class="dca-empty" id="dca-empty">
+                            <div class="dca-empty-icon">📊</div>
+                            <div class="dca-empty-title" id="dca-empty-title">DCA 플랜 없음</div>
+                            <div class="dca-empty-message" id="dca-empty-msg">위에서 첫 DCA 플랜을 만들어보세요!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Footer -->
@@ -1029,6 +1466,16 @@
                 © 2026 FunSwap. Powered by 1inch Protocol
             </div>
         </footer>
+    </div>
+
+    <!-- Swap Coming Soon Overlay -->
+    <div class="modal-overlay" id="swapComingSoonOverlay" style="align-items:center;">
+        <div class="modal" style="max-width:360px;border-radius:24px;text-align:center;padding:40px 24px;">
+            <button class="modal-close" onclick="document.getElementById('swapComingSoonOverlay').classList.remove('active')" style="position:absolute;top:16px;right:16px;">✕</button>
+            <img src="../../funs-nugi.png" alt="FunS" style="width:110px;height:110px;border-radius:50%;margin-bottom:20px;box-shadow:0 0 40px rgba(255,107,53,0.5),0 0 12px rgba(255,107,53,0.3);">
+            <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:#FF6B35;margin-bottom:14px;letter-spacing:3px;">COMING SOON</div>
+            <p style="color:rgba(255,255,255,0.55);font-size:14px;line-height:1.7;margin:0;">FunSwap DEX is launching soon!<br>The next-gen decentralized exchange on BNB Chain.</p>
+        </div>
     </div>
 
     <!-- Settings Modal -->
@@ -1114,6 +1561,44 @@
                 'routing-label': '라우팅',
                 'network-label': '네트워크',
                 'version-label': '버전',
+                // DCA translations
+                'tab-swap': 'SWAP',
+                'tab-dca': 'DCA',
+                'dca-label-spend': '투자할 토큰',
+                'dca-label-buy': '살 토큰',
+                'dca-label-amount': '주문당 금액',
+                'dca-label-freq': '실행 주기',
+                'dca-label-orders': '총 주문 횟수',
+                'dca-freq-daily': '매일',
+                'dca-freq-weekly': '매주',
+                'dca-freq-monthly': '매월',
+                'dca-sum-total-label': '총 투자금액',
+                'dca-sum-duration-label': '예상 기간',
+                'dca-sum-freq-label': '실행 빈도',
+                'dca-start-text': 'DCA 시작하기',
+                'dca-start-connect': '지갑을 연결하세요',
+                'dca-dashboard-title': '내 DCA 플랜',
+                'dca-stat-active-label': '활성 플랜',
+                'dca-stat-executed-label': '실행된 주문',
+                'dca-stat-invested-label': '총 투자금',
+                'dca-stat-plans-label': '전체 플랜',
+                'dca-empty-title': 'DCA 플랜 없음',
+                'dca-empty-msg': '위에서 첫 DCA 플랜을 만들어보세요!',
+                'dca-plan-pause': '일시정지',
+                'dca-plan-resume': '재개',
+                'dca-plan-cancel': '취소',
+                'dca-plan-delete': '삭제',
+                'dca-plan-execute': '지금 실행',
+                'dca-freq-daily-text': '매일',
+                'dca-freq-weekly-text': '매주',
+                'dca-freq-monthly-text': '매월',
+                'dca-next': '다음 실행',
+                'dca-invested': '투자금',
+                'dca-progress': '진행률',
+                'dca-amount-per': '주문당',
+                'dca-days': '일',
+                'dca-weeks': '주',
+                'dca-months': '개월',
             },
             en: {
                 'label-from': 'From',
@@ -1145,6 +1630,44 @@
                 'routing-label': 'Routing',
                 'network-label': 'Network',
                 'version-label': 'Version',
+                // DCA translations
+                'tab-swap': 'SWAP',
+                'tab-dca': 'DCA',
+                'dca-label-spend': 'Spend',
+                'dca-label-buy': 'Buy',
+                'dca-label-amount': 'Amount Per Order',
+                'dca-label-freq': 'Frequency',
+                'dca-label-orders': 'Total Orders',
+                'dca-freq-daily': 'Daily',
+                'dca-freq-weekly': 'Weekly',
+                'dca-freq-monthly': 'Monthly',
+                'dca-sum-total-label': 'Total Investment',
+                'dca-sum-duration-label': 'Est. Duration',
+                'dca-sum-freq-label': 'Frequency',
+                'dca-start-text': 'Start DCA',
+                'dca-start-connect': 'Connect Wallet',
+                'dca-dashboard-title': 'My DCA Plans',
+                'dca-stat-active-label': 'Active Plans',
+                'dca-stat-executed-label': 'Orders Executed',
+                'dca-stat-invested-label': 'Total Invested',
+                'dca-stat-plans-label': 'All Plans',
+                'dca-empty-title': 'No DCA Plans',
+                'dca-empty-msg': 'Create your first DCA plan above!',
+                'dca-plan-pause': 'Pause',
+                'dca-plan-resume': 'Resume',
+                'dca-plan-cancel': 'Cancel',
+                'dca-plan-delete': 'Delete',
+                'dca-plan-execute': 'Execute Now',
+                'dca-freq-daily-text': 'Daily',
+                'dca-freq-weekly-text': 'Weekly',
+                'dca-freq-monthly-text': 'Monthly',
+                'dca-next': 'Next Execution',
+                'dca-invested': 'Invested',
+                'dca-progress': 'Progress',
+                'dca-amount-per': 'Per Order',
+                'dca-days': 'days',
+                'dca-weeks': 'weeks',
+                'dca-months': 'months',
             }
         };
 
@@ -1157,6 +1680,14 @@
                 decimals: 18,
                 icon: 'bnb.svg',
                 price: 612.45
+            },
+            'BTC': {
+                symbol: 'BTC',
+                name: 'Bitcoin (BTCB)',
+                address: '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c',
+                decimals: 18,
+                icon: 'btc.svg',
+                price: 84521.30
             },
             'WBNB': {
                 symbol: 'WBNB',
@@ -1228,6 +1759,14 @@
             slippage: 0.5,
             swapHistory: [],
             tokenModalTarget: 'from'
+            ,
+            // DCA state
+            dcaFromToken: tokens.USDT,
+            dcaToToken: tokens.BNB,
+            dcaAmount: '',
+            dcaFrequency: 'daily',
+            dcaOrders: '',
+            dcaTokenModalTarget: null
         };
 
         // ============================================
@@ -1281,13 +1820,13 @@
                 'BNB': '../icons/bnb.svg', 'WBNB': '../icons/bnb.svg',
                 'FUNS': '../../funs-nugi.png', 'USDT': '../icons/usdt.svg',
                 'USDC': '../icons/usdc.svg', 'BUSD': '../icons/usdc.svg',
-                'ETH': '../icons/eth.svg', 'CAKE': '../icons/cake.svg'
+                'ETH': '../icons/eth.svg', 'CAKE': '../icons/cake.svg', 'BTC': '../icons/btc.svg'
             };
             const src = iconMap[symbol];
             if (src) {
                 return `<img src="${src}" alt="${symbol}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
             }
-            const colors = { 'BNB': '#F3BA2F', 'FUNS': '#FF6B35', 'USDT': '#26A17B', 'USDC': '#2775CA', 'ETH': '#627EEA', 'CAKE': '#D1884F' };
+            const colors = { 'BNB': '#F3BA2F', 'FUNS': '#FF6B35', 'USDT': '#26A17B', 'USDC': '#2775CA', 'ETH': '#627EEA', 'CAKE': '#D1884F', 'BTC': '#F7931A' };
             return `<span style="background: ${colors[symbol] || '#999'}; color: white; width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;">${symbol}</span>`;
         }
 
@@ -1360,6 +1899,10 @@
             if (!state.fromAmount || parseFloat(state.fromAmount) === 0) return;
 
             const engine = new SwapEngine();
+            // Check if testnet mode from wallet config
+            if (window.WalletConfig?.WALLET_CONFIG?.isTestnetMode) {
+                engine.setNetwork(97); // BSC Testnet
+            }
             try {
                 const fromAddr = state.fromToken.address;
                 const toAddr = state.toToken.address;
@@ -1408,6 +1951,10 @@
 
             try {
                 const engine = new SwapEngine();
+                // Check if testnet mode from wallet config
+                if (window.WalletConfig?.WALLET_CONFIG?.isTestnetMode) {
+                    engine.setNetwork(97); // BSC Testnet
+                }
                 let txData = null;
 
                 // Try SwapEngine first
@@ -1497,8 +2044,275 @@
         }
 
         // ============================================
+        // DCA ENGINE INTEGRATION
+        // ============================================
+
+        const dcaEngine = new DCAEngine();
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}-content`).classList.add('active');
+
+            if (tabName === 'dca') {
+                renderDCADashboard();
+            }
+        }
+
+        // DCA Summary update
+        function updateDCASummary() {
+            const amount = parseFloat(state.dcaAmount) || 0;
+            const orders = parseInt(state.dcaOrders) || 0;
+            const freq = state.dcaFrequency;
+            const lang = state.currentLang;
+            const t = translations[lang];
+
+            // Total investment
+            const total = amount * orders;
+            document.getElementById('dca-sum-total').textContent = total > 0
+                ? `${total.toLocaleString()} ${state.dcaFromToken.symbol}` : '-';
+
+            // Duration
+            if (orders > 0) {
+                let durationText = '';
+                if (freq === 'daily') durationText = `${orders} ${t['dca-days']}`;
+                else if (freq === 'weekly') durationText = `${orders} ${t['dca-weeks']}`;
+                else if (freq === 'monthly') durationText = `${orders} ${t['dca-months']}`;
+                document.getElementById('dca-sum-duration').textContent = durationText;
+            } else {
+                document.getElementById('dca-sum-duration').textContent = '-';
+            }
+
+            // Frequency
+            document.getElementById('dca-sum-freq').textContent = t[`dca-freq-${freq}-text`] || freq;
+
+            // Enable/disable start button
+            const startBtn = document.getElementById('dca-start-btn');
+            startBtn.disabled = !(amount > 0 && orders > 0);
+        }
+
+        // Render DCA Dashboard
+        function renderDCADashboard() {
+            const stats = dcaEngine.getStats();
+            const lang = state.currentLang;
+            const t = translations[lang];
+
+            // Update stats
+            document.getElementById('dca-stat-active').textContent = stats.activePlans;
+            document.getElementById('dca-stat-executed').textContent = stats.totalOrdersExecuted;
+            document.getElementById('dca-stat-invested').textContent = `$${stats.totalInvested.toFixed(2)}`;
+            document.getElementById('dca-stat-plans').textContent = stats.totalPlans;
+
+            // Render plan list
+            const plans = dcaEngine.getAllPlans();
+            const listEl = document.getElementById('dca-plan-list');
+            const emptyEl = document.getElementById('dca-empty');
+
+            if (plans.length === 0) {
+                listEl.innerHTML = '';
+                listEl.appendChild(emptyEl);
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            const plansHTML = plans.map(plan => {
+                const progress = plan.totalOrders > 0 ? (plan.completedOrders / plan.totalOrders * 100) : 0;
+                const invested = dcaEngine.getTotalInvested(plan.id);
+                const nextDate = plan.status === 'active' ? new Date(plan.nextExecution).toLocaleDateString(
+                    lang === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+                ) : '-';
+
+                const statusText = { active: t['dca-plan-resume'] ? '활성' : 'Active', paused: '일시정지', completed: '완료', cancelled: '취소됨' };
+                const statusMap = { active: 'active', paused: 'paused', completed: 'completed', cancelled: 'cancelled' };
+
+                let actionsHTML = '';
+                if (plan.status === 'active') {
+                    actionsHTML = `
+                        <button class="dca-action-btn" onclick="dcaExecuteNow('${plan.id}')">${t['dca-plan-execute']}</button>
+                        <button class="dca-action-btn pause" onclick="dcaPause('${plan.id}')">${t['dca-plan-pause']}</button>
+                        <button class="dca-action-btn cancel" onclick="dcaCancel('${plan.id}')">${t['dca-plan-cancel']}</button>
+                    `;
+                } else if (plan.status === 'paused') {
+                    actionsHTML = `
+                        <button class="dca-action-btn resume" onclick="dcaResume('${plan.id}')">${t['dca-plan-resume']}</button>
+                        <button class="dca-action-btn cancel" onclick="dcaCancel('${plan.id}')">${t['dca-plan-cancel']}</button>
+                    `;
+                } else {
+                    actionsHTML = `
+                        <button class="dca-action-btn cancel" onclick="dcaDelete('${plan.id}')">${t['dca-plan-delete']}</button>
+                    `;
+                }
+
+                return `
+                    <div class="dca-plan-item">
+                        <div class="dca-plan-header">
+                            <div class="dca-plan-tokens">
+                                <div class="dca-plan-token-icons">
+                                    <div class="icon">${formatTokenIcon(plan.fromToken)}</div>
+                                    <div class="icon">${formatTokenIcon(plan.toToken)}</div>
+                                </div>
+                                <span class="dca-plan-pair">${plan.fromToken} → ${plan.toToken}</span>
+                            </div>
+                            <span class="dca-plan-status ${statusMap[plan.status]}">${plan.status.toUpperCase()}</span>
+                        </div>
+                        <div class="dca-plan-progress">
+                            <div class="dca-plan-progress-label">${t['dca-progress']} ${plan.completedOrders}/${plan.totalOrders}</div>
+                            <div class="dca-plan-progress-bar">
+                                <div class="dca-plan-progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                        <div class="dca-plan-details">
+                            <div class="dca-plan-detail-item">
+                                <span class="dca-plan-detail-label">${t['dca-amount-per']}</span>
+                                <span class="dca-plan-detail-value">${plan.amountPerOrder} ${plan.fromToken}</span>
+                            </div>
+                            <div class="dca-plan-detail-item">
+                                <span class="dca-plan-detail-label">${t['dca-label-freq']}</span>
+                                <span class="dca-plan-detail-value">${t['dca-freq-' + plan.frequency + '-text']}</span>
+                            </div>
+                            <div class="dca-plan-detail-item">
+                                <span class="dca-plan-detail-label">${t['dca-next']}</span>
+                                <span class="dca-plan-detail-value accent">${nextDate}</span>
+                            </div>
+                            <div class="dca-plan-detail-item">
+                                <span class="dca-plan-detail-label">${t['dca-invested']}</span>
+                                <span class="dca-plan-detail-value">${invested.toFixed(2)} ${plan.fromToken}</span>
+                            </div>
+                        </div>
+                        <div class="dca-plan-actions">${actionsHTML}</div>
+                    </div>
+                `;
+            }).join('');
+
+            listEl.innerHTML = plansHTML;
+        }
+
+        // DCA Actions
+        function dcaStartPlan() {
+            try {
+                const plan = dcaEngine.createPlan({
+                    fromToken: state.dcaFromToken.symbol,
+                    toToken: state.dcaToToken.symbol,
+                    amountPerOrder: parseFloat(state.dcaAmount),
+                    frequency: state.dcaFrequency,
+                    totalOrders: parseInt(state.dcaOrders)
+                });
+
+                // Reset form
+                state.dcaAmount = '';
+                state.dcaOrders = '';
+                document.getElementById('dca-amount').value = '';
+                document.getElementById('dca-orders').value = '';
+                updateDCASummary();
+                renderDCADashboard();
+
+                showDCAToast(`DCA ${plan.fromToken} → ${plan.toToken} 플랜이 생성되었습니다!`);
+            } catch (err) {
+                console.error('DCA plan creation failed:', err);
+            }
+        }
+
+        function dcaPause(id) { dcaEngine.pausePlan(id); renderDCADashboard(); }
+        function dcaResume(id) { dcaEngine.resumePlan(id); renderDCADashboard(); }
+        function dcaCancel(id) { dcaEngine.cancelPlan(id); renderDCADashboard(); }
+        function dcaDelete(id) { dcaEngine.deletePlan(id); renderDCADashboard(); }
+        function dcaExecuteNow(id) {
+            const order = dcaEngine.executeOrder(id);
+            if (order) {
+                showDCAToast(`${order.fromToken} → ${order.toToken}: ${order.fromAmount} → ${order.toAmount.toFixed(6)} 실행 완료!`);
+                renderDCADashboard();
+            }
+        }
+
+        function showDCAToast(message) {
+            const existing = document.querySelector('.dca-exec-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'dca-exec-toast';
+            toast.innerHTML = `<span>✅</span> <span>${message}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // DCA Token Selection (reuses existing modal)
+        function openDCATokenModal(target) {
+            state.dcaTokenModalTarget = target;
+            const list = document.getElementById('token-list');
+            list.innerHTML = '';
+
+            Object.values(tokens).forEach(token => {
+                const item = document.createElement('div');
+                item.className = 'token-item';
+                item.innerHTML = `
+                    <div class="token-item-icon">${formatTokenIcon(token.symbol)}</div>
+                    <div class="token-item-info">
+                        <div class="token-item-name">${token.symbol}</div>
+                        <div class="token-item-address">${token.name}</div>
+                    </div>
+                    <div class="token-item-balance">$${token.price.toFixed(2)}</div>
+                `;
+                item.addEventListener('click', () => {
+                    if (target === 'dca-from') {
+                        state.dcaFromToken = token;
+                        document.getElementById('dca-from-symbol').textContent = token.symbol;
+                        document.getElementById('dca-from-icon').innerHTML = formatTokenIcon(token.symbol);
+                    } else {
+                        state.dcaToToken = token;
+                        document.getElementById('dca-to-symbol').textContent = token.symbol;
+                        document.getElementById('dca-to-icon').innerHTML = formatTokenIcon(token.symbol);
+                    }
+                    closeTokenModal();
+                    updateDCASummary();
+                });
+                list.appendChild(item);
+            });
+
+            document.getElementById('token-modal-overlay').classList.add('active');
+        }
+
+        // ============================================
         // EVENT LISTENERS
         // ============================================
+
+        // Tab switcher
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        // DCA Token selectors
+        document.getElementById('dca-from-btn').addEventListener('click', () => openDCATokenModal('dca-from'));
+        document.getElementById('dca-to-btn').addEventListener('click', () => openDCATokenModal('dca-to'));
+
+        // DCA Amount input
+        document.getElementById('dca-amount').addEventListener('input', (e) => {
+            state.dcaAmount = e.target.value;
+            updateDCASummary();
+        });
+
+        // DCA Orders input
+        document.getElementById('dca-orders').addEventListener('input', (e) => {
+            state.dcaOrders = e.target.value;
+            updateDCASummary();
+        });
+
+        // DCA Frequency buttons
+        document.querySelectorAll('.dca-freq-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.dca-freq-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.dcaFrequency = btn.dataset.freq;
+                updateDCASummary();
+            });
+        });
+
+        // DCA Start button
+        document.getElementById('dca-start-btn').addEventListener('click', dcaStartPlan);
 
         // Language switcher
         document.querySelectorAll('.lang-link').forEach(el => {
@@ -1559,8 +2373,10 @@
             }
         });
 
-        // Swap button
-        document.getElementById('swap-btn').addEventListener('click', executeSwap);
+        // Swap button — show COMING SOON overlay
+        document.getElementById('swap-btn').addEventListener('click', () => {
+            document.getElementById('swapComingSoonOverlay').classList.add('active');
+        });
 
         // Settings modal
         document.getElementById('settings-btn').addEventListener('click', () => {
@@ -1628,6 +2444,18 @@
             document.getElementById('from-icon').innerHTML = formatTokenIcon('BNB');
             document.getElementById('to-icon').innerHTML = formatTokenIcon('USDT');
 
+            // Initialize DCA
+            document.getElementById('dca-from-icon').innerHTML = formatTokenIcon('USDT');
+            document.getElementById('dca-to-icon').innerHTML = formatTokenIcon('BNB');
+            updateDCASummary();
+            renderDCADashboard();
+
+            // Check for due DCA orders on load
+            const dueOrders = dcaEngine.executeDueOrders();
+            if (dueOrders.length > 0) {
+                showDCAToast(`${dueOrders.length}개의 DCA 주문이 자동 실행되었습니다!`);
+            }
+
             // Prevent body scroll when modal is open
             const observer = new MutationObserver(() => {
                 const isOpen = document.getElementById('token-modal-overlay').classList.contains('active');
@@ -1647,27 +2475,5 @@
             init();
         }
     </script>
-<!-- TEST VERSION MODAL -->
-<div id="test-version-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;" onclick="this.style.display='none'">
-  <img src="../../funs-nugi.png" alt="FunS Logo" style="width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(255,107,53,0.5));animation:tvFloat 2s ease-in-out infinite;">
-  <div style="font-family:'Orbitron',monospace;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900;background:linear-gradient(135deg,#FF6B35,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;">TEST VERSION</div>
-  <p style="color:rgba(255,255,255,0.7);font-size:1rem;text-align:center;max-width:400px;line-height:1.6;">현재 테스트 버전입니다.<br>정식 출시를 기대해 주세요!</p>
-  <style>@keyframes tvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded',function(){
-  var btns=document.querySelectorAll('[class*="wallet"],[id*="wallet"],[class*="connect"],[id*="connect"],[class*="swap-btn"]');
-  btns.forEach(function(b){
-    if(b.tagName==='BUTTON'||b.tagName==='A'){
-      b.addEventListener('click',function(e){
-        e.preventDefault();e.stopPropagation();
-        document.getElementById('test-version-modal').style.display='flex';
-      });
-    }
-  });
-});
-</script>
-
-
 </body>
 </html>

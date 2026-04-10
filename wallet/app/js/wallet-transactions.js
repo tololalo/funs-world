@@ -8,6 +8,16 @@ class WalletTransactions {
   constructor() {
     this.transactionCache = new Map();
     this.gasEstimates = new Map();
+    this._pendingTxKey = 'funs_pending_txs';
+    // Use sessionStorage: cleared when tab closes, reducing sensitive data exposure window
+    this._txStorage = window.sessionStorage;
+  }
+
+  _validateTransaction(to) {
+    if (!window.WalletBlockchain) throw new Error('WalletBlockchain not initialized');
+    if (!window.walletCore?.wallet) throw new Error('Wallet not initialized or locked');
+    if (window.walletCore.isLocked) throw new Error('Wallet is locked. Please unlock before sending transactions.');
+    if (to && !ethers.isAddress(to)) throw new Error(`Invalid address: ${to}`);
   }
 
   /**
@@ -19,20 +29,12 @@ class WalletTransactions {
    */
   async sendNativeToken(to, amount, networkKey) {
     try {
-      // Validate WalletCore is unlocked
-      if (!window.walletCore || window.walletCore.isLocked) {
-        throw new Error('Wallet is locked. Please unlock before sending transactions.');
-      }
+      this._validateTransaction(to);
 
-      // Validate address format
-      if (!ethers.isAddress(to)) {
-        throw new Error(`Invalid recipient address: ${to}`);
-      }
-
-      // Parse amount
+      // Parse amount (ensure string for ethers.js v6 compatibility)
       let parsedAmount;
       try {
-        parsedAmount = ethers.parseEther(amount);
+        parsedAmount = ethers.parseEther(String(amount));
       } catch (error) {
         throw new Error(`Invalid amount format: ${amount}`);
       }
@@ -126,29 +128,22 @@ class WalletTransactions {
    */
   async sendERC20Token(tokenSymbol, to, amount, networkKey) {
     try {
-      // Validate WalletCore is unlocked
-      if (!window.walletCore || window.walletCore.isLocked) {
-        throw new Error('Wallet is locked. Please unlock before sending transactions.');
-      }
-
-      // Validate address format
-      if (!ethers.isAddress(to)) {
-        throw new Error(`Invalid recipient address: ${to}`);
-      }
+      this._validateTransaction(to);
 
       // Get token config
-      const tokenConfig = window.WalletConfig.TOKENS[networkKey]?.[tokenSymbol];
+      const resolvedNetwork = networkKey || window.WalletBlockchain?.currentNetwork;
+      const tokenConfig = window.WalletConfig.TOKENS[resolvedNetwork]?.[tokenSymbol];
       if (!tokenConfig) {
         throw new Error(`Token ${tokenSymbol} not found in configuration`);
       }
 
       const tokenAddress = tokenConfig.address;
       if (!tokenAddress) {
-        throw new Error(`Token ${tokenSymbol} not available on network ${networkKey}`);
+        throw new Error(`Token ${tokenSymbol} not available on network ${resolvedNetwork}`);
       }
 
       // Get provider and signer
-      const provider = window.WalletBlockchain.getProvider(networkKey);
+      const provider = window.WalletBlockchain.getProvider(resolvedNetwork);
       const signer = window.walletCore.wallet.connect(provider);
 
       // Create contract instance
@@ -165,7 +160,7 @@ class WalletTransactions {
       // Parse amount
       let parsedAmount;
       try {
-        parsedAmount = ethers.parseUnits(amount, decimals);
+        parsedAmount = ethers.parseUnits(String(amount), decimals);
       } catch (error) {
         throw new Error(`Invalid amount format for ${decimals} decimals: ${amount}`);
       }
@@ -178,6 +173,7 @@ class WalletTransactions {
 
       // Estimate gas
       const estimateGasParams = {
+        from: signer.address,
         to: tokenAddress,
         data: contract.interface.encodeFunctionData('transfer', [to, parsedAmount])
       };
@@ -245,15 +241,7 @@ class WalletTransactions {
    */
   async approveToken(tokenSymbol, spenderAddress, amount, networkKey) {
     try {
-      // Validate WalletCore is unlocked
-      if (!window.walletCore || window.walletCore.isLocked) {
-        throw new Error('Wallet is locked. Please unlock before approving tokens.');
-      }
-
-      // Validate spender address
-      if (!ethers.isAddress(spenderAddress)) {
-        throw new Error(`Invalid spender address: ${spenderAddress}`);
-      }
+      this._validateTransaction(spenderAddress);
 
       // Get token config
       const tokenConfig = window.WalletConfig.TOKENS[networkKey]?.[tokenSymbol];
@@ -283,6 +271,11 @@ class WalletTransactions {
       // Parse amount (use max uint256 if amount is 'unlimited')
       let parsedAmount;
       if (amount === 'unlimited' || amount === 'max') {
+        // SECURITY WARNING: Unlimited approval is risky
+        console.warn('[FunS] Unlimited token approval requested for', tokenAddress);
+        window.dispatchEvent(new CustomEvent('approvalWarning', {
+          detail: { token: tokenAddress, spender: spenderAddress, amount: 'unlimited' }
+        }));
         parsedAmount = ethers.MaxUint256;
       } else {
         try {
@@ -409,6 +402,10 @@ class WalletTransactions {
    */
   async swapTokens(fromToken, toToken, amount, slippage, networkKey) {
     try {
+      // Validate dependencies
+      if (!window.WalletBlockchain) throw new Error('WalletBlockchain not initialized');
+      if (!window.walletCore?.wallet) throw new Error('Wallet not initialized or locked');
+
       // Validate WalletCore is unlocked
       if (!window.walletCore || window.walletCore.isLocked) {
         throw new Error('Wallet is locked. Please unlock before swapping tokens.');
@@ -471,8 +468,9 @@ class WalletTransactions {
       const amounts = await routerContract.getAmountsOut(amountIn, path);
       const amountOut = amounts[amounts.length - 1];
 
-      // Calculate minimum amount with slippage
-      const amountOutMin = (amountOut * BigInt(10000 - Math.floor(slippage * 100))) / 10000n;
+      // Calculate minimum amount with slippage (using Math.round for more accurate slippage)
+      const slippageBps = Math.round(slippage * 100);
+      const amountOutMin = (amountOut * BigInt(10000 - slippageBps)) / 10000n;
 
       // Get fee data
       const feeData = await provider.getFeeData();
@@ -506,8 +504,8 @@ class WalletTransactions {
         );
       } else if (isToNative) {
         // Token → ETH/BNB
-        // Check and set approval
-        await this._ensureTokenApproval(fromTokenAddress, router.address, amountIn, signer);
+        // Check and set approval (with confirmation wait)
+        await this._ensureTokenApprovalWithWait(fromTokenAddress, router.address, amountIn, signer);
         tx = await routerContract.swapExactTokensForETH(
           amountIn,
           amountOutMin,
@@ -518,8 +516,8 @@ class WalletTransactions {
         );
       } else {
         // Token → Token
-        // Check and set approval
-        await this._ensureTokenApproval(fromTokenAddress, router.address, amountIn, signer);
+        // Check and set approval (with confirmation wait)
+        await this._ensureTokenApprovalWithWait(fromTokenAddress, router.address, amountIn, signer);
         tx = await routerContract.swapExactTokensForTokens(
           amountIn,
           amountOutMin,
@@ -676,29 +674,26 @@ class WalletTransactions {
 
       let estimatedGas = 21000n; // Base for native transfer
 
-      switch (type) {
-        case 'send':
-          estimatedGas = 21000n;
-          break;
-
-        case 'sendToken':
-          estimatedGas = 65000n; // Typical ERC20 transfer
-          break;
-
-        case 'swap':
-          estimatedGas = 200000n; // Typical swap
-          break;
-
-        case 'approve':
-          estimatedGas = 45000n; // Typical approve
-          break;
-
-        default:
-          throw new Error(`Unknown transaction type: ${type}`);
+      // Attempt real gas estimation if transaction data provided
+      if (params.transaction) {
+        try {
+          const estimated = await provider.estimateGas(params.transaction);
+          // Add 20% buffer to estimated gas
+          estimatedGas = (estimated * 120n) / 100n;
+          console.log('[FunS] Gas estimation successful:', estimatedGas.toString());
+        } catch (estimationError) {
+          console.warn('[FunS] Real gas estimation failed, falling back to defaults:', estimationError.message);
+          // Fall through to defaults below
+          estimatedGas = this._getDefaultGasLimit(type);
+        }
+      } else {
+        // Use conservative defaults when no transaction data provided
+        estimatedGas = this._getDefaultGasLimit(type);
       }
 
       // Calculate cost
-      const gasPrice = feeData.gasPrice || feeData.maxFeePerGas || ethers.parseUnits('50', 'gwei');
+      const defaultGasPrice = this._getDefaultGasPrice(params.networkKey);
+      const gasPrice = feeData.gasPrice || feeData.maxFeePerGas || defaultGasPrice;
       const gasCostWei = estimatedGas * gasPrice;
       const gasCostEther = ethers.formatEther(gasCostWei);
 
@@ -721,6 +716,35 @@ class WalletTransactions {
   }
 
   /**
+   * Get default gas limits for different transaction types
+   * @private
+   * @param {string} type - Transaction type
+   * @returns {bigint} Default gas limit
+   */
+  _getDefaultGasLimit(type) {
+    const defaults = {
+      'send': 21000n,
+      'sendNative': 21000n,
+      'sendToken': 65000n,
+      'approve': 50000n,
+      'swap': 250000n,
+      'swapMultiHop': 350000n
+    };
+    return defaults[type] || 200000n;
+  }
+
+  /**
+   * Get default gas price for network
+   * @private
+   * @param {string} networkKey - Network identifier
+   * @returns {bigint} Default gas price in wei
+   */
+  _getDefaultGasPrice(networkKey) {
+    const defaults = { bsc: '5', bscTestnet: '10', ethereum: '30', default: '20' };
+    return ethers.parseUnits(defaults[networkKey] || defaults.default, 'gwei');
+  }
+
+  /**
    * Build optimal swap path
    * @private
    * @param {string} fromTokenAddress - From token address
@@ -738,9 +762,9 @@ class WalletTransactions {
       }
     }
 
-    // Direct path if one is WETH or they're the same
+    // CRITICAL: Cannot swap token to itself - path must have at least 2 elements
     if (fromTokenAddress === toTokenAddress) {
-      return [fromTokenAddress];
+      throw new Error('Cannot swap token to itself');
     }
 
     if (fromTokenAddress === wethAddress || toTokenAddress === wethAddress) {
@@ -757,13 +781,29 @@ class WalletTransactions {
   }
 
   /**
-   * Get appropriate DEX router for network
+   * Get appropriate DEX router for network with testnet support
    * @private
    * @param {string} networkKey - Network identifier
-   * @returns {Object|null} Router config { address, type, name }
+   * @returns {Object|null} Router config { address, type, name, weth }
    */
   _getRouterForNetwork(networkKey) {
     const routers = window.WalletConfig.DEX_ROUTERS;
+
+    // Testnet-specific router configuration
+    const testnetRouters = {
+      'bscTestnet': {
+        address: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1',
+        type: 'pancakeswap',
+        name: 'PancakeSwap (Testnet)',
+        weth: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd'
+      }
+    };
+
+    // Check if testnet router is explicitly configured
+    if (testnetRouters[networkKey]) {
+      return testnetRouters[networkKey];
+    }
+
     if (!routers) {
       return null;
     }
@@ -790,7 +830,8 @@ class WalletTransactions {
     return {
       address: routerConfig.address,
       type: routerType,
-      name: routerType.charAt(0).toUpperCase() + routerType.slice(1)
+      name: routerType.charAt(0).toUpperCase() + routerType.slice(1),
+      weth: routerConfig.weth
     };
   }
 
@@ -805,6 +846,7 @@ class WalletTransactions {
     const nativeTokens = {
       'ethereum': 'ETH',
       'bsc': 'BNB',
+      'bscTestnet': 'tBNB',
       'polygon': 'MATIC',
       'arbitrum': 'ETH',
       'optimism': 'ETH'
@@ -837,6 +879,34 @@ class WalletTransactions {
   }
 
   /**
+   * Ensure token approval with race condition prevention
+   * Waits for confirmation before returning to prevent race conditions
+   * @private
+   * @param {string} tokenAddress - Token address
+   * @param {string} spenderAddress - Spender address
+   * @param {bigint} amount - Amount to spend
+   * @param {Object} signer - Signer object
+   */
+  async _ensureTokenApprovalWithWait(tokenAddress, spenderAddress, amount, signer) {
+    const erc20ABI = [
+      'function allowance(address owner, address spender) view returns (uint256)',
+      'function approve(address spender, uint256 amount) returns (bool)'
+    ];
+
+    const contract = new ethers.Contract(tokenAddress, erc20ABI, signer);
+    const allowance = await contract.allowance(signer.address, spenderAddress);
+
+    if (allowance < amount) {
+      const approveTx = await contract.approve(spenderAddress, ethers.MaxUint256);
+      // Wait for 1 confirmation to prevent race conditions
+      const approvalReceipt = await approveTx.wait(1);
+      if (!approvalReceipt || approvalReceipt.status !== 1) {
+        throw new Error('Token approval failed');
+      }
+    }
+  }
+
+  /**
    * Validate sufficient balance for token
    * @private
    * @param {string} tokenAddress - Token address
@@ -863,6 +933,106 @@ class WalletTransactions {
       return address;
     }
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  }
+
+  /**
+   * Get transaction receipt and status
+   * @param {string} txHash - Transaction hash
+   * @returns {Promise<Object>} Transaction status
+   */
+  async getTransactionStatus(txHash) {
+    try {
+      const blockchain = window.walletBlockchain || new window.WalletBlockchain();
+      const provider = blockchain.getProvider();
+      const receipt = await provider.getTransactionReceipt(txHash);
+
+      if (!receipt) {
+        return { status: 'pending', confirmations: 0 };
+      }
+
+      const currentBlock = await provider.getBlockNumber();
+      const confirmations = currentBlock - receipt.blockNumber;
+
+      return {
+        status: receipt.status === 1 ? 'confirmed' : 'failed',
+        confirmations: confirmations,
+        gasUsed: receipt.gasUsed.toString(),
+        blockNumber: receipt.blockNumber,
+        transactionIndex: receipt.index
+      };
+    } catch (error) {
+      console.error('Failed to get transaction status:', error);
+      return { status: 'unknown', confirmations: 0 };
+    }
+  }
+
+  /**
+   * Wait for transaction confirmation
+   * @param {string} txHash - Transaction hash
+   * @param {number} confirmations - Number of confirmations to wait for (default 1)
+   * @param {number} timeout - Timeout in ms (default 60000)
+   * @returns {Promise<Object>} Transaction receipt
+   */
+  async waitForTransaction(txHash, confirmations = 1, timeout = 60000) {
+    try {
+      const blockchain = window.walletBlockchain || new window.WalletBlockchain();
+      const provider = blockchain.getProvider();
+      const receipt = await provider.waitForTransaction(txHash, confirmations, timeout);
+      return {
+        success: receipt.status === 1,
+        receipt: receipt,
+        gasUsed: receipt.gasUsed.toString()
+      };
+    } catch (error) {
+      console.error('Transaction wait failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Track pending transaction in localStorage
+   * @param {string} txHash - Transaction hash
+   * @param {Object} details - Transaction details
+   */
+  addPendingTransaction(txHash, details) {
+    try {
+      const pending = JSON.parse(this._txStorage.getItem(this._pendingTxKey) || '[]');
+      pending.push({
+        hash: txHash,
+        timestamp: Date.now(),
+        ...details
+      });
+      this._txStorage.setItem(this._pendingTxKey, JSON.stringify(pending));
+    } catch(e) {
+      console.error('Failed to add pending transaction:', e);
+    }
+  }
+
+  /**
+   * Remove pending transaction from localStorage
+   * @param {string} txHash - Transaction hash
+   */
+  removePendingTransaction(txHash) {
+    try {
+      let pending = JSON.parse(this._txStorage.getItem(this._pendingTxKey) || '[]');
+      pending = pending.filter(tx => tx.hash !== txHash);
+      this._txStorage.setItem(this._pendingTxKey, JSON.stringify(pending));
+    } catch(e) {
+      console.error('Failed to remove pending transaction:', e);
+    }
+  }
+
+  /**
+   * Get all pending transactions
+   * @returns {Array} Array of pending transaction objects
+   */
+  getPendingTransactions() {
+    try {
+      return JSON.parse(this._txStorage.getItem(this._pendingTxKey) || '[]');
+    } catch(e) {
+      console.error('Failed to get pending transactions:', e);
+      return [];
+    }
   }
 
   /**

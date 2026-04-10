@@ -1,0 +1,95 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkBgWarrior" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1f1f3a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="steelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0e0e0;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#b0b0b0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#808080;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:1" />
+    </linearGradient>
+    <filter id="neonEdge">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="400" height="400" fill="url(#darkBgWarrior)"/>
+
+  <!-- Radial glow from center -->
+  <defs>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  <circle cx="200" cy="200" r="150" fill="url(#centerGlow)"/>
+
+  <!-- Shield back -->
+  <g filter="url(#neonEdge)">
+    <ellipse cx="200" cy="200" rx="70" ry="80" fill="url(#steelGrad)" stroke="#FF6B35" stroke-width="3"/>
+    <!-- Shield rim accent -->
+    <ellipse cx="200" cy="200" rx="65" ry="75" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.7"/>
+    <!-- Shield pattern -->
+    <path d="M 165 150 L 235 150 M 160 200 L 240 200 M 165 250 L 235 250" stroke="#FF6B35" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- Left sword -->
+  <g filter="url(#neonEdge)">
+    <!-- Blade -->
+    <path d="M 140 200 L 70 130 L 75 125 L 145 195 Z" fill="url(#steelGrad)" stroke="#FF6B35" stroke-width="2.5"/>
+    <!-- Blade shine -->
+    <line x1="140" y1="200" x2="72" y2="127" stroke="#FFD700" stroke-width="1.5" opacity="0.8"/>
+    <!-- Cross guard -->
+    <rect x="130" y="195" width="20" height="10" fill="url(#goldGrad)" stroke="#FF6B35" stroke-width="2"/>
+    <!-- Handle -->
+    <rect x="138" y="205" width="4" height="25" fill="#8B4513" stroke="#FF6B35" stroke-width="1.5"/>
+    <!-- Pommel -->
+    <circle cx="140" cy="235" r="5" fill="url(#goldGrad)" stroke="#FF6B35" stroke-width="1.5"/>
+  </g>
+
+  <!-- Right sword -->
+  <g filter="url(#neonEdge)">
+    <!-- Blade -->
+    <path d="M 260 200 L 330 130 L 325 125 L 255 195 Z" fill="url(#steelGrad)" stroke="#FF6B35" stroke-width="2.5"/>
+    <!-- Blade shine -->
+    <line x1="260" y1="200" x2="328" y2="127" stroke="#FFD700" stroke-width="1.5" opacity="0.8"/>
+    <!-- Cross guard -->
+    <rect x="250" y="195" width="20" height="10" fill="url(#goldGrad)" stroke="#FF6B35" stroke-width="2"/>
+    <!-- Handle -->
+    <rect x="258" y="205" width="4" height="25" fill="#8B4513" stroke="#FF6B35" stroke-width="1.5"/>
+    <!-- Pommel -->
+    <circle cx="260" cy="235" r="5" fill="url(#goldGrad)" stroke="#FF6B35" stroke-width="1.5"/>
+  </g>
+
+  <!-- Neon corner brackets -->
+  <g stroke="#FF6B35" stroke-width="2.5" fill="none" opacity="0.7">
+    <path d="M 40 40 L 80 40 L 80 80" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 360 40 L 320 40 L 320 80" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 40 360 L 80 360 L 80 320" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 360 360 L 320 360 L 320 320" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Gold accent lines -->
+  <g stroke="#FFD700" stroke-width="1" opacity="0.4">
+    <line x1="60" y1="200" x2="90" y2="200"/>
+    <line x1="310" y1="200" x2="340" y2="200"/>
+    <line x1="200" y1="60" x2="200" y2="90"/>
+    <line x1="200" y1="310" x2="200" y2="340"/>
+  </g>
+
+  <!-- Diagonal energy lines -->
+  <g stroke="#FF6B35" stroke-width="1.5" opacity="0.3">
+    <line x1="100" y1="100" x2="130" y2="130"/>
+    <line x1="300" y1="100" x2="270" y2="130"/>
+    <line x1="100" y1="300" x2="130" y2="270"/>
+    <line x1="300" y1="300" x2="270" y2="270"/>
+  </g>
+</svg>

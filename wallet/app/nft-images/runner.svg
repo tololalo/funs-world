@@ -1,0 +1,85 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @keyframes glow {
+        0%, 100% { filter: drop-shadow(0 0 8px #FF6B35); }
+        50% { filter: drop-shadow(0 0 16px #FF6B35); }
+      }
+      .glowing { animation: glow 2s ease-in-out infinite; }
+    </style>
+    <linearGradient id="darkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e27;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1f3a;stop-opacity:1" />
+    </linearGradient>
+    <filter id="neonGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="circuit" patternUnits="userSpaceOnUse" width="40" height="40">
+      <rect width="40" height="40" fill="none" stroke="#FF6B35" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="5" cy="5" r="1" fill="#FF6B35" opacity="0.4"/>
+      <circle cx="35" cy="35" r="1" fill="#FF6B35" opacity="0.4"/>
+      <line x1="0" y1="20" x2="40" y2="20" stroke="#FFD700" stroke-width="0.3" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="400" fill="url(#darkBg)"/>
+  <rect width="400" height="400" fill="url(#circuit)"/>
+
+  <!-- Speed lines -->
+  <g class="glowing" opacity="0.8">
+    <line x1="50" y1="160" x2="120" y2="160" stroke="#FF6B35" stroke-width="2" stroke-linecap="round"/>
+    <line x1="40" y1="190" x2="100" y2="190" stroke="#FF6B35" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    <line x1="60" y1="220" x2="130" y2="220" stroke="#FFD700" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <line x1="45" y1="245" x2="105" y2="245" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  </g>
+
+  <!-- Running character body -->
+  <g class="glowing" filter="url(#neonGlow)">
+    <!-- Head -->
+    <circle cx="200" cy="140" r="18" fill="#FF6B35" stroke="#FFD700" stroke-width="2"/>
+
+    <!-- Body -->
+    <ellipse cx="200" cy="185" rx="14" ry="28" fill="#FF6B35" stroke="#FFD700" stroke-width="2"/>
+
+    <!-- Arms in running position -->
+    <!-- Back arm (raised) -->
+    <g>
+      <line x1="186" y1="165" x2="160" y2="130" stroke="#FF6B35" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="160" cy="130" r="6" fill="#FFD700"/>
+    </g>
+    <!-- Front arm (bent down) -->
+    <g>
+      <line x1="214" y1="165" x2="230" y2="200" stroke="#FF6B35" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="230" cy="200" r="6" fill="#FFD700"/>
+    </g>
+
+    <!-- Legs in running motion -->
+    <!-- Back leg (stretched) -->
+    <g>
+      <line x1="195" y1="210" x2="185" y2="260" stroke="#FF6B35" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="185" cy="260" r="7" fill="#FFD700"/>
+    </g>
+    <!-- Front leg (bent) -->
+    <g>
+      <line x1="205" y1="210" x2="225" y2="245" stroke="#FF6B35" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="225" cy="245" r="7" fill="#FFD700"/>
+    </g>
+  </g>
+
+  <!-- Additional speed effect trails -->
+  <g opacity="0.4">
+    <rect x="30" y="175" width="60" height="3" fill="none" stroke="#FF6B35" stroke-width="1" stroke-dasharray="5,5"/>
+    <rect x="20" y="215" width="70" height="2" fill="none" stroke="#FFD700" stroke-width="1" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- Neon corner accents -->
+  <g stroke="#FF6B35" stroke-width="2" fill="none" opacity="0.6">
+    <path d="M 20 20 L 50 20 L 50 50"/>
+    <path d="M 380 20 L 350 20 L 350 50"/>
+    <path d="M 20 380 L 50 380 L 50 350"/>
+    <path d="M 380 380 L 350 380 L 350 350"/>
+  </g>
+</svg>

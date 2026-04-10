@@ -11,6 +11,37 @@
  */
 
 class SwapEngine extends EventTarget {
+  /**
+   * BSC Testnet token addresses
+   */
+  static TESTNET_TOKENS = {
+    'tBNB': {
+      address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+      decimals: 18,
+      symbol: 'tBNB',
+      name: 'Test BNB',
+      isNative: true
+    },
+    'WBNB': {
+      address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
+      decimals: 18,
+      symbol: 'WBNB',
+      name: 'Wrapped BNB (Testnet)'
+    },
+    'USDT': {
+      address: '0x337610d27c682E347C9cD60BD4b3b107C9d34dDd',
+      decimals: 18,
+      symbol: 'USDT',
+      name: 'Test USDT'
+    },
+    'BUSD': {
+      address: '0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee',
+      decimals: 18,
+      symbol: 'BUSD',
+      name: 'Test BUSD'
+    }
+  };
+
   constructor() {
     super();
 
@@ -52,6 +83,10 @@ class SwapEngine extends EventTarget {
       CAKE: '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
       FUNS: '0x0000000000000000000000000000000000000000', // Placeholder
     };
+
+    // Network detection (testnet vs mainnet)
+    this.isTestnet = false;
+    this.rpcUrl = 'https://bsc-dataseed1.binance.org';
 
     // Minimal ERC20 ABI for token operations
     this.ERC20_ABI = [
@@ -137,6 +172,34 @@ class SwapEngine extends EventTarget {
   }
 
   /**
+   * Set network (mainnet or testnet)
+   * @param {number} chainId - 56 for mainnet, 97 for testnet
+   */
+  setNetwork(chainId) {
+    this.chainId = chainId;
+    this.isTestnet = (chainId === 97);
+
+    if (this.isTestnet) {
+      // BSC Testnet configuration
+      this.PANCAKESWAP_ROUTER = '0xD99D1c33F9fC3444f8101754aBC46c52416550D1';
+      this.PANCAKESWAP_FACTORY = '0x6725f303b657a9451d8ba641348b6761a6cc7a17';
+      this.WBNB = '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd';
+      this.rpcUrl = 'https://data-seed-prebsc-1-s1.bnbchain.org:8545';
+      this.chainIdHex = '0x61'; // Hex representation of 97
+    } else {
+      // BSC Mainnet configuration
+      this.PANCAKESWAP_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024E';
+      this.PANCAKESWAP_FACTORY = '0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73';
+      this.WBNB = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
+      this.rpcUrl = 'https://bsc-dataseed1.binance.org';
+      this.chainIdHex = '0x38'; // Hex representation of 56
+    }
+
+    // Reinitialize provider with new RPC URL
+    this._initProvider();
+  }
+
+  /**
    * Initialize ethers.js provider for BSC
    * @private
    */
@@ -146,9 +209,9 @@ class SwapEngine extends EventTarget {
         console.warn('ethers.js not loaded. Provider initialization deferred.');
         return;
       }
-      this._provider = new ethers.JsonRpcProvider('https://bsc-dataseed1.binance.org', {
+      this._provider = new ethers.JsonRpcProvider(this.rpcUrl, {
         chainId: this.chainId,
-        name: 'bsc'
+        name: this.isTestnet ? 'bsc-testnet' : 'bsc'
       });
     } catch (error) {
       console.error('Failed to initialize provider:', error);
@@ -791,8 +854,20 @@ class SwapEngine extends EventTarget {
     // This is a fallback; the actual address should be fetched from 1inch API
     const routers = {
       56: '0x1111111254fb6c44bac0bed2854e76f90643097d', // BSC 1inch Router V6
+      97: '0x1111111254fb6c44bac0bed2854e76f90643097d', // BSC Testnet 1inch Router V6 (same as mainnet)
     };
     return routers[this.chainId] || this.PANCAKESWAP_ROUTER;
+  }
+
+  /**
+   * Get appropriate token list based on network mode
+   * @returns {Object} Token list for current network (mainnet or testnet)
+   */
+  getTokens() {
+    if (this.isTestnet) {
+      return SwapEngine.TESTNET_TOKENS || this.constructor.TESTNET_TOKENS;
+    }
+    return this.TOKENS;
   }
 
   /**

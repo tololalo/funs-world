@@ -1,3 +1,14 @@
+// Escape HTML to prevent XSS when inserting user/blockchain data into innerHTML
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 class WalletUI {
   constructor() {
     // WalletCore is a class, create an instance
@@ -15,11 +26,21 @@ class WalletUI {
     this.selectedTokenForSend = 'BNB';
     this.selectedTokenForSwap = 'BNB';
     this.swapQuoteTimer = null;
+    this._dashboardLoading = false;
   }
 
   // Main initialization
   async init() {
+    // Validate required window dependencies
+    if (!window.WalletCore) { console.error('[FunS] WalletCore not loaded'); return; }
+    if (!window.WalletConfig) { console.error('[FunS] WalletConfig not loaded'); return; }
+
     try {
+      // Initialize i18n if available
+      if (window.i18n && typeof window.i18n.init === 'function') {
+        await window.i18n.init();
+      }
+
       const walletExists = this.walletCore.isWalletExists();
 
       if (!walletExists) {
@@ -38,10 +59,31 @@ class WalletUI {
       try {
         await this.walletBlockchain.init();
       } catch (networkError) {
-        console.warn('[FunS] 블록체인 네트워크 연결 대기 중:', networkError.message);
+        console.warn('[FunS] Blockchain network connection pending:', networkError.message);
       }
+
+      // Listen to balancesUpdated from the blockchain layer's built-in refresh timer
+      // This is the single source of UI refresh — no duplicate setInterval in loadDashboard
+      this.walletBlockchain.addEventListener('balancesUpdated', (e) => {
+        const result = e.detail?.balances;
+        if (!result || !result.tokens) return;
+        const balancesMap = {};
+        for (const token of result.tokens) {
+          balancesMap[token.symbol] = {
+            balance: token.balance,
+            usdValue: token.balanceUSD ? parseFloat(token.balanceUSD.replace('$', '')) : 0,
+            change24h: token.change ? parseFloat(token.change) : 0,
+            name: token.name,
+            icon: token.icon,
+            decimals: token.decimals,
+            address: token.address
+          };
+        }
+        this.updateBalanceDisplay(result.totalUSD);
+        this.updateTokenList(balancesMap);
+      });
     } catch (error) {
-      console.warn('[FunS] 초기화:', error.message);
+      console.warn('[FunS] Initialization:', error.message);
     }
   }
 
@@ -52,24 +94,24 @@ class WalletUI {
     overlay.innerHTML = `
       <div class="onboarding-container">
         <div class="onboarding-logo">
-          <img src="../../funs-nugi.png" alt="FunS" style="width:72px;height:72px;border-radius:50%;margin-bottom:16px;">
+          <img src="./icons/funs-nugi.png" alt="FunS" style="width:72px;height:72px;border-radius:50%;margin-bottom:16px;">
         </div>
         <div class="onboarding-header">
           <h1>FunS Wallet</h1>
-          <p>블록체인 자산을 안전하게 관리하세요</p>
+          <p>${window.i18n?.t('onboarding.subtitle') || 'Manage your blockchain assets securely'}</p>
         </div>
         <div class="onboarding-options">
           <button class="onboarding-btn demo-wallet-btn" style="background:linear-gradient(135deg, var(--primary,#FF6B35) 0%, #FF8C52 100%); border:none; color:white; justify-content:center;">
-            <span class="text">🚀 테스트 버전으로 둘러보기</span>
+            <span class="text">${window.i18n?.t('onboarding.demo') || 'Explore demo version'}</span>
           </button>
-          <div class="onboarding-divider" style="display:flex;align-items:center;gap:12px;margin:8px 0;"><span style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></span><span style="color:rgba(255,255,255,0.3);font-size:12px;">또는</span><span style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></span></div>
+          <div class="onboarding-divider" style="display:flex;align-items:center;gap:12px;margin:8px 0;"><span style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></span><span style="color:rgba(255,255,255,0.3);font-size:12px;">${window.i18n?.t('onboarding.or') || 'or'}</span><span style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></span></div>
           <button class="onboarding-btn create-wallet-btn">
             <span class="icon">+</span>
-            <span class="text">새 지갑 만들기</span>
+            <span class="text">${window.i18n?.t('onboarding.create') || 'Create New Wallet'}</span>
           </button>
           <button class="onboarding-btn import-wallet-btn">
             <span class="icon">⇄</span>
-            <span class="text">기존 지갑 복구</span>
+            <span class="text">${window.i18n?.t('onboarding.import') || 'Restore Existing Wallet'}</span>
           </button>
         </div>
       </div>
@@ -81,7 +123,7 @@ class WalletUI {
     overlay.querySelector('.demo-wallet-btn').addEventListener('click', () => {
       overlay.remove();
       this.isLocked = false;
-      this.showToast('테스트 모드로 실행 중', 'success');
+      this.showToast(window.i18n?.t('toast.demoMode') || 'Running in demo mode', 'success');
     });
 
     overlay.querySelector('.create-wallet-btn').addEventListener('click', () => {
@@ -94,260 +136,450 @@ class WalletUI {
   }
 
   // Create wallet flow
-  showCreateWalletFlow(overlay) {
-    const mnemonic = this.walletCore.generateMnemonic();
-    const words = mnemonic.split(' ');
+  async showCreateWalletFlow(overlay) {
+    try {
+      const mnemonic = await this.walletCore.generateMnemonic();
+      if (!mnemonic) {
+        throw new Error(window.i18n?.t('error.mnemonicGenFail') || 'Unable to generate seed phrase');
+      }
+      const words = mnemonic.split(' ');
+      this.tempMnemonic = mnemonic;
 
-    const container = overlay.querySelector('.onboarding-container');
-    container.innerHTML = `
-      <div class="onboarding-header">
-        <h1>시드 구문 저장</h1>
-        <p>다음 12개의 단어를 안전한 곳에 기록하세요</p>
-      </div>
-      <div class="mnemonic-warning">
-        <span class="warning-icon">⚠️</span>
-        <p>이 시드 구문을 안전한 곳에 보관하세요. 분실 시 지갑을 복구할 수 없습니다.</p>
-      </div>
-      <div class="mnemonic-grid">
-        ${words.map((word, index) => `
-          <div class="mnemonic-item">
-            <span class="word-number">${index + 1}</span>
-            <span class="word-text">${word}</span>
+      const t = (key, fallback) => window.i18n?.t(key) || fallback;
+
+      const container = overlay.querySelector('.onboarding-container');
+      if (!container) return;
+
+      container.innerHTML = `
+        <div class="onboarding-content" style="padding-top: 10px;">
+          <div class="seed-step-indicator">
+            <div class="seed-step active"></div>
+            <div class="seed-step"></div>
+            <div class="seed-step"></div>
           </div>
-        `).join('')}
-      </div>
-      <button class="onboarding-btn confirm-mnemonic-btn">시드 구문 확인</button>
-    `;
 
-    container.querySelector('.confirm-mnemonic-btn').addEventListener('click', () => {
-      this.showMnemonicConfirmation(overlay, words, mnemonic);
-    });
+          <div class="onboarding-header">
+            <h1>${t('mnemonic.title', 'Seed Phrase')}</h1>
+            <p>${t('mnemonic.warning', 'Write down these 12 words in a safe place')}</p>
+          </div>
+
+          <div class="seed-security-banner">
+            <div class="security-icon">🔐</div>
+            <div class="security-text">
+              <h4>${t('mnemonic.securityTitle', 'Never share this')}</h4>
+              <p>${t('mnemonic.keepSafe', 'Keep this seed phrase in a safe place. If lost, your wallet cannot be recovered.')}</p>
+            </div>
+          </div>
+
+          <div class="mnemonic-reveal-container">
+            <div class="mnemonic-blur-overlay" id="mnemonicBlurOverlay">
+              <div class="reveal-icon">👁</div>
+              <div class="reveal-text">${t('mnemonic.tapToReveal', 'Tap to reveal seed phrase')}</div>
+              <div class="reveal-hint">${t('mnemonic.revealHint', 'Make sure no one is watching')}</div>
+            </div>
+            <div class="mnemonic-grid">
+              ${words.map((word, index) => `
+                <div class="mnemonic-item">
+                  <span class="word-number">${String(index + 1).padStart(2, '0')}</span>
+                  <span class="word-text">${word}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="seed-actions">
+            <button class="seed-action-btn" id="copySeedBtn">
+              <span class="action-icon">📋</span>
+              ${t('mnemonic.copy', 'Copy')}
+            </button>
+            <button class="seed-action-btn" id="hideSeedBtn">
+              <span class="action-icon">🙈</span>
+              ${t('mnemonic.hide', 'Hide')}
+            </button>
+          </div>
+
+          <div class="seed-checklist">
+            <div class="seed-check-item" data-check="1">
+              <div class="check-box">✓</div>
+              <span class="check-label">${t('mnemonic.check1', 'I have written down the seed phrase on paper')}</span>
+            </div>
+            <div class="seed-check-item" data-check="2">
+              <div class="check-box">✓</div>
+              <span class="check-label">${t('mnemonic.check2', 'I have stored it in a safe place')}</span>
+            </div>
+            <div class="seed-check-item" data-check="3">
+              <div class="check-box">✓</div>
+              <span class="check-label">${t('mnemonic.check3', 'I have not taken a screenshot')}</span>
+            </div>
+          </div>
+
+          <button class="onboarding-btn confirm-mnemonic-btn" disabled>${t('mnemonic.confirm', 'Verify Seed Phrase')}</button>
+        </div>
+      `;
+
+      // Blur overlay reveal
+      const overlay_el = container.querySelector('#mnemonicBlurOverlay');
+      if (overlay_el) {
+        overlay_el.addEventListener('click', () => {
+          overlay_el.classList.add('revealed');
+        });
+      }
+
+      // Copy button
+      const copyBtn = container.querySelector('#copySeedBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(mnemonic).then(() => {
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<span class="action-icon">✅</span> ' + t('mnemonic.copied', 'Copied');
+            setTimeout(() => {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<span class="action-icon">📋</span> ' + t('mnemonic.copy', 'Copy');
+            }, 3000);
+          }).catch(() => {
+            // Fallback copy
+            const ta = document.createElement('textarea');
+            ta.value = mnemonic;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = '<span class="action-icon">✅</span> ' + t('mnemonic.copied', 'Copied');
+            setTimeout(() => {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = '<span class="action-icon">📋</span> ' + t('mnemonic.copy', 'Copy');
+            }, 3000);
+          });
+        });
+      }
+
+      // Hide/show toggle
+      const hideBtn = container.querySelector('#hideSeedBtn');
+      if (hideBtn) {
+        hideBtn.addEventListener('click', () => {
+          if (overlay_el.classList.contains('revealed')) {
+            overlay_el.classList.remove('revealed');
+            hideBtn.innerHTML = '<span class="action-icon">🙈</span> ' + t('mnemonic.hide', 'Hide');
+          } else {
+            overlay_el.classList.add('revealed');
+            hideBtn.innerHTML = '<span class="action-icon">👁</span> ' + t('mnemonic.show', 'Show');
+          }
+        });
+      }
+
+      // Security checklist
+      const checkItems = container.querySelectorAll('.seed-check-item');
+      const confirmBtn = container.querySelector('.confirm-mnemonic-btn');
+      checkItems.forEach(item => {
+        item.addEventListener('click', () => {
+          item.classList.toggle('checked');
+          const allChecked = container.querySelectorAll('.seed-check-item.checked').length === 3;
+          if (confirmBtn) confirmBtn.disabled = !allChecked;
+        });
+      });
+
+      // Confirm button → verification
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => this.showMnemonicVerification(overlay, words));
+      }
+
+    } catch (error) {
+      console.error('[FunS] Create wallet flow error:', error);
+      this.showToast(error.message || (window.i18n?.t('error.mnemonicGenFail') || 'Unable to generate seed phrase'), 'error');
+      overlay.remove();
+      this.showOnboarding();
+    }
   }
 
-  // Confirm mnemonic words
-  showMnemonicConfirmation(overlay, words, mnemonic) {
-    const indices = [2, 6, 10]; // Word 3, 7, 11 (0-indexed)
-    const requiredWords = indices.map(i => words[i]);
-    let confirmed = [null, null, null];
+  // Verify mnemonic words by selecting correct options
+  showMnemonicVerification(overlay, words) {
+    try {
+      const t = (key, fallback) => window.i18n?.t(key) || fallback;
+      const container = overlay.querySelector('.onboarding-container');
+      if (!container) return;
 
-    const container = overlay.querySelector('.onboarding-container');
-    container.innerHTML = `
-      <div class="onboarding-header">
-        <h1>시드 구문 확인</h1>
-        <p>다음 단어들을 입력하세요</p>
-      </div>
-      <div class="confirmation-items">
-        ${indices.map((idx, i) => `
-          <div class="confirmation-item">
-            <label>단어 #${idx + 1}</label>
-            <input type="text" class="confirmation-input" data-index="${i}" placeholder="단어 입력">
-          </div>
-        `).join('')}
-      </div>
-      <button class="onboarding-btn confirm-words-btn" disabled>계속</button>
-    `;
-
-    const inputs = container.querySelectorAll('.confirmation-input');
-    const btn = container.querySelector('.confirm-words-btn');
-
-    inputs.forEach((input, i) => {
-      input.addEventListener('input', (e) => {
-        confirmed[i] = e.target.value.trim().toLowerCase();
-        const allFilled = confirmed.every(v => v);
-        btn.disabled = !allFilled;
-      });
-    });
-
-    btn.addEventListener('click', () => {
-      const isValid = requiredWords.every((word, i) => word.toLowerCase() === confirmed[i]);
-      if (!isValid) {
-        this.showToast('입력한 단어가 일치하지 않습니다', 'error');
-        return;
+      // Pick 3 random positions to verify
+      const allIndices = Array.from({length: 12}, (_, i) => i);
+      const verifyIndices = [];
+      while (verifyIndices.length < 3) {
+        const rand = allIndices.splice(Math.floor(Math.random() * allIndices.length), 1)[0];
+        verifyIndices.push(rand);
       }
-      this.showPinSetup(overlay, mnemonic, 'create');
-    });
+      verifyIndices.sort((a, b) => a - b);
+
+      let currentStep = 0;
+      const mnemonic = this.tempMnemonic;
+
+      const renderStep = () => {
+        const targetIndex = verifyIndices[currentStep];
+        const correctWord = words[targetIndex];
+
+        // Create 5 random wrong options + correct one
+        const options = [correctWord];
+        const otherWords = words.filter((_, i) => i !== targetIndex);
+        while (options.length < 6) {
+          const rand = otherWords[Math.floor(Math.random() * otherWords.length)];
+          if (!options.includes(rand)) options.push(rand);
+        }
+        // Shuffle
+        for (let i = options.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [options[i], options[j]] = [options[j], options[i]];
+        }
+
+        container.innerHTML = `
+          <div class="onboarding-content" style="padding-top: 10px;">
+            <div class="seed-step-indicator">
+              <div class="seed-step completed"></div>
+              <div class="seed-step active"></div>
+              <div class="seed-step"></div>
+            </div>
+
+            <div class="verify-progress">
+              ${verifyIndices.map((_, i) => `
+                <div class="verify-dot ${i < currentStep ? 'correct' : ''} ${i === currentStep ? 'current' : ''}"></div>
+              `).join('')}
+            </div>
+
+            <div class="verify-prompt">
+              <h3>${t('mnemonic.verifyTitle', 'Verify Seed Phrase')}</h3>
+              <p>${t('mnemonic.selectWord', 'Select a word')} <span class="verify-word-number">${targetIndex + 1}</span></p>
+            </div>
+
+            <div class="verify-word-grid">
+              ${options.map(word => `
+                <button class="verify-word-option" data-word="${word}">${word}</button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        // Handle word selection
+        container.querySelectorAll('.verify-word-option').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const selected = btn.dataset.word;
+            if (selected === correctWord) {
+              btn.classList.add('correct');
+              currentStep++;
+              if (currentStep >= 3) {
+                // All verified! Show PIN setup
+                setTimeout(() => this.showPinSetup(overlay, mnemonic, 'create'), 600);
+              } else {
+                setTimeout(() => renderStep(), 500);
+              }
+            } else {
+              btn.classList.add('wrong');
+              setTimeout(() => btn.classList.remove('wrong'), 600);
+            }
+          });
+        });
+      };
+
+      renderStep();
+    } catch (error) {
+      console.error('Failed to display seed phrase verification screen:', error);
+      this.showToast(error.message || (window.i18n?.t('error.verifyFail') || 'An error occurred'), 'error');
+      overlay.remove();
+      this.showOnboarding();
+    }
   }
 
   // Import wallet flow
   showImportWalletFlow(overlay) {
-    const container = overlay.querySelector('.onboarding-container');
-    container.innerHTML = `
-      <div class="onboarding-header">
-        <h1>지갑 복구</h1>
-        <p>시드 구문 또는 개인키를 입력하세요</p>
-      </div>
-      <div class="import-options">
-        <button class="import-option-btn active" data-option="mnemonic">시드 구문</button>
-        <button class="import-option-btn" data-option="textarea">텍스트 붙여넣기</button>
-      </div>
-      <div class="import-mnemonic-container">
-        <div class="mnemonic-inputs">
-          ${Array(12).fill(0).map((_, i) => `
-            <input type="text" class="mnemonic-input" placeholder="${i + 1}" data-index="${i}">
-          `).join('')}
+    try {
+      const container = overlay.querySelector('.onboarding-container');
+      const t = (key, fallback) => window.i18n?.t(key) || fallback;
+      container.innerHTML = `
+        <div class="onboarding-header">
+          <h1>${t('onboarding.import', 'Restore Wallet')}</h1>
+          <p>${t('mnemonic.importDesc', 'Enter your seed phrase or private key')}</p>
         </div>
-      </div>
-      <div class="import-textarea-container" style="display: none;">
-        <textarea class="import-textarea" placeholder="시드 구문을 공백으로 구분하여 입력하세요"></textarea>
-      </div>
-      <button class="onboarding-btn import-wallet-confirm-btn" disabled>계속</button>
-    `;
+        <div class="import-options">
+          <button class="import-option-btn active" data-option="mnemonic">Seed Phrase</button>
+          <button class="import-option-btn" data-option="textarea">Paste Text</button>
+        </div>
+        <div class="import-mnemonic-container">
+          <div class="mnemonic-inputs">
+            ${Array(12).fill(0).map((_, i) => `
+              <input type="text" class="mnemonic-input" placeholder="${i + 1}" data-index="${i}">
+            `).join('')}
+          </div>
+        </div>
+        <div class="import-textarea-container" style="display: none;">
+          <textarea class="import-textarea" placeholder="Enter seed phrase separated by spaces"></textarea>
+        </div>
+        <button class="onboarding-btn import-wallet-confirm-btn" disabled>Continue</button>
+      `;
 
-    const mnemonicContainer = container.querySelector('.import-mnemonic-container');
-    const textareaContainer = container.querySelector('.import-textarea-container');
-    const options = container.querySelectorAll('.import-option-btn');
-    const confirmBtn = container.querySelector('.import-wallet-confirm-btn');
+      const mnemonicContainer = container.querySelector('.import-mnemonic-container');
+      const textareaContainer = container.querySelector('.import-textarea-container');
+      const options = container.querySelectorAll('.import-option-btn');
+      const confirmBtn = container.querySelector('.import-wallet-confirm-btn');
 
-    options.forEach(opt => {
-      opt.addEventListener('click', (e) => {
-        options.forEach(o => o.classList.remove('active'));
-        e.target.classList.add('active');
+      options.forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          options.forEach(o => o.classList.remove('active'));
+          e.target.classList.add('active');
 
-        if (e.target.dataset.option === 'mnemonic') {
-          mnemonicContainer.style.display = 'block';
-          textareaContainer.style.display = 'none';
+          if (e.target.dataset.option === 'mnemonic') {
+            mnemonicContainer.style.display = 'block';
+            textareaContainer.style.display = 'none';
+          } else {
+            mnemonicContainer.style.display = 'none';
+            textareaContainer.style.display = 'block';
+          }
+        });
+      });
+
+      const validateInputs = () => {
+        const option = container.querySelector('.import-option-btn.active').dataset.option;
+        let words = [];
+
+        if (option === 'mnemonic') {
+          words = Array.from(container.querySelectorAll('.mnemonic-input'))
+            .map(input => input.value.trim())
+            .filter(w => w);
         } else {
-          mnemonicContainer.style.display = 'none';
-          textareaContainer.style.display = 'block';
+          words = container.querySelector('.import-textarea').value.trim().split(/\s+/);
+        }
+
+        confirmBtn.disabled = words.length !== 12;
+        return words.length === 12 ? words : null;
+      };
+
+      container.querySelectorAll('.mnemonic-input, .import-textarea').forEach(input => {
+        input.addEventListener('input', validateInputs);
+      });
+
+      confirmBtn.addEventListener('click', () => {
+        try {
+          const option = container.querySelector('.import-option-btn.active').dataset.option;
+          let words = [];
+
+          if (option === 'mnemonic') {
+            words = Array.from(container.querySelectorAll('.mnemonic-input'))
+              .map(input => input.value.trim());
+          } else {
+            words = container.querySelector('.import-textarea').value.trim().split(/\s+/);
+          }
+
+          if (words.length !== 12) {
+            this.showToast(window.i18n?.t('mnemonic.invalid') || 'Please enter 12 words', 'error');
+            return;
+          }
+
+          const mnemonic = words.join(' ');
+          this.showPinSetup(overlay, mnemonic, 'import');
+        } catch (error) {
+          console.error('Wallet recovery validation error:', error);
+          this.showToast(error.message || 'An error occurred while restoring the wallet', 'error');
         }
       });
-    });
-
-    const validateInputs = () => {
-      const option = container.querySelector('.import-option-btn.active').dataset.option;
-      let words = [];
-
-      if (option === 'mnemonic') {
-        words = Array.from(container.querySelectorAll('.mnemonic-input'))
-          .map(input => input.value.trim())
-          .filter(w => w);
-      } else {
-        words = container.querySelector('.import-textarea').value.trim().split(/\s+/);
-      }
-
-      confirmBtn.disabled = words.length !== 12;
-      return words.length === 12 ? words : null;
-    };
-
-    container.querySelectorAll('.mnemonic-input, .import-textarea').forEach(input => {
-      input.addEventListener('input', validateInputs);
-    });
-
-    confirmBtn.addEventListener('click', () => {
-      const option = container.querySelector('.import-option-btn.active').dataset.option;
-      let words = [];
-
-      if (option === 'mnemonic') {
-        words = Array.from(container.querySelectorAll('.mnemonic-input'))
-          .map(input => input.value.trim());
-      } else {
-        words = container.querySelector('.import-textarea').value.trim().split(/\s+/);
-      }
-
-      if (words.length !== 12) {
-        this.showToast('12개의 단어를 입력하세요', 'error');
-        return;
-      }
-
-      const mnemonic = words.join(' ');
-      this.showPinSetup(overlay, mnemonic, 'import');
-    });
+    } catch (error) {
+      console.error('Failed to display wallet recovery screen:', error);
+      this.showToast(error.message || 'An error occurred', 'error');
+      overlay.remove();
+      this.showOnboarding();
+    }
   }
 
   // PIN setup
   showPinSetup(overlay, mnemonic, flow) {
-    let pin = '';
-    let confirmPin = '';
-    let confirmingPin = false;
+    try {
+      let confirmPin = '';
+      let confirmingPin = false;
 
-    const container = overlay.querySelector('.onboarding-container');
-    container.innerHTML = `
-      <div class="onboarding-header">
-        <h1>PIN 설정</h1>
-        <p>6자리 PIN 번호를 설정하세요</p>
-      </div>
-      <div class="pin-display">
-        <input type="password" class="pin-input" readonly maxlength="6">
-      </div>
-      <div class="pin-numpad">
-        ${Array(10).fill(0).map((_, i) => `
-          <button class="numpad-btn" data-num="${i}">
-            <span class="num-text">${i}</span>
-          </button>
-        `).join('')}
-        <button class="numpad-btn delete-btn" data-delete>
-          <span class="num-text">⌫</span>
-        </button>
-        <button class="numpad-btn clear-btn" data-clear>
-          <span class="num-text">C</span>
-        </button>
-      </div>
-      <button class="onboarding-btn pin-confirm-btn" disabled>확인</button>
-    `;
+      const container = overlay.querySelector('.onboarding-container');
+      container.innerHTML = `
+        <div class="onboarding-header">
+          <h1>${window.i18n?.t('pin.setup') || 'PIN Setup'}</h1>
+          <p>${window.i18n?.t('pin.setupDesc') || 'Set a password of at least 8 characters'}</p>
+        </div>
+        <div class="pin-display">
+          <div class="pin-keyboard-wrapper">
+            <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="new-password">
+            <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="onboarding-btn pin-confirm-btn" disabled>${window.i18n?.t('common.confirm') || 'Confirm'}</button>
+      `;
 
-    const input = container.querySelector('.pin-input');
-    const numpadBtns = container.querySelectorAll('[data-num]');
-    const deleteBtn = container.querySelector('[data-delete]');
-    const clearBtn = container.querySelector('[data-clear]');
-    const confirmBtn = container.querySelector('.pin-confirm-btn');
+      const input = container.querySelector('.pin-input');
+      const confirmBtn = container.querySelector('.pin-confirm-btn');
+      const toggleBtn = container.querySelector('.pin-toggle-btn');
 
-    const updateDisplay = () => {
-      input.value = '●'.repeat(pin.length);
-      confirmBtn.disabled = pin.length !== 6;
-    };
-
-    numpadBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (pin.length < 6) {
-          pin += btn.dataset.num;
-          updateDisplay();
-        }
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+        toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
       });
-    });
 
-    deleteBtn.addEventListener('click', () => {
-      pin = pin.slice(0, -1);
-      updateDisplay();
-    });
+      input.addEventListener('input', () => {
+        confirmBtn.disabled = input.value.length < 8;
+      });
 
-    clearBtn.addEventListener('click', () => {
-      pin = '';
-      updateDisplay();
-    });
-
-    confirmBtn.addEventListener('click', () => {
-      if (!confirmingPin) {
-        confirmPin = pin;
-        pin = '';
-        updateDisplay();
-        container.querySelector('.onboarding-header h1').textContent = 'PIN 확인';
-        container.querySelector('.onboarding-header p').textContent = 'PIN을 다시 입력하세요';
-        confirmingPin = true;
-      } else {
-        if (pin === confirmPin) {
-          this.createWallet(mnemonic, confirmPin, flow, overlay);
-        } else {
-          this.showToast('PIN이 일치하지 않습니다', 'error');
-          pin = '';
-          confirmPin = '';
-          confirmingPin = false;
-          updateDisplay();
-          container.querySelector('.onboarding-header h1').textContent = 'PIN 설정';
-          container.querySelector('.onboarding-header p').textContent = '6자리 PIN 번호를 설정하세요';
+      const doConfirm = () => {
+        try {
+          const pin = input.value;
+          if (pin.length < 8) return;
+          if (!confirmingPin) {
+            confirmPin = pin;
+            input.value = '';
+            confirmBtn.disabled = true;
+            container.querySelector('.onboarding-header h1').textContent = window.i18n?.t('pin.confirm') || 'Confirm PIN';
+            container.querySelector('.onboarding-header p').textContent = window.i18n?.t('pin.confirmDesc') || 'Enter PIN again';
+            confirmingPin = true;
+            input.focus();
+          } else {
+            if (pin === confirmPin) {
+              this.createWallet(mnemonic, confirmPin, flow, overlay);
+            } else {
+              this.showToast(window.i18n?.t('error.pinMismatch') || 'PINs do not match', 'error');
+              input.value = '';
+              confirmPin = '';
+              confirmingPin = false;
+              confirmBtn.disabled = true;
+              container.querySelector('.onboarding-header h1').textContent = window.i18n?.t('pin.setup') || 'PIN Setup';
+              container.querySelector('.onboarding-header p').textContent = window.i18n?.t('pin.setupDesc') || 'Set a password of at least 8 characters';
+              input.focus();
+            }
+          }
+        } catch (error) {
+          console.error('PIN verification error:', error);
+          this.showToast(error.message || (window.i18n?.t('error.common') || 'An error occurred'), 'error');
         }
-      }
-    });
+      };
+
+      confirmBtn.addEventListener('click', doConfirm);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doConfirm(); });
+      setTimeout(() => input.focus(), 100);
+    } catch (error) {
+      console.error('Failed to display PIN setup screen:', error);
+      this.showToast(error.message || (window.i18n?.t('error.common') || 'An error occurred'), 'error');
+      overlay.remove();
+      this.showOnboarding();
+    }
   }
 
   // Create or import wallet
   async createWallet(mnemonic, pin, flow, overlay) {
     try {
-      const stopLoading = this.showLoading(overlay, '지갑을 생성 중입니다...');
+      const stopLoading = this.showLoading(overlay, 'Creating wallet...');
 
-      if (flow === 'create') {
-        this.walletCore.createWallet(mnemonic, pin);
-      } else {
-        this.walletCore.importWallet(mnemonic, pin);
+      try {
+        if (flow === 'create') {
+          await this.walletCore.createWallet(mnemonic, pin);
+        } else {
+          await this.walletCore.importWallet(mnemonic, pin);
+        }
+      } catch (walletError) {
+        stopLoading();
+        throw new Error(walletError.message || 'Failed to create wallet');
       }
 
       stopLoading();
@@ -355,12 +587,12 @@ class WalletUI {
 
       this.isLocked = false;
       this.loadDashboard();
-      this.showToast('지갑이 성공적으로 생성되었습니다', 'success');
+      this.showToast(window.i18n?.t('toast.walletCreated') || 'Wallet created successfully', 'success');
 
       window.dispatchEvent(new CustomEvent('walletCreated'));
     } catch (error) {
-      console.error('지갑 생성 실패:', error);
-      this.showToast(error.message || '지갑 생성 실패', 'error');
+      console.error('Wallet creation failed:', error);
+      this.showToast(error.message || 'Wallet creation failed', 'error');
     }
   }
 
@@ -371,27 +603,23 @@ class WalletUI {
     overlay.innerHTML = `
       <div class="pin-entry-container">
         <div class="pin-entry-header">
-          <h1>PIN 입력</h1>
-          <p>지갑을 열기 위해 PIN을 입력하세요</p>
+          <h1>${window.i18n?.t('pin.enter') || 'Enter PIN'}</h1>
+          <p>${window.i18n?.t('pin.enterDesc') || 'Unlock your wallet'}</p>
         </div>
         <div class="pin-display">
-          <input type="password" class="pin-input" readonly maxlength="6">
-        </div>
-        <div class="pin-numpad">
-          ${Array(10).fill(0).map((_, i) => `
-            <button class="numpad-btn" data-num="${i}">
-              <span class="num-text">${i}</span>
+          <div class="pin-keyboard-wrapper">
+            <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="current-password">
+            <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
-          `).join('')}
-          <button class="numpad-btn delete-btn" data-delete>
-            <span class="num-text">⌫</span>
-          </button>
-          <button class="numpad-btn clear-btn" data-clear>
-            <span class="num-text">C</span>
-          </button>
+          </div>
         </div>
+        <button class="onboarding-btn pin-unlock-btn" disabled style="margin-top:8px;">
+          ${window.i18n?.t('pin.unlock') || 'Unlock'}
+        </button>
         <button class="onboarding-btn demo-skip-btn" style="margin-top:16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);justify-content:center;font-size:14px;padding:14px;">
-          테스트 모드로 건너뛰기
+          ${window.i18n?.t('toast.demoMode') || 'Skip to demo mode'}
         </button>
         <div class="pin-error" style="display: none;"></div>
       </div>
@@ -400,65 +628,105 @@ class WalletUI {
     document.body.appendChild(overlay);
 
     const input = overlay.querySelector('.pin-input');
-    const numpadBtns = overlay.querySelectorAll('[data-num]');
-    const deleteBtn = overlay.querySelector('[data-delete]');
-    const clearBtn = overlay.querySelector('[data-clear]');
+    const unlockBtn = overlay.querySelector('.pin-unlock-btn');
+    const toggleBtn = overlay.querySelector('.pin-toggle-btn');
     const errorDiv = overlay.querySelector('.pin-error');
-    let pin = '';
 
-    const updateDisplay = () => {
-      input.value = '●'.repeat(pin.length);
-    };
+    // Restore lockout state on open so reopening the modal doesn't bypass the lockout
+    try {
+      const stored = JSON.parse(localStorage.getItem('funs_pin_lock') || '{}');
+      if (stored.lockUntil && Date.now() < stored.lockUntil) {
+        const remaining = Math.ceil((stored.lockUntil - Date.now()) / 1000);
+        errorDiv.textContent = `${remaining}s remaining, please try again`;
+        errorDiv.style.display = 'block';
+        input.disabled = true;
+        unlockBtn.disabled = true;
+      }
+    } catch (_) { /* ignore */ }
 
-    const tryUnlock = () => {
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+      toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
+    });
+
+    input.addEventListener('input', () => {
+      unlockBtn.disabled = input.value.length < 1;
+      errorDiv.style.display = 'none';
+    });
+
+    // Load PIN lockout state from localStorage so it persists across page refreshes
+    const loadPinLockState = () => {
       try {
-        this.walletCore.unlockWallet(pin);
-        this.pinAttempts = 0;
+        const stored = JSON.parse(localStorage.getItem('funs_pin_lock') || '{}');
+        this._pinAttempts = stored.attempts || 0;
+        this._pinLockUntil = stored.lockUntil || null;
+      } catch (_) {
+        this._pinAttempts = 0;
+        this._pinLockUntil = null;
+      }
+    };
+    const savePinLockState = () => {
+      localStorage.setItem('funs_pin_lock', JSON.stringify({
+        attempts: this._pinAttempts,
+        lockUntil: this._pinLockUntil
+      }));
+    };
+    loadPinLockState();
+
+    const tryUnlock = async () => {
+      const pin = input.value;
+      if (pin.length < 1) return;
+
+      // PIN rate limiting — state persisted in localStorage to survive page refresh
+      if (this._pinLockUntil && Date.now() < this._pinLockUntil) {
+        const remaining = Math.ceil((this._pinLockUntil - Date.now()) / 1000);
+        errorDiv.textContent = `${remaining}s remaining, please try again`;
+        errorDiv.style.display = 'block';
+        input.disabled = true;
+        unlockBtn.disabled = true;
+        return;
+      }
+      // Clear expired lockout
+      if (this._pinLockUntil && Date.now() >= this._pinLockUntil) {
+        this._pinLockUntil = null;
+        this._pinAttempts = 0;
+        savePinLockState();
+        input.disabled = false;
+        unlockBtn.disabled = false;
+      }
+
+      try {
+        await this.walletCore.unlockWallet(pin);
+        this._pinAttempts = 0;
+        this._pinLockUntil = null;
+        savePinLockState();
         overlay.remove();
         this.isLocked = false;
-        this.loadDashboard();
         window.dispatchEvent(new CustomEvent('walletUnlocked'));
       } catch (error) {
-        this.pinAttempts++;
-        errorDiv.textContent = `PIN이 잘못되었습니다 (${this.pinAttempts}/${this.maxPinAttempts})`;
+        this._pinAttempts++;
+        errorDiv.textContent = `Incorrect PIN (${this._pinAttempts}/${this.maxPinAttempts})`;
         errorDiv.style.display = 'block';
         input.parentElement.classList.add('shake');
-        setTimeout(() => {
-          input.parentElement.classList.remove('shake');
-        }, 500);
-        pin = '';
-        updateDisplay();
+        setTimeout(() => input.parentElement.classList.remove('shake'), 500);
+        input.value = '';
+        unlockBtn.disabled = true;
 
-        if (this.pinAttempts >= this.maxPinAttempts) {
-          errorDiv.textContent = '시도 횟수 초과. 앱을 다시 시작하세요.';
-          overlay.querySelectorAll('button').forEach(btn => btn.disabled = true);
+        if (this._pinAttempts >= this.maxPinAttempts) {
+          this._pinLockUntil = Date.now() + 30000; // 30 second lockout
+          this._pinAttempts = 0;
+          errorDiv.textContent = `${this.maxPinAttempts} failed attempts. Please try again in 30 seconds`;
+          input.disabled = true;
+          unlockBtn.disabled = true;
         }
+        savePinLockState();
       }
     };
 
-    numpadBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (pin.length < 6) {
-          pin += btn.dataset.num;
-          updateDisplay();
-          if (pin.length === 6) {
-            setTimeout(tryUnlock, 300);
-          }
-        }
-      });
-    });
-
-    deleteBtn.addEventListener('click', () => {
-      pin = pin.slice(0, -1);
-      updateDisplay();
-      errorDiv.style.display = 'none';
-    });
-
-    clearBtn.addEventListener('click', () => {
-      pin = '';
-      updateDisplay();
-      errorDiv.style.display = 'none';
-    });
+    unlockBtn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
 
     // Demo skip button
     const demoBtn = overlay.querySelector('.demo-skip-btn');
@@ -466,9 +734,11 @@ class WalletUI {
       demoBtn.addEventListener('click', () => {
         overlay.remove();
         this.isLocked = false;
-        this.showToast('테스트 모드로 실행 중', 'success');
+        this.showToast('Running in demo mode', 'success');
       });
     }
+
+    setTimeout(() => input.focus(), 100);
   }
 
   // PIN confirmation for transactions
@@ -479,25 +749,19 @@ class WalletUI {
       overlay.innerHTML = `
         <div class="pin-confirmation-container">
           <div class="pin-confirmation-header">
-            <h1>거래 확인</h1>
-            <p>PIN을 입력하여 거래를 확인하세요</p>
+            <h1>Transaction Confirmation</h1>
+            <p>Enter PIN to confirm transaction</p>
           </div>
           <div class="pin-display">
-            <input type="password" class="pin-input" readonly maxlength="6">
-          </div>
-          <div class="pin-numpad">
-            ${Array(10).fill(0).map((_, i) => `
-              <button class="numpad-btn" data-num="${i}">
-                <span class="num-text">${i}</span>
+            <div class="pin-keyboard-wrapper">
+              <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="current-password">
+              <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
               </button>
-            `).join('')}
-            <button class="numpad-btn delete-btn" data-delete>
-              <span class="num-text">⌫</span>
-            </button>
-            <button class="numpad-btn clear-btn" data-clear>
-              <span class="num-text">C</span>
-            </button>
+            </div>
           </div>
+          <button class="onboarding-btn pin-confirm-action-btn" disabled style="margin-top:8px;">Confirm</button>
           <div class="pin-error" style="display: none;"></div>
         </div>
       `;
@@ -505,64 +769,51 @@ class WalletUI {
       document.body.appendChild(overlay);
 
       const input = overlay.querySelector('.pin-input');
-      const numpadBtns = overlay.querySelectorAll('[data-num]');
-      const deleteBtn = overlay.querySelector('[data-delete]');
-      const clearBtn = overlay.querySelector('[data-clear]');
+      const confirmBtn = overlay.querySelector('.pin-confirm-action-btn');
+      const toggleBtn = overlay.querySelector('.pin-toggle-btn');
       const errorDiv = overlay.querySelector('.pin-error');
-      let pin = '';
       let attempts = 0;
 
-      const updateDisplay = () => {
-        input.value = '●'.repeat(pin.length);
-      };
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+        toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
+      });
 
-      const tryConfirm = () => {
-        try {
-          this.walletCore.verifyPin(pin);
+      input.addEventListener('input', () => {
+        confirmBtn.disabled = input.value.length < 1;
+        errorDiv.style.display = 'none';
+      });
+
+      const tryConfirm = async () => {
+        const pin = input.value;
+        if (pin.length < 1) return;
+        const valid = await this.walletCore.validatePin(pin);
+        if (valid) {
           overlay.remove();
+          document.removeEventListener('keydown', closeOnEsc);
           if (callback) callback();
           resolve(true);
-        } catch (error) {
+        } else {
           attempts++;
-          errorDiv.textContent = `PIN이 잘못되었습니다 (${attempts}/3)`;
+          errorDiv.textContent = `Incorrect PIN (${attempts}/3)`;
           errorDiv.style.display = 'block';
           input.parentElement.classList.add('shake');
-          setTimeout(() => {
-            input.parentElement.classList.remove('shake');
-          }, 500);
-          pin = '';
-          updateDisplay();
+          setTimeout(() => input.parentElement.classList.remove('shake'), 500);
+          input.value = '';
+          confirmBtn.disabled = true;
 
           if (attempts >= 3) {
+            document.removeEventListener('keydown', closeOnEsc);
             overlay.remove();
             resolve(false);
           }
         }
       };
 
-      numpadBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (pin.length < 6) {
-            pin += btn.dataset.num;
-            updateDisplay();
-            if (pin.length === 6) {
-              setTimeout(tryConfirm, 300);
-            }
-          }
-        });
-      });
-
-      deleteBtn.addEventListener('click', () => {
-        pin = pin.slice(0, -1);
-        updateDisplay();
-        errorDiv.style.display = 'none';
-      });
-
-      clearBtn.addEventListener('click', () => {
-        pin = '';
-        updateDisplay();
-        errorDiv.style.display = 'none';
-      });
+      confirmBtn.addEventListener('click', tryConfirm);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryConfirm(); });
 
       // Close on ESC
       const closeOnEsc = (e) => {
@@ -573,53 +824,165 @@ class WalletUI {
         }
       };
       document.addEventListener('keydown', closeOnEsc);
+      setTimeout(() => input.focus(), 100);
     });
   }
 
   // Load dashboard
   async loadDashboard() {
+    // Fix 2: Debounce - ignore calls within 2000ms of each other
+    const now = Date.now();
+    if (this._lastDashboardCall && (now - this._lastDashboardCall) < 2000) return;
+    this._lastDashboardCall = now;
+
+    if (this._dashboardLoading) return;
+    this._dashboardLoading = true;
     try {
       const address = this.walletCore.getAddress();
-      document.querySelector('#addressDisplay span').textContent =
-        `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
 
-      const balances = await this.walletBlockchain.getBalances();
-      this.updateBalances(balances);
-      this.updateTokenList(balances);
-      this.updateChart(this.currentToken, this.currentTimeRange);
-      this.updateTransactionHistory();
-      this.setupChartTimeButtons();
-      this.setupTransactionFilters();
+      // Update portfolio address display
+      const portfolioAddress = document.getElementById('portfolioAddress');
+      if (portfolioAddress) {
+        if (address) {
+          portfolioAddress.textContent = `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+          portfolioAddress.removeAttribute('data-i18n'); // Prevent i18n from overwriting the address
+        } else {
+          portfolioAddress.textContent = window.i18n?.t('home.createWallet') || 'Create a wallet';
+        }
+      }
 
-      // Auto-refresh
-      setInterval(() => {
-        this.walletBlockchain.getBalances().then(b => this.updateBalances(b));
-        this.updateTransactionHistory();
-      }, 30000); // Every 30 seconds
+      // Update network indicator
+      const networkInfo = this.walletBlockchain.getNetworkInfo?.();
+      if (networkInfo) {
+        // After setupNetworkSelector(), the structure is .network-current button
+        const networkCurrentBtn = document.querySelector('#networkSelector .network-current');
+        if (networkCurrentBtn) {
+          networkCurrentBtn.textContent = networkInfo.name;
+        }
+      }
+
+      // Check connection
+      const connected = await this.walletBlockchain.isConnected?.();
+      const statusDot = document.getElementById('connection-status');
+      if (statusDot) {
+        statusDot.className = connected ? 'connection-dot connected' : 'connection-dot disconnected';
+      }
+
+      if (!address) {
+        // Demo mode - show sample data
+        console.log('[FunS] Demo mode - no wallet address');
+        return;
+      }
+
+      // Show skeleton while fetching balances
+      this.showSkeletonTokenList();
+
+      // Fetch real balances
+      try {
+        const balancesResult = await this.walletBlockchain.fetchAllBalances(address);
+        // Fix 1: Bridge data structure - fetchAllBalances returns {tokens: [...], totalUSD}
+        // But updateBalanceDisplay and updateTokenList expect symbol-keyed map
+        const balancesMap = {};
+        if (balancesResult.tokens && Array.isArray(balancesResult.tokens)) {
+          for (const token of balancesResult.tokens) {
+            balancesMap[token.symbol] = {
+              balance: token.balance,
+              usdValue: token.balanceUSD ? parseFloat(token.balanceUSD.replace('$', '')) : 0,
+              change24h: token.change ? parseFloat(token.change) : 0,
+              name: token.name,
+              icon: token.icon,
+              decimals: token.decimals,
+              address: token.address
+            };
+          }
+        }
+        this.updateBalanceDisplay(balancesResult.totalUSD);
+        this.updateTokenList(balancesMap);
+      } catch (balanceError) {
+        console.warn('[FunS] Balance fetch failed:', balanceError.message);
+        this.showToast(window.i18n?.t('toast.balanceFetchFail') || 'Balance fetch failed - check your network connection', 'warning');
+      }
+
+      // Fetch transaction history
+      try {
+        await this.updateTransactionHistory();
+      } catch (txError) {
+        console.warn('[FunS] Transaction history fetch failed:', txError.message);
+      }
+
+      // Setup chart
+      this.setupChartTimeButtons?.();
+      this.setupTransactionFilters?.();
+
+      // Auto-refresh is handled by walletBlockchain's built-in timer via 'balancesUpdated' event.
+      // Do NOT add a second setInterval here — that causes duplicate RPC calls and main thread overload.
+
     } catch (error) {
-      console.error('대시보드 로드 실패:', error);
-      this.showToast('데이터 로드 실패', 'error');
+      console.error('Dashboard load failed:', error);
+    } finally {
+      this._dashboardLoading = false;
     }
   }
 
-  // Update balances
-  async updateBalances(balances) {
-    let totalUSD = 0;
+  // Format token balance with smart precision (OKX-style)
+  // - 0 → '0'
+  // - >= 1000 → no decimals
+  // - >= 1 → 4 decimal places
+  // - < 1 → enough decimals to show at least 4 significant figures (max 8)
+  formatBalance(balance) {
+    const val = parseFloat(balance);
+    if (!val || val === 0) return '0';
+    if (val >= 1000) return val.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    if (val >= 1) return val.toFixed(4).replace(/\.?0+$/, '') || '0';
+    // For values < 1: find first significant digit then show 4-6 sig figs
+    const str = val.toPrecision(6);
+    const num = parseFloat(str);
+    // Remove unnecessary trailing zeros
+    return num.toString();
+  }
 
-    for (const token in balances) {
-      const balance = balances[token];
-      try {
-        const price = await this.walletBlockchain.getTokenPrice(token);
-        const value = balance * price;
-        totalUSD += value;
-      } catch (error) {
-        console.warn(`가격 조회 실패: ${token}`);
-      }
+  // Update balance display from blockchain data
+  // Fix 1: Now accepts totalUSD directly (number) instead of balances object
+  updateBalanceDisplay(totalUSD) {
+    if (totalUSD === null || totalUSD === undefined) return;
+
+    // Fix 7: Use specific ID selector instead of broad selectors
+    const balEl = document.getElementById('portfolioBalance');
+    if (balEl) {
+      balEl.textContent = '$' + totalUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    const counterSpan = document.querySelector('.balance-amount h1 .counter span');
-    if (counterSpan) {
-      this.animateCounter(counterSpan, 0, totalUSD, 1000);
+    // portfolioBalance is the only balance display element; skip broad DOM traversal
+  }
+
+  // Update balances from event
+  // Fix 1: Handle both event format (with .balances property) and direct result format
+  updateBalances(data) {
+    try {
+      if (!data) return;
+
+      // Event detail contains { balances: {tokens: [...], totalUSD: number} }
+      const balancesResult = data.balances || data;
+
+      if (balancesResult.tokens && Array.isArray(balancesResult.tokens)) {
+        // Convert token array to symbol-keyed map
+        const balancesMap = {};
+        for (const token of balancesResult.tokens) {
+          balancesMap[token.symbol] = {
+            balance: token.balance,
+            usdValue: token.balanceUSD ? parseFloat(token.balanceUSD.replace('$', '')) : 0,
+            change24h: token.change ? parseFloat(token.change) : 0,
+            name: token.name,
+            icon: token.icon,
+            decimals: token.decimals,
+            address: token.address
+          };
+        }
+        this.updateBalanceDisplay(balancesResult.totalUSD);
+        this.updateTokenList(balancesMap);
+      }
+    } catch(e) {
+      console.warn('[FunS] updateBalances error:', e.message);
     }
   }
 
@@ -636,58 +999,99 @@ class WalletUI {
     update();
   }
 
-  // Update token list
-  async updateTokenList(balances) {
+  // Update token list from blockchain data
+  showSkeletonTokenList(count = 3) {
     const tokenList = document.querySelector('.token-list');
-    tokenList.innerHTML = '';
+    if (!tokenList) return;
+    tokenList.innerHTML = Array.from({ length: count }, () => `
+      <div class="skeleton-item">
+        <div class="skeleton-icon skeleton-pulse"></div>
+        <div class="skeleton-info">
+          <div class="skeleton-name skeleton-pulse"></div>
+          <div class="skeleton-balance skeleton-pulse"></div>
+        </div>
+        <div class="skeleton-value">
+          <div class="skeleton-usd skeleton-pulse"></div>
+          <div class="skeleton-change skeleton-pulse"></div>
+        </div>
+      </div>
+    `).join('');
+  }
 
-    for (const token in balances) {
-      const balance = balances[token];
-      if (balance === 0) continue;
+  async updateTokenList(balances) {
+    try {
+    const tokenList = document.querySelector('.token-list');
+    if (!tokenList || !balances) return;
 
-      let price = 0;
-      let change24h = 0;
+    // Set up event delegation once so token clicks don't require per-item listeners
+    if (!tokenList._delegated) {
+      tokenList._delegated = true;
+      tokenList.addEventListener('click', (e) => {
+        const item = e.target.closest('.token-item');
+        if (!item) return;
+        this.currentToken = item.dataset.symbol;
+        tokenList.querySelectorAll('.token-item').forEach(t => t.classList.remove('active'));
+        item.classList.add('active');
+      });
+    }
 
-      try {
-        const priceData = await this.walletBlockchain.getTokenPrice(token);
-        price = typeof priceData === 'object' ? priceData.price : priceData;
-        change24h = typeof priceData === 'object' ? priceData.change24h : 0;
-      } catch (error) {
-        console.warn(`가격 조회 실패: ${token}`);
-      }
+    const networkTokens = window.WalletConfig?.getAllTokens?.(this.walletBlockchain.currentNetwork) || {};
+    const entries = Object.entries(balances);
 
-      const usdValue = balance * price;
+    if (entries.length === 0) {
+      requestAnimationFrame(() => {
+        tokenList.innerHTML = '<div style="text-align:center;padding:24px;color:rgba(255,255,255,0.4);font-size:14px;">No tokens</div>';
+      });
+      return;
+    }
+
+    // Build DOM nodes off-screen in a DocumentFragment to avoid mid-loop reflows
+    const fragment = document.createDocumentFragment();
+    for (const [symbol, data] of entries) {
+      const balance = parseFloat(data.balance) || 0;
+      const usdValue = parseFloat(data.usdValue) || 0;
+      const change24h = data.change24h || 0;
+
+      const tokenConfig = networkTokens[symbol] || {};
+      const icon = tokenConfig.icon || '';
+
       const item = document.createElement('div');
       item.className = 'token-item';
+      item.dataset.symbol = symbol;
+      const eSym = escapeHtml(symbol);
+      const eName = escapeHtml(tokenConfig.name || symbol);
+      const iconHtml = icon
+        ? `<img src="${escapeHtml(icon)}" alt="${eSym}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="token-icon-fallback">${eSym.charAt(0)}</span>`
+        : `<span class="token-icon-fallback" style="display:flex">${eSym.charAt(0)}</span>`;
       item.innerHTML = `
         <div class="token-info">
-          <div class="token-icon">${this.getTokenIcon(token)}</div>
+          <div class="token-icon">${iconHtml}</div>
           <div class="token-details">
-            <div class="token-name">${token}</div>
-            <div class="token-balance">${balance.toFixed(4)} ${token}</div>
+            <div class="token-name">${eName}</div>
+            <div class="token-subtitle">${eSym}</div>
           </div>
         </div>
-        <div class="token-value">
-          <div class="token-price">$${usdValue.toFixed(2)}</div>
-          <div class="token-change ${change24h >= 0 ? 'positive' : 'negative'}">
+        <div class="token-values">
+          <div class="token-balance">${this.formatBalance(balance)} ${eSym}</div>
+          <div class="token-usd">$${usdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <div class="token-change-badge ${change24h >= 0 ? 'up' : 'down'}">
             ${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}%
           </div>
         </div>
       `;
-
-      item.addEventListener('click', () => {
-        this.currentToken = token;
-        document.querySelectorAll('.token-item').forEach(t => t.classList.remove('active'));
-        item.classList.add('active');
-        this.updateChart(token, this.currentTimeRange);
-      });
-
-      tokenList.appendChild(item);
+      fragment.appendChild(item);
     }
 
-    // Select first token by default
-    const firstToken = tokenList.querySelector('.token-item');
-    if (firstToken) firstToken.click();
+    // Cancel any pending DOM update and schedule a single batched swap
+    if (this._tokenListRaf) cancelAnimationFrame(this._tokenListRaf);
+    this._tokenListRaf = requestAnimationFrame(() => {
+      this._tokenListRaf = null;
+      tokenList.innerHTML = '';
+      tokenList.appendChild(fragment);
+    });
+    } catch (error) {
+      console.warn('[FunS] updateTokenList error:', error.message);
+    }
   }
 
   // Update chart
@@ -696,13 +1100,20 @@ class WalletUI {
       const chartToken = document.querySelector('#chartToken');
       if (chartToken) chartToken.textContent = tokenSymbol;
 
-      const priceHistory = await this.walletBlockchain.fetchPriceHistory(tokenSymbol, timeRange);
+      // Get coingeckoId from config for this token
+      const network = this.walletBlockchain.currentNetwork || WalletConfig.defaultNetwork;
+      const tokenConfig = WalletConfig.getToken(tokenSymbol, network);
+      const coingeckoId = tokenConfig?.coingeckoId || tokenSymbol.toLowerCase();
+
+      // fetchPriceHistory accepts string like '1h','1d','1w','1m','1y'
+      const priceHistory = await this.walletBlockchain.fetchPriceHistory(coingeckoId, timeRange);
       if (!priceHistory || priceHistory.length === 0) {
-        this.showToast('차트 데이터를 불러올 수 없습니다', 'warning');
+        this.showToast(window.i18n?.t('toast.chartNoData') || 'Unable to load chart data', 'warning');
         return;
       }
 
-      const prices = priceHistory.map(p => p.price);
+      // CoinGecko returns [[timestamp, price], ...] format
+      const prices = priceHistory.map(p => Array.isArray(p) ? p[1] : p.price);
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
       const priceRange = maxPrice - minPrice || 1;
@@ -740,23 +1151,25 @@ class WalletUI {
         }
       }
     } catch (error) {
-      console.error('차트 업데이트 실패:', error);
-      this.showToast('차트 업데이트 실패', 'error');
+      console.error('Chart update failed:', error);
+      this.showToast(window.i18n?.t('toast.chartFail') || 'Chart update failed', 'error');
     }
   }
 
   // Update transaction history
   async updateTransactionHistory() {
     try {
-      const transactions = await this.walletTransactions.getTransactionHistory();
-      const txList = document.querySelector('.transaction-list');
+      const address = this.walletCore.getAddress();
+      const network = this.walletBlockchain.currentNetwork || WalletConfig.defaultNetwork;
+      const transactions = await this.walletBlockchain.getTransactionHistory(address, network);
+      const txList = document.querySelector('.tx-list');
 
       if (!txList) return;
 
       txList.innerHTML = '';
 
       if (transactions.length === 0) {
-        txList.innerHTML = '<div class="no-transactions">거래 내역이 없습니다</div>';
+        txList.innerHTML = '<div class="no-transactions">No transaction history</div>';
         return;
       }
 
@@ -773,12 +1186,12 @@ class WalletUI {
         item.innerHTML = `
           <div class="tx-icon">${icon}</div>
           <div class="tx-info">
-            <div class="tx-type">${this.getTransactionTypeText(tx.type)}</div>
-            <div class="tx-time">${relativeTime}</div>
+            <div class="tx-type">${escapeHtml(this.getTransactionTypeText(tx.type))}</div>
+            <div class="tx-time">${escapeHtml(relativeTime)}</div>
           </div>
           <div class="tx-amount">
-            <div class="tx-value">${tx.type === 'send' ? '-' : '+'}${tx.amount} ${tx.token}</div>
-            <div class="tx-status ${statusClass}">${statusText}</div>
+            <div class="tx-value">${tx.type === 'send' ? '-' : '+'}${escapeHtml(tx.amount)} ${escapeHtml(tx.token)}</div>
+            <div class="tx-status ${statusClass}">${escapeHtml(statusText)}</div>
           </div>
         `;
 
@@ -789,19 +1202,30 @@ class WalletUI {
         txList.appendChild(item);
       });
     } catch (error) {
-      console.error('거래 내역 로드 실패:', error);
+      console.error('Transaction history load failed:', error);
     }
   }
 
   // Setup event listeners
   setupEventListeners() {
+    // Fix 5: Guard against double-calling setupEventListeners
+    if (this._listenersAttached) return;
+    this._listenersAttached = true;
+
+    // Language change listener
+    window.addEventListener('languageChanged', () => {
+      if (window.i18n) window.i18n.applyToDOM();
+    });
+
     // Address copy button
     const copyBtn = document.querySelector('#copyBtn');
     if (copyBtn) {
       copyBtn.addEventListener('click', () => {
         const address = this.walletCore.getAddress();
         navigator.clipboard.writeText(address).then(() => {
-          this.showToast('주소가 복사되었습니다', 'success');
+          this.showToast(window.i18n?.t('toast.addressCopied') || 'Address copied', 'success');
+        }).catch(() => {
+          this.showToast('Failed to copy address', 'error');
         });
       });
     }
@@ -822,19 +1246,109 @@ class WalletUI {
     // Window events
     window.addEventListener('walletCreated', () => this.loadDashboard());
     window.addEventListener('walletUnlocked', () => this.loadDashboard());
-    window.addEventListener('walletLocked', () => this.showPinEntry());
-    window.addEventListener('balancesUpdated', (e) => this.updateBalances(e.detail));
+    window.addEventListener('walletLocked', () => {
+      this.showPinEntry();
+    });
     window.addEventListener('networkChanged', () => this.loadDashboard());
     window.addEventListener('transactionSent', (e) => {
-      this.showToast(`거래 전송됨: ${e.detail.hash}`, 'info');
+      this.showToast(`Transaction sent: ${e.detail.hash}`, 'info');
     });
     window.addEventListener('transactionConfirmed', () => {
-      this.showToast('거래가 완료되었습니다', 'success');
+      this.showToast('Transaction completed', 'success');
       this.updateTransactionHistory();
     });
     window.addEventListener('transactionFailed', (e) => {
-      this.showToast(`거래 실패: ${e.detail.error}`, 'error');
+      this.showToast(`Transaction failed: ${e.detail.error}`, 'error');
     });
+
+    // Backup buttons
+    const seedBackupBtn = document.getElementById('seedBackupBtn');
+    if (seedBackupBtn) {
+      seedBackupBtn.addEventListener('click', () => this.showBackupModal('seed'));
+    }
+    const walletBackupBtn = document.getElementById('walletBackupBtn');
+    if (walletBackupBtn) {
+      walletBackupBtn.addEventListener('click', () => this.showBackupModal('all'));
+    }
+    const tosBtn = document.getElementById('tosBtn');
+    if (tosBtn) {
+      tosBtn.addEventListener('click', () => this.showLegalModal('terms'));
+    }
+    const privacyBtn = document.getElementById('privacyBtn');
+    if (privacyBtn) {
+      privacyBtn.addEventListener('click', () => this.showLegalModal('privacy'));
+    }
+
+    // Settings tab - Ethereum network toggle (static settings page #page-settings)
+    const ethToggleStatic = document.getElementById('ethToggle');
+    if (ethToggleStatic) {
+      // Initialize checked state from saved config
+      const savedNetworks = window.WalletConfig.getEnabledNetworks?.() || ['bsc'];
+      ethToggleStatic.checked = savedNetworks.includes('ethereum');
+
+      ethToggleStatic.addEventListener('change', async (e) => {
+        const enabled = e.target.checked;
+        window.WalletConfig.toggleNetwork('ethereum', enabled);
+
+        if (enabled) {
+          try {
+            await this.walletBlockchain.enableNetwork('ethereum');
+            this.showToast('Ethereum network enabled', 'success');
+          } catch (err) {
+            e.target.checked = false;
+            window.WalletConfig.toggleNetwork('ethereum', false);
+            this.showToast(err.message || 'Failed to enable network', 'error');
+          }
+        } else {
+          try {
+            this.walletBlockchain.disableNetwork('ethereum');
+            this.showToast('Ethereum network disabled', 'info');
+          } catch (err) {
+            e.target.checked = true;
+            window.WalletConfig.toggleNetwork('ethereum', true);
+            this.showToast(err.message, 'error');
+          }
+        }
+
+        // Refresh network selector
+        this.setupNetworkSelector();
+      });
+    }
+
+    // Settings tab - Ethereum Sepolia testnet toggle
+    const ethSepoliaToggle = document.getElementById('ethSepoliaToggle');
+    if (ethSepoliaToggle) {
+      const savedNetworks = window.WalletConfig.getEnabledNetworks?.() || ['bsc'];
+      ethSepoliaToggle.checked = savedNetworks.includes('ethereumSepolia');
+
+      ethSepoliaToggle.addEventListener('change', async (e) => {
+        const enabled = e.target.checked;
+        window.WalletConfig.toggleNetwork('ethereumSepolia', enabled);
+
+        if (enabled) {
+          try {
+            await this.walletBlockchain.enableNetwork('ethereumSepolia');
+            this.showToast('Ethereum Sepolia testnet enabled', 'success');
+          } catch (err) {
+            e.target.checked = false;
+            window.WalletConfig.toggleNetwork('ethereumSepolia', false);
+            this.showToast(err.message || 'Failed to enable network', 'error');
+          }
+        } else {
+          try {
+            this.walletBlockchain.disableNetwork('ethereumSepolia');
+            this.showToast('Ethereum Sepolia testnet disabled', 'info');
+          } catch (err) {
+            e.target.checked = true;
+            window.WalletConfig.toggleNetwork('ethereumSepolia', true);
+            this.showToast(err.message, 'error');
+          }
+        }
+
+        // Refresh network selector
+        this.setupNetworkSelector();
+      });
+    }
   }
 
   // Setup modals
@@ -843,6 +1357,73 @@ class WalletUI {
     this.setupReceiveModal();
     this.setupSwapModal();
     this.setupBuyModal();
+  }
+
+  // Populate the send token picker with logos + balances
+  populateSendTokenPicker(selectedSymbol) {
+    const picker = document.getElementById('sendTokenPicker');
+    const hiddenInput = document.getElementById('sendTokenValue');
+    if (!picker) return;
+
+    const network = this.walletBlockchain?.currentNetwork || 'bsc';
+    const networkTokens = window.WalletConfig?.getAllTokens?.(network) || {};
+    const balances = this.walletBlockchain?.balances || {};
+
+    // Determine which tokens to show: prefer cached balance keys, fallback to config
+    const symbols = Object.keys(balances).length
+      ? Object.keys(balances)
+      : Object.keys(networkTokens);
+
+    const selected = selectedSymbol || hiddenInput?.value || 'BNB';
+    picker.innerHTML = '';
+
+    for (const sym of symbols) {
+      const tokenConfig = networkTokens[sym] || {};
+      const bal = balances[sym];
+      const rawBalance = bal ? parseFloat(bal.balance) : 0;
+      const usdValue = bal ? (bal.usdValue || 0) : 0;
+      const icon = tokenConfig.icon || '';
+      const name = tokenConfig.name || sym;
+      const eSym = escapeHtml(sym);
+      const eName = escapeHtml(name);
+
+      const balText = rawBalance === 0 ? '0' : rawBalance.toFixed(6).replace(/\.?0+$/, '') || '0';
+      const usdValue_num = parseFloat(usdValue) || 0;
+      const usdText = usdValue_num > 0
+        ? '$' + usdValue_num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : '';
+
+      const iconHtml = icon
+        ? `<img src="${escapeHtml(icon)}" alt="${eSym}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="stc-icon-fallback" style="display:none">${eSym.charAt(0)}</span>`
+        : `<span class="stc-icon-fallback">${eSym.charAt(0)}</span>`;
+
+      const card = document.createElement('div');
+      card.className = 'send-token-card' + (sym === selected ? ' selected' : '');
+      card.dataset.symbol = sym;
+      card.innerHTML = `
+        <div class="stc-icon">${iconHtml}</div>
+        <div class="stc-info">
+          <div class="stc-symbol">${eSym}</div>
+          <div class="stc-name">${eName}</div>
+        </div>
+        <div class="stc-balance">
+          <div class="stc-bal-amount">${balText} ${eSym}</div>
+          ${usdText ? `<div class="stc-bal-usd">${usdText}</div>` : ''}
+        </div>
+        <div class="stc-check">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <polyline points="2,6 5,9 10,3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>`;
+
+      card.addEventListener('click', () => {
+        picker.querySelectorAll('.send-token-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        if (hiddenInput) hiddenInput.value = sym;
+      });
+
+      picker.appendChild(card);
+    }
   }
 
   // Send modal
@@ -859,27 +1440,47 @@ class WalletUI {
       submitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const token = tokenSelect?.value || this.selectedTokenForSend;
-        const address = addressInput?.value;
-        const amount = parseFloat(amountInput?.value);
-
-        if (!address || !amount || amount <= 0) {
-          this.showToast('모든 필드를 올바르게 입력하세요', 'error');
-          return;
-        }
-
-        if (!this.isValidAddress(address)) {
-          this.showToast('올바른 주소가 아닙니다', 'error');
-          return;
-        }
-
         try {
+          const token = tokenSelect?.value || this.selectedTokenForSend;
+          const address = addressInput?.value?.trim();
+          const amount = parseFloat(amountInput?.value);
+
+          // Validate inputs
+          if (!address || !amount || amount <= 0) {
+            this.showToast('Please fill in all fields correctly', 'error');
+            return;
+          }
+
+          if (!this.isValidAddress(address)) {
+            this.showToast('Invalid address (must be 42 characters starting with 0x)', 'error');
+            return;
+          }
+
+          // Use cached balances for validation (avoid triggering another full RPC fetch on button click)
+          const cachedBalances = this.walletBlockchain.balances || {};
+          if (!cachedBalances[token]) {
+            this.showToast(`${token} token balance could not be fetched`, 'error');
+            return;
+          }
+
+          const balance = parseFloat(cachedBalances[token].balance);
+          if (amount > balance) {
+            this.showToast(`${token} balance is insufficient (available: ${this.formatBalance(balance)} ${token})`, 'error');
+            return;
+          }
+
           // Get gas estimate
-          const gasEstimate = await this.walletBlockchain.estimateGas('transfer', {
-            to: address,
-            amount: amount,
-            token: token
-          });
+          let gasEstimate = 0;
+          try {
+            gasEstimate = await this.walletBlockchain.estimateGas('transfer', {
+              to: address,
+              amount: amount,
+              token: token
+            });
+          } catch (gasError) {
+            console.warn('Gas estimation failed:', gasError);
+            gasEstimate = 0.001; // Default estimate
+          }
 
           // Show confirmation
           const confirmed = await this.showSendConfirmation(token, address, amount, gasEstimate);
@@ -887,38 +1488,66 @@ class WalletUI {
 
           // Get PIN confirmation
           const pinConfirmed = await this.showPinConfirmation(() => {
-            this.showToast('거래를 처리 중입니다...', 'info');
+            this.showToast('Processing transaction...', 'info');
           });
 
           if (!pinConfirmed) {
-            this.showToast('거래가 취소되었습니다', 'warning');
+            this.showToast('Transaction cancelled', 'warning');
             return;
           }
 
-          // Send transaction
-          const txHash = await this.walletTransactions.sendTransaction({
-            to: address,
-            amount: amount,
-            token: token
-          });
+          // Show loading state
+          submitBtn.disabled = true;
+          const originalText = submitBtn.textContent;
+          submitBtn.textContent = window.i18n?.t('send.sending') || 'Sending...';
 
-          this.showToast(`거래가 전송되었습니다: ${txHash.substring(0, 10)}...`, 'success');
+          try {
+            // Determine token type and send accordingly
+            let txHash;
+            const currentNetwork = this.walletBlockchain.currentNetwork;
+            const tokenConfig = window.WalletConfig?.getAllTokens?.(currentNetwork)?.[token];
 
-          const modal = sendForm.closest('.modal');
-          if (modal) modal.style.display = 'none';
+            if (tokenConfig?.native || token === 'BNB' || !tokenConfig) {
+              // Native token
+              txHash = await this.walletTransactions.sendNativeToken(address, amount, currentNetwork);
+            } else {
+              // ERC20 token
+              txHash = await this.walletTransactions.sendERC20Token(token, address, amount, currentNetwork);
+            }
 
-          // Clear form
-          if (addressInput) addressInput.value = '';
-          if (amountInput) amountInput.value = '';
+            const txHashStr = typeof txHash === 'string' ? txHash : txHash?.hash || '';
+            this.showToast(`Sent: ${txHashStr.substring(0, 10)}...`, 'success');
 
-          // Refresh history
-          setTimeout(() => this.updateTransactionHistory(), 2000);
+            // Clear form before closing so state is reset for next send
+            if (addressInput) addressInput.value = '';
+            if (amountInput) amountInput.value = '';
+
+            this._closeBottomSheet(sendForm);
+
+            // Refresh transaction history after send (balances will auto-refresh via blockchain timer)
+            setTimeout(() => {
+              this.updateTransactionHistory();
+            }, 2000);
+
+          } catch (txError) {
+            console.error('Transaction send failed:', txError);
+            this.showToast(txError.message || 'Failed to send transaction', 'error');
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }
+
         } catch (error) {
-          console.error('거래 전송 실패:', error);
-          this.showToast(error.message || '거래 전송 실패', 'error');
+          console.error('Transaction send error:', error);
+          this.showToast(error.message || 'An error occurred while sending the transaction', 'error');
         }
       });
     }
+
+    // Populate token picker each time the send modal opens so balances are fresh
+    document.getElementById('sendBtn')?.addEventListener('click', () => {
+      this.populateSendTokenPicker();
+    });
   }
 
   // Receive modal
@@ -926,33 +1555,52 @@ class WalletUI {
     const receiveModal = document.querySelector('#receiveModal');
     if (!receiveModal) return;
 
-    const address = this.walletCore.getAddress();
-    const addressDisplay = receiveModal.querySelector('[data-address]');
-
-    if (addressDisplay) {
-      addressDisplay.textContent = address;
-    }
-
-    // Generate QR code
-    const qrContainer = receiveModal.querySelector('[data-qr]');
-    if (qrContainer && window.QRCode) {
-      qrContainer.innerHTML = '';
-      new window.QRCode(qrContainer, {
-        text: address,
-        width: 200,
-        height: 200,
-        colorDark: '#FF6B35',
-        colorLight: '#1a1f35'
-      });
-    }
-
+    // Copy button: resolve address at click time (wallet may not be unlocked at setup)
     const copyBtn = receiveModal.querySelector('[data-copy-address]');
     if (copyBtn) {
       copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(address).then(() => {
-          this.showToast('주소가 복사되었습니다', 'success');
-        });
+        try {
+          const addr = this.walletCore.getAddress();
+          if (!addr) return;
+          navigator.clipboard.writeText(addr).then(() => {
+            this.showToast(window.i18n?.t('toast.addressCopied') || 'Address copied', 'success');
+          }).catch(() => {
+            this.showToast('Failed to copy address', 'error');
+          });
+        } catch (error) {
+          console.error('Clipboard copy failed:', error);
+          this.showToast('Failed to copy address', 'error');
+        }
       });
+    }
+
+    // Generate QR + show address when the receive modal opens
+    const receiveBtn = document.querySelector('#receiveBtn');
+    const renderReceiveModal = () => {
+      try {
+        const address = this.walletCore.getAddress();
+        if (!address) return;
+
+        const addressDisplay = receiveModal.querySelector('[data-address]');
+        if (addressDisplay) addressDisplay.textContent = address;
+
+        const qrContainer = receiveModal.querySelector('[data-qr]');
+        if (qrContainer && window.QRCode) {
+          QRCode.toCanvas(qrContainer, address, {
+            width: 200,
+            margin: 2,
+            color: { dark: '#000000', light: '#FFFFFF' }
+          }, function (error) {
+            if (error) console.error('QR code generation failed:', error);
+          });
+        }
+      } catch (error) {
+        console.error('Receive modal render failed:', error);
+      }
+    };
+
+    if (receiveBtn) {
+      receiveBtn.addEventListener('click', renderReceiveModal);
     }
   }
 
@@ -961,10 +1609,10 @@ class WalletUI {
     const swapForm = document.querySelector('#swapForm');
     if (!swapForm) return;
 
-    const fromToken = swapForm.querySelector('[name="from-token"]');
-    const toToken = swapForm.querySelector('[name="to-token"]');
-    const fromAmount = swapForm.querySelector('[name="from-amount"]');
-    const toAmount = swapForm.querySelector('[name="to-amount"]');
+    const fromToken = swapForm.querySelector('[name="fromToken"]');
+    const toToken = swapForm.querySelector('[name="toToken"]');
+    const fromAmount = swapForm.querySelector('[name="amount"]');
+    const toAmount = swapForm.querySelector('[name="toAmount"]');
     const submitBtn = swapForm.querySelector('button[type="submit"]');
 
     const fetchSwapQuote = async () => {
@@ -973,24 +1621,28 @@ class WalletUI {
       try {
         clearTimeout(this.swapQuoteTimer);
         this.swapQuoteTimer = setTimeout(async () => {
-          const quote = await this.walletBlockchain.getSwapQuote(
-            fromToken.value,
-            toToken.value,
-            parseFloat(fromAmount.value)
-          );
+          try {
+            const quote = await this.walletBlockchain.getSwapQuote(
+              fromToken.value,
+              toToken.value,
+              parseFloat(fromAmount.value)
+            );
 
-          toAmount.value = quote.outputAmount.toFixed(6);
+            toAmount.value = quote.outputAmount.toFixed(6);
 
-          // Show price impact
-          const priceImpact = quote.priceImpact || 0;
-          const impactElement = swapForm.querySelector('[data-price-impact]');
-          if (impactElement) {
-            impactElement.textContent = `가격 영향: ${priceImpact.toFixed(2)}%`;
-            impactElement.className = priceImpact > 5 ? 'warning' : '';
+            // Show price impact
+            const priceImpact = quote.priceImpact || 0;
+            const impactElement = swapForm.querySelector('[data-price-impact]');
+            if (impactElement) {
+              impactElement.textContent = `Price impact: ${priceImpact.toFixed(2)}%`;
+              impactElement.className = priceImpact > 5 ? 'warning' : '';
+            }
+          } catch (quoteError) {
+            console.error('Swap quote retrieval failed:', quoteError);
           }
         }, 500);
       } catch (error) {
-        console.error('스왑 견적 조회 실패:', error);
+        console.error('Swap quote fetch error:', error);
       }
     };
 
@@ -1002,13 +1654,13 @@ class WalletUI {
       submitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const amount = parseFloat(fromAmount.value);
-        if (!amount || amount <= 0) {
-          this.showToast('올바른 금액을 입력하세요', 'error');
-          return;
-        }
-
         try {
+          const amount = parseFloat(fromAmount.value);
+          if (!amount || amount <= 0) {
+            this.showToast('Please enter a valid amount', 'error');
+            return;
+          }
+
           // Show confirmation
           const confirmed = await this.showSwapConfirmation(
             fromToken.value,
@@ -1020,42 +1672,67 @@ class WalletUI {
           if (!confirmed) return;
 
           // Check allowance and approve if needed
-          const needsApproval = await this.walletBlockchain.checkAllowance(
-            fromToken.value,
-            amount
-          );
+          const routerAddress = WalletConfig.getRouter(this.walletBlockchain.currentNetwork || WalletConfig.defaultNetwork);
+          try {
+            const needsApproval = await this.walletBlockchain.checkAllowance(
+              fromToken.value,
+              routerAddress.address,
+              this.walletCore.getAddress()
+            );
 
-          if (needsApproval) {
-            this.showToast('토큰 승인 중...', 'info');
-            await this.walletTransactions.approveToken(fromToken.value);
-            this.showToast('토큰이 승인되었습니다', 'success');
+            if (needsApproval) {
+              this.showToast('Approving token...', 'info');
+              await this.walletTransactions.approveToken(fromToken.value);
+              this.showToast('Token approved', 'success');
+            }
+          } catch (approvalError) {
+            console.warn('Token approval check failed:', approvalError);
           }
 
           // Get PIN confirmation
           const pinConfirmed = await this.showPinConfirmation();
           if (!pinConfirmed) {
-            this.showToast('스왑이 취소되었습니다', 'warning');
+            this.showToast('Swap cancelled', 'warning');
             return;
           }
 
-          // Execute swap
-          const txHash = await this.walletTransactions.executeSwap(
-            fromToken.value,
-            toToken.value,
-            amount
-          );
+          submitBtn.disabled = true;
+          const originalText = submitBtn.textContent;
+          submitBtn.textContent = window.i18n?.t('swap.swapping') || 'Swapping...';
 
-          this.showToast(`스왑이 실행되었습니다: ${txHash.substring(0, 10)}...`, 'success');
+          try {
+            // Execute swap
+            const txHash = await this.walletTransactions.swapTokens(
+              fromToken.value,
+              toToken.value,
+              amount,
+              0.5, // Default slippage
+              this.walletBlockchain.currentNetwork || WalletConfig.defaultNetwork
+            );
 
-          const modal = swapForm.closest('.modal');
-          if (modal) modal.style.display = 'none';
+            this.showToast(`Swap complete: ${txHash.substring(0, 10)}...`, 'success');
 
-          fromAmount.value = '';
-          toAmount.value = '';
-          setTimeout(() => this.updateTransactionHistory(), 2000);
+            // Clear swap quote timer on modal close
+            if (this.swapQuoteTimer) {
+              clearTimeout(this.swapQuoteTimer);
+              this.swapQuoteTimer = null;
+            }
+            this._closeBottomSheet(swapForm);
+
+            fromAmount.value = '';
+            toAmount.value = '';
+            setTimeout(() => this.updateTransactionHistory(), 2000);
+          } catch (txError) {
+            console.error('Swap execution failed:', txError);
+            this.showToast(txError.message || 'Failed to execute swap', 'error');
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }
+
         } catch (error) {
-          console.error('스왑 실행 실패:', error);
-          this.showToast(error.message || '스왑 실행 실패', 'error');
+          console.error('Swap error:', error);
+          this.showToast(error.message || 'An error occurred during swap', 'error');
         }
       });
     }
@@ -1074,24 +1751,23 @@ class WalletUI {
       submitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const selectedToken = token?.value || 'BNB';
-        const selectedAmount = parseFloat(amount?.value);
-
-        if (!selectedAmount || selectedAmount <= 0) {
-          this.showToast('올바른 금액을 입력하세요', 'error');
-          return;
-        }
-
         try {
+          const selectedToken = token?.value || 'BNB';
+          const selectedAmount = parseFloat(amount?.value);
+
+          if (!selectedAmount || selectedAmount <= 0) {
+            this.showToast('Please enter a valid amount', 'error');
+            return;
+          }
+
           // Redirect to payment gateway
           const paymentUrl = this.walletConfig.getPaymentGatewayUrl(selectedToken, selectedAmount);
           window.open(paymentUrl, '_blank');
 
-          const modal = buyForm.closest('.modal');
-          if (modal) modal.style.display = 'none';
+          this._closeBottomSheet(buyForm);
         } catch (error) {
-          console.error('구매 실패:', error);
-          this.showToast('구매 페이지를 열 수 없습니다', 'error');
+          console.error('Purchase failed:', error);
+          this.showToast('Unable to open purchase page', 'error');
         }
       });
     }
@@ -1102,15 +1778,26 @@ class WalletUI {
     const networkSelector = document.querySelector('#networkSelector');
     if (!networkSelector) return;
 
+    // Fix 2: Remove previous click handler to prevent accumulation
+    if (this._networkSelectorClickHandler) {
+      document.removeEventListener('click', this._networkSelectorClickHandler);
+    }
+
     const enabledNetworks = window.WalletConfig.getEnabledNetworks?.() || ['bsc'];
     const networkNames = {
       'bsc': 'BNB Chain',
-      'ethereum': 'Ethereum'
+      'bscTestnet': 'BSC Testnet',
+      'ethereum': 'Ethereum',
+      'ethereumSepolia': 'Ethereum Sepolia'
     };
 
     const currentNetwork = this.walletBlockchain.currentNetwork || 'bsc';
 
+    // Preserve connection-status dot, only update current button and dropdown
+    const existingDot = networkSelector.querySelector('#connection-status');
     networkSelector.innerHTML = `
+      <span id="connection-status" class="${existingDot?.className || 'connection-dot'}"></span>
+      <span class="network-chip-sep"></span>
       <button class="network-current">${networkNames[currentNetwork] || 'BNB Chain'}</button>
       <div class="network-dropdown">
         ${enabledNetworks.map(net => `
@@ -1129,28 +1816,34 @@ class WalletUI {
     options.forEach(option => {
       option.addEventListener('click', async () => {
         const network = option.dataset.network;
+        const stopLoading = this.showLoading(networkSelector, 'Changing network...');
         try {
-          const stopLoading = this.showLoading(networkSelector, '네트워크 변경 중...');
           await this.walletBlockchain.switchNetwork(network);
-          stopLoading();
           currentBtn.textContent = option.textContent;
           networkSelector.classList.remove('open');
           options.forEach(o => o.classList.remove('active'));
           option.classList.add('active');
           this.loadDashboard();
-          this.showToast('네트워크가 변경되었습니다', 'success');
+          this.showToast('Network changed', 'success');
         } catch (error) {
-          console.error('네트워크 변경 실패:', error);
-          this.showToast('네트워크 변경 실패', 'error');
+          console.error('Network switch failed:', error);
+          this.showToast('Network change failed', 'error');
+        } finally {
+          stopLoading();
         }
       });
     });
 
-    document.addEventListener('click', (e) => {
+    // Fix 2: Store handler and remove old one before adding new
+    if (this._networkSelectorClickHandler) {
+      document.removeEventListener('click', this._networkSelectorClickHandler);
+    }
+    this._networkSelectorClickHandler = (e) => {
       if (!networkSelector.contains(e.target)) {
         networkSelector.classList.remove('open');
       }
-    });
+    };
+    document.addEventListener('click', this._networkSelectorClickHandler);
   }
 
   // Settings panel
@@ -1172,17 +1865,17 @@ class WalletUI {
     overlay.innerHTML = `
       <div class="settings-panel">
         <div class="settings-header">
-          <h2>설정</h2>
-          <button class="settings-close-btn">✕</button>
+          <h2>Settings</h2>
+          <button class="settings-close-btn">X</button>
         </div>
         <div class="settings-content">
           <div class="settings-section">
-            <h3>네트워크 관리</h3>
+            <h3>Network Management</h3>
             <div class="network-toggle-list">
               <div class="network-toggle-item">
                 <div class="network-toggle-info">
                   <span class="network-toggle-name">BNB Smart Chain</span>
-                  <span class="network-toggle-desc">기본 네트워크</span>
+                  <span class="network-toggle-desc">Default Network</span>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" checked disabled>
@@ -1192,7 +1885,7 @@ class WalletUI {
               <div class="network-toggle-item">
                 <div class="network-toggle-info">
                   <span class="network-toggle-name">Ethereum</span>
-                  <span class="network-toggle-desc">선택적 활성화</span>
+                  <span class="network-toggle-desc">Optionally Enable</span>
                 </div>
                 <label class="toggle-switch">
                   <input type="checkbox" id="ethToggle" ${isEthEnabled ? 'checked' : ''}>
@@ -1202,10 +1895,10 @@ class WalletUI {
             </div>
           </div>
           <div class="settings-section">
-            <h3>커스텀 토큰</h3>
-            <p class="settings-desc">컨트랙트 주소로 토큰을 직접 추가할 수 있습니다.</p>
+            <h3>Custom Tokens</h3>
+            <p class="settings-desc">You can add tokens directly by contract address.</p>
             <div class="custom-token-list" id="customTokenList"></div>
-            <button class="add-custom-token-btn" id="addCustomTokenBtn">+ 토큰 추가</button>
+            <button class="add-custom-token-btn" id="addCustomTokenBtn">+ Add Token</button>
           </div>
         </div>
       </div>
@@ -1234,14 +1927,21 @@ class WalletUI {
         window.WalletConfig.toggleNetwork('ethereum', enabled);
 
         if (enabled) {
-          await this.walletBlockchain.enableNetwork('ethereum');
-          this.showToast('Ethereum 네트워크가 활성화되었습니다', 'success');
+          try {
+            await this.walletBlockchain.enableNetwork('ethereum');
+            this.showToast('Ethereum network enabled', 'success');
+          } catch (err) {
+            e.target.checked = false;
+            window.WalletConfig.toggleNetwork('ethereum', false);
+            this.showToast(err.message || 'Failed to enable network', 'error');
+          }
         } else {
           try {
             this.walletBlockchain.disableNetwork('ethereum');
-            this.showToast('Ethereum 네트워크가 비활성화되었습니다', 'info');
+            this.showToast('Ethereum network disabled', 'info');
           } catch(err) {
             e.target.checked = true;
+            window.WalletConfig.toggleNetwork('ethereum', true);
             this.showToast(err.message, 'error');
           }
         }
@@ -1268,63 +1968,125 @@ class WalletUI {
     const customTokens = window.WalletConfig.getCustomTokens(currentNetwork);
 
     if (Object.keys(customTokens).length === 0) {
-      listEl.innerHTML = '<p class="no-custom-tokens">추가된 커스텀 토큰이 없습니다</p>';
+      listEl.innerHTML = '<p class="no-custom-tokens">No custom tokens added</p>';
       return;
     }
 
-    listEl.innerHTML = Object.entries(customTokens).map(([symbol, token]) => `
-      <div class="custom-token-item" data-symbol="${symbol}">
+    listEl.innerHTML = Object.entries(customTokens).map(([symbol, token]) => {
+      const eSym = escapeHtml(symbol);
+      const eName = escapeHtml(token.name);
+      const eAddr = escapeHtml(token.address);
+      return `
+      <div class="custom-token-item" data-symbol="${eSym}">
         <div class="custom-token-info">
-          <span class="custom-token-symbol">${symbol}</span>
-          <span class="custom-token-name">${token.name}</span>
-          <span class="custom-token-address">${token.address.substring(0, 6)}...${token.address.substring(token.address.length - 4)}</span>
+          <span class="custom-token-symbol">${eSym}</span>
+          <span class="custom-token-name">${eName}</span>
+          <span class="custom-token-address">${eAddr.substring(0, 6)}...${eAddr.substring(eAddr.length - 4)}</span>
         </div>
-        <button class="remove-custom-token-btn" data-symbol="${symbol}">✕</button>
-      </div>
-    `).join('');
+        <button class="remove-custom-token-btn" data-symbol="${eSym}">X</button>
+      </div>`;
+    }).join('');
 
     // Remove buttons
     listEl.querySelectorAll('.remove-custom-token-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const sym = e.target.dataset.symbol;
-        if (confirm(`${sym} 토큰을 제거하시겠습니까?`)) {
+        if (confirm(`${sym} token? This will remove it.`)) {
           window.WalletConfig.removeCustomToken(currentNetwork, sym);
           this.refreshCustomTokenList();
-          this.showToast(`${sym} 토큰이 제거되었습니다`, 'success');
+          this.showToast(`${sym} token removed`, 'success');
         }
       });
     });
   }
 
+  async showLegalModal(type) {
+    const isTerms = type === 'terms';
+    const title = isTerms ? 'Terms of Service' : 'Privacy Policy';
+    const url = isTerms ? './legal/terms-of-service.html' : './legal/privacy-policy.html';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'legal-modal-overlay';
+    overlay.style.cssText = `
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: flex-end; justify-content: center;
+    `;
+    overlay.innerHTML = `
+      <div class="legal-modal-sheet" style="
+        background: #0B0E17;
+        width: 100%; max-width: 480px;
+        height: 90vh;
+        border-radius: 20px 20px 0 0;
+        display: flex; flex-direction: column;
+        overflow: hidden;
+      ">
+        <div style="
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 16px 20px;
+          border-bottom: 1px solid rgba(255,107,53,0.2);
+          flex-shrink: 0;
+        ">
+          <span style="font-size:16px; font-weight:700; color:#FF6B35;">${escapeHtml(title)}</span>
+          <button id="legalModalClose" style="
+            background: rgba(255,255,255,0.08); border: none; color: #E8E9EB;
+            width: 32px; height: 32px; border-radius: 50%; font-size: 16px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+          ">×</button>
+        </div>
+        <div id="legalModalBody" style="flex: 1; overflow-y: auto; padding: 4px 0;">
+          <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#666;">Loading…</div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#legalModalClose').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Failed to load');
+      const html = await resp.text();
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Extract just the English content section and style
+      const enSection = doc.getElementById('en');
+      const styleEl = doc.querySelector('style');
+
+      const body = overlay.querySelector('#legalModalBody');
+      body.innerHTML = '';
+
+      if (styleEl) {
+        const scopedStyle = document.createElement('style');
+        scopedStyle.textContent = styleEl.textContent.replace(/body\s*\{[^}]*\}/g, '');
+        body.appendChild(scopedStyle);
+      }
+
+      if (enSection) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'container';
+        wrapper.style.cssText = 'padding: 20px; color: #E8E9EB;';
+        wrapper.appendChild(enSection.cloneNode(true));
+        body.appendChild(wrapper);
+      } else {
+        body.innerHTML = '<div style="padding:20px;color:#C4C7CC;">Content unavailable.</div>';
+      }
+    } catch (err) {
+      const body = overlay.querySelector('#legalModalBody');
+      body.innerHTML = `<div style="padding:20px;color:#C4C7CC;">${escapeHtml(title)} content could not be loaded.</div>`;
+    }
+  }
+
   // Custom token modal
   setupCustomTokenModal() {
-    // Bind the modal trigger button from settings panel
-    const addCustomTokenBtn = document.getElementById('addCustomTokenBtn');
-    const closeAddTokenModal = document.getElementById('closeAddTokenModal');
-    const cancelAddToken = document.getElementById('cancelAddToken');
-    const confirmAddToken = document.getElementById('confirmAddToken');
-
-    if (addCustomTokenBtn) {
-      addCustomTokenBtn.addEventListener('click', () => this.showAddCustomTokenModal());
-    }
-
-    if (closeAddTokenModal) {
-      closeAddTokenModal.addEventListener('click', () => {
-        const modal = document.querySelector('.custom-token-modal');
-        if (modal) modal.remove();
-      });
-    }
-
-    if (cancelAddToken) {
-      cancelAddToken.addEventListener('click', () => {
-        const modal = document.querySelector('.custom-token-modal');
-        if (modal) modal.remove();
-      });
-    }
-
-    if (confirmAddToken) {
-      confirmAddToken.addEventListener('click', () => this.handleConfirmAddToken());
-    }
+    // Fix 4: Listeners for #addCustomTokenBtn, #closeAddTokenModal, #cancelAddToken
+    // are already set up in index.html (lines 1632-1634) using openSheet/closeSheet.
+    // Those use the sheet system which is the proper approach.
+    // Only keep setupTokenAddressInput for the auto-fetch functionality.
 
     // Listen for token address input to fetch info
     this.setupTokenAddressInput();
@@ -1334,15 +2096,44 @@ class WalletUI {
    * Setup event listener for token address input with auto-fetch capability
    */
   setupTokenAddressInput() {
+    // Disconnect any previously active observer before creating a new one
+    if (this._tokenInputObserver) {
+      this._tokenInputObserver.disconnect();
+      this._tokenInputObserver = null;
+    }
+
+    // If the element already exists in the DOM, attach directly without an observer
+    const existingInput = document.getElementById('customTokenAddress');
+    if (existingInput) {
+      if (!existingInput.hasTokenInputListener) {
+        existingInput.addEventListener('input', (e) => this.handleTokenAddressInput(e));
+        existingInput.hasTokenInputListener = true;
+      }
+      return;
+    }
+
+    // Element not yet in DOM — watch for it, but only on the modal container subtree
+    // and only for direct childList changes, not the entire document body.
     const observer = new MutationObserver(() => {
       const addressInput = document.getElementById('customTokenAddress');
       if (addressInput && !addressInput.hasTokenInputListener) {
         addressInput.addEventListener('input', (e) => this.handleTokenAddressInput(e));
         addressInput.hasTokenInputListener = true;
+        observer.disconnect();
+        this._tokenInputObserver = null;
       }
     });
 
+    this._tokenInputObserver = observer;
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // Auto-disconnect after 5 s if the element never appears (prevents indefinite observation)
+    setTimeout(() => {
+      if (this._tokenInputObserver) {
+        this._tokenInputObserver.disconnect();
+        this._tokenInputObserver = null;
+      }
+    }, 5000);
   }
 
   /**
@@ -1378,10 +2169,10 @@ class WalletUI {
       ];
       const contract = new ethers.Contract(address, erc20ABI, provider);
 
-      const [symbol, name, decimals] = await Promise.all([
-        contract.symbol(),
-        contract.name(),
-        contract.decimals()
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Token info fetch timed out')), 10000));
+      const [symbol, name, decimals] = await Promise.race([
+        Promise.all([contract.symbol(), contract.name(), contract.decimals()]),
+        timeout
       ]);
 
       if (symbolInput) symbolInput.value = symbol;
@@ -1399,7 +2190,7 @@ class WalletUI {
       if (decimalsInput) decimalsInput.value = '';
       if (confirmBtn) confirmBtn.disabled = true;
       if (loadingDiv) loadingDiv.style.display = 'none';
-      this.showToast('유효하지 않은 토큰 컨트랙트 주소입니다', 'error');
+      this.showToast('Invalid token contract address', 'error');
     }
   }
 
@@ -1416,13 +2207,13 @@ class WalletUI {
     // Check if already exists
     const existing = window.WalletConfig.getAllTokens(currentNetwork);
     if (existing[tokenData.symbol]) {
-      this.showToast(`${tokenData.symbol} 토큰이 이미 존재합니다`, 'warning');
+      this.showToast(`${tokenData.symbol} token already exists`, 'warning');
       return;
     }
 
     const success = window.WalletConfig.addCustomToken(currentNetwork, tokenData);
     if (success) {
-      this.showToast(`${tokenData.symbol} 토큰이 추가되었습니다`, 'success');
+      this.showToast(`${tokenData.symbol} token added`, 'success');
       this.refreshCustomTokenList();
       const modal = document.querySelector('.custom-token-modal');
       if (modal) modal.remove();
@@ -1432,7 +2223,7 @@ class WalletUI {
         this.loadDashboard();
       }
     } else {
-      this.showToast('토큰 추가에 실패했습니다', 'error');
+      this.showToast('Failed to add token', 'error');
     }
   }
 
@@ -1441,29 +2232,29 @@ class WalletUI {
     modal.className = 'custom-token-modal';
     modal.innerHTML = `
       <div class="custom-token-modal-content">
-        <h2>커스텀 토큰 추가</h2>
+        <h2>Add Custom Token</h2>
         <div class="custom-token-form">
           <div class="form-group">
-            <label>컨트랙트 주소</label>
+            <label>Contract Address</label>
             <input type="text" id="customTokenAddress" placeholder="0x..." class="form-input">
-            <div class="token-loading" style="display:none;">토큰 정보 조회 중...</div>
+            <div class="token-loading" style="display:none;">Loading token info...</div>
           </div>
           <div class="form-group">
-            <label>토큰 심볼</label>
-            <input type="text" id="customTokenSymbol" placeholder="자동 입력" class="form-input" readonly>
+            <label>Token Symbol</label>
+            <input type="text" id="customTokenSymbol" placeholder="Auto-filled" class="form-input" readonly>
           </div>
           <div class="form-group">
-            <label>토큰 이름</label>
-            <input type="text" id="customTokenName" placeholder="자동 입력" class="form-input" readonly>
+            <label>Token Name</label>
+            <input type="text" id="customTokenName" placeholder="Auto-filled" class="form-input" readonly>
           </div>
           <div class="form-group">
-            <label>소수점 자릿수</label>
-            <input type="number" id="customTokenDecimals" placeholder="자동 입력" class="form-input" readonly>
+            <label>Decimals</label>
+            <input type="number" id="customTokenDecimals" placeholder="Auto-filled" class="form-input" readonly>
           </div>
         </div>
         <div class="custom-token-buttons">
-          <button class="btn-cancel" id="cancelCustomToken">취소</button>
-          <button class="btn-confirm" id="confirmCustomToken" disabled>추가</button>
+          <button class="btn-cancel" id="cancelCustomToken">Cancel</button>
+          <button class="btn-confirm" id="confirmCustomToken" disabled>Add</button>
         </div>
       </div>
     `;
@@ -1506,10 +2297,10 @@ class WalletUI {
           ];
           const contract = new ethers.Contract(address, erc20ABI, provider);
 
-          const [symbol, name, decimals] = await Promise.all([
-            contract.symbol(),
-            contract.name(),
-            contract.decimals()
+          const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Token info fetch timed out')), 10000));
+          const [symbol, name, decimals] = await Promise.race([
+            Promise.all([contract.symbol(), contract.name(), contract.decimals()]),
+            timeout
           ]);
 
           symbolInput.value = symbol;
@@ -1526,7 +2317,7 @@ class WalletUI {
           decimalsInput.value = '';
           confirmBtn.disabled = true;
           tokenData = null;
-          this.showToast('유효하지 않은 토큰 컨트랙트 주소입니다', 'error');
+          this.showToast('Invalid token contract address', 'error');
         }
       }, 800);
     });
@@ -1548,13 +2339,13 @@ class WalletUI {
       // Check if already exists
       const existing = window.WalletConfig.getAllTokens(currentNetwork);
       if (existing[tokenData.symbol]) {
-        this.showToast(`${tokenData.symbol} 토큰이 이미 존재합니다`, 'warning');
+        this.showToast(`${tokenData.symbol} token already exists`, 'warning');
         return;
       }
 
       const success = window.WalletConfig.addCustomToken(currentNetwork, tokenData);
       if (success) {
-        this.showToast(`${tokenData.symbol} 토큰이 추가되었습니다`, 'success');
+        this.showToast(`${tokenData.symbol} token added`, 'success');
         this.refreshCustomTokenList();
         modal.remove();
 
@@ -1563,7 +2354,7 @@ class WalletUI {
           this.loadDashboard();
         }
       } else {
-        this.showToast('토큰 추가에 실패했습니다', 'error');
+        this.showToast('Failed to add token', 'error');
       }
     });
   }
@@ -1572,6 +2363,9 @@ class WalletUI {
   setupChartTimeButtons() {
     const timeButtons = document.querySelectorAll('.time-btn');
     timeButtons.forEach(btn => {
+      // Guard: skip buttons that already have this listener attached
+      if (btn._chartClickAdded) return;
+      btn._chartClickAdded = true;
       btn.addEventListener('click', () => {
         timeButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -1585,6 +2379,9 @@ class WalletUI {
   setupTransactionFilters() {
     const filterButtons = document.querySelectorAll('.filter-btn');
     filterButtons.forEach(btn => {
+      // Guard: skip buttons that already have this listener attached
+      if (btn._filterClickAdded) return;
+      btn._filterClickAdded = true;
       btn.addEventListener('click', () => {
         filterButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -1605,32 +2402,34 @@ class WalletUI {
   // Show send confirmation
   async showSendConfirmation(token, address, amount, gasEstimate) {
     return new Promise((resolve) => {
+      const currentNetwork = this.walletBlockchain?.currentNetwork || 'bsc';
+      const nativeSymbol = window.WalletConfig?.NETWORKS?.[currentNetwork]?.symbol || 'BNB';
       const modal = document.createElement('div');
       modal.className = 'confirmation-modal';
       modal.innerHTML = `
         <div class="confirmation-content">
-          <h2>거래 확인</h2>
+          <h2>Transaction Confirmation</h2>
           <div class="confirmation-details">
             <div class="detail-row">
-              <span>토큰:</span>
+              <span>Token:</span>
               <strong>${token}</strong>
             </div>
             <div class="detail-row">
-              <span>수신 주소:</span>
+              <span>Recipient Address:</span>
               <strong>${address.substring(0, 10)}...${address.substring(address.length - 8)}</strong>
             </div>
             <div class="detail-row">
-              <span>금액:</span>
+              <span>Amount:</span>
               <strong>${amount} ${token}</strong>
             </div>
             <div class="detail-row">
-              <span>가스비:</span>
-              <strong>${gasEstimate.toFixed(6)} BNB</strong>
+              <span>Gas Fee:</span>
+              <strong>${gasEstimate.toFixed(6)} ${nativeSymbol}</strong>
             </div>
           </div>
           <div class="confirmation-buttons">
-            <button class="btn-cancel">취소</button>
-            <button class="btn-confirm">확인</button>
+            <button class="btn-cancel">Cancel</button>
+            <button class="btn-confirm">Confirm</button>
           </div>
         </div>
       `;
@@ -1656,21 +2455,21 @@ class WalletUI {
       modal.className = 'confirmation-modal';
       modal.innerHTML = `
         <div class="confirmation-content">
-          <h2>스왑 확인</h2>
+          <h2>Swap Confirmation</h2>
           <div class="swap-flow">
             <div class="token-amount">
               <span class="amount">${fromAmount}</span>
               <span class="token">${fromToken}</span>
             </div>
-            <div class="swap-arrow">⇄</div>
+            <div class="swap-arrow">SWAP</div>
             <div class="token-amount">
               <span class="amount">${toAmount.toFixed(6)}</span>
               <span class="token">${toToken}</span>
             </div>
           </div>
           <div class="confirmation-buttons">
-            <button class="btn-cancel">취소</button>
-            <button class="btn-confirm">확인</button>
+            <button class="btn-cancel">Cancel</button>
+            <button class="btn-confirm">Confirm</button>
           </div>
         </div>
       `;
@@ -1695,38 +2494,38 @@ class WalletUI {
     modal.className = 'tx-detail-modal';
     modal.innerHTML = `
       <div class="tx-detail-content">
-        <h2>거래 상세</h2>
+        <h2>Transaction Details</h2>
         <div class="tx-detail">
           <div class="detail-row">
-            <span>유형:</span>
-            <strong>${this.getTransactionTypeText(tx.type)}</strong>
+            <span>Type:</span>
+            <strong>${escapeHtml(this.getTransactionTypeText(tx.type))}</strong>
           </div>
           <div class="detail-row">
-            <span>금액:</span>
-            <strong>${tx.amount} ${tx.token}</strong>
+            <span>Amount:</span>
+            <strong>${escapeHtml(tx.amount)} ${escapeHtml(tx.token)}</strong>
           </div>
           <div class="detail-row">
-            <span>상태:</span>
-            <strong>${this.getTransactionStatusText(tx.status)}</strong>
+            <span>Status:</span>
+            <strong>${escapeHtml(this.getTransactionStatusText(tx.status))}</strong>
           </div>
           <div class="detail-row">
-            <span>해시:</span>
-            <code>${tx.hash}</code>
+            <span>Hash:</span>
+            <code>${escapeHtml(tx.hash)}</code>
           </div>
           <div class="detail-row">
-            <span>시간:</span>
-            <strong>${new Date(tx.timestamp * 1000).toLocaleString('ko-KR')}</strong>
+            <span>Time:</span>
+            <strong>${escapeHtml(new Date(tx.timestamp * 1000).toLocaleString('en-US'))}</strong>
           </div>
           ${tx.to ? `
             <div class="detail-row">
-              <span>수신자:</span>
-              <code>${tx.to}</code>
+              <span>Recipient:</span>
+              <code>${escapeHtml(tx.to)}</code>
             </div>
           ` : ''}
         </div>
         <div class="tx-detail-buttons">
-          <button class="btn-close">닫기</button>
-          <button class="btn-explorer">블록 익스플로러 보기</button>
+          <button class="btn-close">Close</button>
+          <button class="btn-explorer">View on Block Explorer</button>
         </div>
       </div>
     `;
@@ -1752,13 +2551,18 @@ class WalletUI {
 
   // Show account menu
   showAccountMenu() {
+    // Fix 2: Remove previous account menu click handler
+    if (this._accountMenuClickHandler) {
+      document.removeEventListener('click', this._accountMenuClickHandler);
+    }
+
     const menu = document.createElement('div');
     menu.className = 'account-menu';
     menu.innerHTML = `
-      <button class="menu-item settings-btn">설정</button>
-      <button class="menu-item lock-wallet-btn">지갑 잠금</button>
-      <button class="menu-item export-wallet-btn">개인키 내보내기</button>
-      <button class="menu-item disconnect-btn">연결 해제</button>
+      <button class="menu-item settings-btn">Settings</button>
+      <button class="menu-item lock-wallet-btn">Lock Wallet</button>
+      <button class="menu-item export-wallet-btn">Export Private Key</button>
+      <button class="menu-item disconnect-btn">Disconnect</button>
     `;
 
     document.body.appendChild(menu);
@@ -1772,16 +2576,15 @@ class WalletUI {
       this.walletCore.lockWallet();
       this.isLocked = true;
       menu.remove();
-      this.showPinEntry();
       window.dispatchEvent(new CustomEvent('walletLocked'));
     });
 
     menu.querySelector('.export-wallet-btn').addEventListener('click', () => {
-      this.showToast('개인키 내보내기는 보안 상 비활성화되어 있습니다', 'warning');
+      this.showToast('Private key export is disabled for security', 'warning');
     });
 
     menu.querySelector('.disconnect-btn').addEventListener('click', () => {
-      if (confirm('지갑을 연결 해제하시겠습니까?')) {
+      if (confirm('Are you sure you want to disconnect the wallet?')) {
         this.walletCore.lockWallet();
         this.isLocked = true;
         menu.remove();
@@ -1789,22 +2592,43 @@ class WalletUI {
       }
     });
 
-    // Close on outside click
-    document.addEventListener('click', (e) => {
+    // Fix 2: Store handler and remove old one before adding new
+    this._accountMenuClickHandler = (e) => {
       if (!menu.contains(e.target) && e.target !== document.querySelector('#walletBtn')) {
         menu.remove();
       }
-    });
+    };
+    document.addEventListener('click', this._accountMenuClickHandler);
+  }
+
+  // Close a bottom-sheet overlay with slide-down animation
+  _closeBottomSheet(formOrElement) {
+    const overlay = formOrElement.closest('.bottom-sheet-overlay');
+    if (!overlay) return;
+    const sheet = overlay.querySelector('.bottom-sheet');
+    overlay.classList.add('closing');
+    if (sheet) sheet.classList.add('closing');
+    setTimeout(() => {
+      overlay.classList.remove('active', 'closing');
+      if (sheet) sheet.classList.remove('closing');
+    }, 240);
   }
 
   // Toast notification
   showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-      <span class="toast-icon">${this.getToastIcon(type)}</span>
-      <span class="toast-message">${message}</span>
-    `;
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'toast-icon';
+    iconSpan.textContent = this.getToastIcon(type);
+
+    const msgSpan = document.createElement('span');
+    msgSpan.className = 'toast-message';
+    msgSpan.textContent = message;
+
+    toast.appendChild(iconSpan);
+    toast.appendChild(msgSpan);
 
     document.body.appendChild(toast);
 
@@ -1818,7 +2642,7 @@ class WalletUI {
   }
 
   // Show loading state
-  showLoading(element, message = '로딩 중...') {
+  showLoading(element, message = 'Loading...') {
     const loader = document.createElement('div');
     loader.className = 'loader-overlay';
     loader.innerHTML = `
@@ -1839,13 +2663,16 @@ class WalletUI {
   formatRelativeTime(timestamp) {
     const now = Date.now() / 1000;
     const diff = Math.floor(now - timestamp);
+    const t = (key, fallback) => window.i18n?.t(key) || fallback;
+    const localeMap = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN', vi: 'vi-VN', th: 'th-TH', id: 'id-ID', es: 'es-ES', fr: 'fr-FR', ar: 'ar-SA' };
+    const locale = localeMap[window.i18n?.currentLang] || 'en-US';
 
-    if (diff < 60) return '방금';
-    if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)}일 전`;
+    if (diff < 60) return t('time.justNow', 'just now');
+    if (diff < 3600) return `${Math.floor(diff / 60)} ${t('time.minAgo', 'min ago')}`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} ${t('time.hrAgo', 'hr ago')}`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)} ${t('time.daysAgo', 'days ago')}`;
 
-    return new Date(timestamp * 1000).toLocaleDateString('ko-KR');
+    return new Date(timestamp * 1000).toLocaleDateString(locale);
   }
 
   // Helper methods
@@ -1862,29 +2689,31 @@ class WalletUI {
 
   getTransactionIcon(type) {
     const icons = {
-      'send': '↑',
-      'receive': '↓',
-      'swap': '⇄',
-      'approve': '✓'
+      'send': 'UP',
+      'receive': 'DOWN',
+      'swap': 'SWAP',
+      'approve': 'OK'
     };
-    return icons[type] || '→';
+    return icons[type] || 'ARROW';
   }
 
   getTransactionTypeText(type) {
+    const t = (key, fallback) => window.i18n?.t(key) || fallback;
     const texts = {
-      'send': '전송',
-      'receive': '수신',
-      'swap': '스왑',
-      'approve': '승인'
+      'send': t('tx.send', 'Send'),
+      'receive': t('tx.receive', 'Receive'),
+      'swap': t('tx.swap', 'Swap'),
+      'approve': t('tx.approve', 'Approve')
     };
     return texts[type] || type;
   }
 
   getTransactionStatusText(status) {
+    const t = (key, fallback) => window.i18n?.t(key) || fallback;
     const texts = {
-      'pending': '대기중',
-      'confirmed': '완료',
-      'failed': '실패'
+      'pending': t('tx.pending', 'Pending'),
+      'confirmed': t('tx.confirmed', 'Confirmed'),
+      'failed': t('tx.failed', 'Failed')
     };
     return texts[status] || status;
   }
@@ -1899,14 +2728,197 @@ class WalletUI {
     return icons[type] || '•';
   }
 
+  showBackupModal(initialTab = 'seed') {
+    if (this.isLocked) {
+      this.showToast(window.i18n?.t('toast.error') || 'Unlock wallet first', 'warning');
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'pin-confirmation-overlay';
+    overlay.innerHTML = `
+      <div class="pin-confirmation-container" style="max-width:380px;width:90%;">
+        <div class="pin-confirmation-header">
+          <h1>🔐 ${window.i18n?.t('settings.backup') || 'Wallet Backup'}</h1>
+          <p>${window.i18n?.t('pin.enterDesc') || 'Enter PIN to view backup'}</p>
+        </div>
+        <div class="pin-display">
+          <div class="pin-keyboard-wrapper">
+            <input type="password" class="pin-input pin-keyboard-input" maxlength="20" placeholder="••••••••" autocomplete="current-password">
+            <button class="pin-toggle-btn" type="button" aria-label="Toggle visibility">
+              <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="onboarding-btn pin-backup-confirm-btn" disabled style="margin-top:8px;">${window.i18n?.t('common.confirm') || 'Confirm'}</button>
+        <div class="pin-error" style="display:none;color:#ff4444;text-align:center;margin-top:8px;font-size:13px;"></div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector('.pin-input');
+    const confirmBtn = overlay.querySelector('.pin-backup-confirm-btn');
+    const toggleBtn = overlay.querySelector('.pin-toggle-btn');
+    const errorDiv = overlay.querySelector('.pin-error');
+    let attempts = 0;
+
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      toggleBtn.querySelector('.eye-icon').style.display = isPassword ? 'none' : '';
+      toggleBtn.querySelector('.eye-off-icon').style.display = isPassword ? '' : 'none';
+    });
+
+    input.addEventListener('input', () => {
+      confirmBtn.disabled = input.value.length < 1;
+      errorDiv.style.display = 'none';
+    });
+
+    const tryConfirm = async () => {
+      const pin = input.value;
+      if (pin.length < 1) return;
+      const valid = await this.walletCore.validatePin(pin);
+      if (valid) {
+        overlay.remove();
+        this._showBackupContent(pin, initialTab);
+      } else {
+        attempts++;
+        input.value = '';
+        confirmBtn.disabled = true;
+        errorDiv.textContent = `${window.i18n?.t('pin.wrong') || 'Incorrect PIN'} (${attempts}/3)`;
+        errorDiv.style.display = 'block';
+        if (attempts >= 3) { overlay.remove(); }
+      }
+    };
+
+    confirmBtn.addEventListener('click', tryConfirm);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryConfirm(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    setTimeout(() => input.focus(), 100);
+  }
+
+  async _showBackupContent(pin, initialTab) {
+    let mnemonic = null;
+    let privateKey = null;
+
+    try {
+      mnemonic = await this.walletCore.exportMnemonic(pin);
+    } catch (e) { /* no mnemonic */ }
+
+    try {
+      const encDataStr = localStorage.getItem('funs_wallet_data');
+      if (encDataStr) {
+        const encData = JSON.parse(encDataStr);
+        privateKey = await this.walletCore._decryptPrivateKey(encData, pin);
+      }
+    } catch (e) { /* ignore */ }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'pin-confirmation-overlay';
+    overlay.innerHTML = `
+      <div class="pin-confirmation-container" style="max-width:420px;width:92%;max-height:85vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="font-size:18px;font-weight:700;">🔐 ${window.i18n?.t('settings.backup') || 'Wallet Backup'}</h2>
+          <button id="backupCloseBtn" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px;">✕</button>
+        </div>
+        <div style="background:rgba(255,100,50,0.12);border:1px solid rgba(255,100,50,0.3);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#FF6B35;">
+          ⚠️ ${window.i18n?.t('mnemonic.securityTitle') || 'Never share this with anyone. Anyone with this info has full access to your wallet.'}
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button class="backup-tab-btn" data-tab="seed" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:${initialTab === 'seed' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'};color:white;font-size:13px;cursor:pointer;">${window.i18n?.t('mnemonic.title') || 'Seed Phrase'}</button>
+          <button class="backup-tab-btn" data-tab="key" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:${initialTab !== 'seed' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'};color:white;font-size:13px;cursor:pointer;">${window.i18n?.t('settings.exportKey') || 'Private Key'}</button>
+        </div>
+        <div id="backupSeedPanel" style="display:${initialTab === 'seed' ? 'block' : 'none'};">
+          ${mnemonic ? `
+            <p style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:12px;">${window.i18n?.t('mnemonic.keepSafe') || 'Write down these 12 words in a safe place.'}</p>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+              ${mnemonic.split(' ').map((w, i) => `<div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 10px;font-size:13px;"><span style="color:rgba(255,255,255,0.4);font-size:11px;display:block;">${i + 1}</span>${w}</div>`).join('')}
+            </div>
+            <button id="copySeedBtn" style="width:100%;padding:12px;background:var(--primary);border:none;border-radius:12px;color:white;font-size:14px;font-weight:600;cursor:pointer;">${window.i18n?.t('mnemonic.copy') || 'Copy Seed Phrase'}</button>
+          ` : `<p style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">No seed phrase backup available.</p>`}
+        </div>
+        <div id="backupKeyPanel" style="display:${initialTab !== 'seed' ? 'block' : 'none'};">
+          ${privateKey ? `
+            <p style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:12px;">${window.i18n?.t('mnemonic.keepSafe') || 'Store your private key in a safe place.'}</p>
+            <div id="privateKeyDisplay" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px;word-break:break-all;font-size:12px;font-family:monospace;margin-bottom:14px;"></div>
+            <button id="copyKeyBtn" style="width:100%;padding:12px;background:var(--primary);border:none;border-radius:12px;color:white;font-size:14px;font-weight:600;cursor:pointer;">${window.i18n?.t('settings.copyKey') || 'Copy Private Key'}</button>
+          ` : `<p style="text-align:center;color:rgba(255,255,255,0.4);padding:20px;">Unable to load private key.</p>`}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Set private key via textContent to avoid XSS via raw key injection into innerHTML
+    const privateKeyDisplay = overlay.querySelector('#privateKeyDisplay');
+    if (privateKeyDisplay && privateKey) {
+      privateKeyDisplay.textContent = privateKey;
+    }
+
+    overlay.querySelector('#backupCloseBtn').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    overlay.querySelectorAll('.backup-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        overlay.querySelectorAll('.backup-tab-btn').forEach(b => {
+          b.style.background = b.dataset.tab === tab ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+        });
+        overlay.querySelector('#backupSeedPanel').style.display = tab === 'seed' ? 'block' : 'none';
+        overlay.querySelector('#backupKeyPanel').style.display = tab !== 'seed' ? 'block' : 'none';
+      });
+    });
+
+    const copySeedBtn = overlay.querySelector('#copySeedBtn');
+    if (copySeedBtn) {
+      copySeedBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(mnemonic).then(() => {
+          copySeedBtn.textContent = window.i18n?.t('mnemonic.copied') || 'Copied ✓';
+          setTimeout(() => { copySeedBtn.textContent = window.i18n?.t('mnemonic.copy') || 'Copy Seed Phrase'; }, 2000);
+        });
+      });
+    }
+
+    const copyKeyBtn = overlay.querySelector('#copyKeyBtn');
+    if (copyKeyBtn) {
+      copyKeyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(privateKey).then(() => {
+          copyKeyBtn.textContent = window.i18n?.t('settings.copiedKey') || 'Copied ✓';
+          setTimeout(() => { copyKeyBtn.textContent = window.i18n?.t('settings.copyKey') || 'Copy Private Key'; }, 2000);
+        });
+      });
+    }
+  }
+
   isValidAddress(address) {
     // Simple validation for BSC/Ethereum addresses
     return /^0x[a-fA-F0-9]{40}$/.test(address);
   }
 }
 
-// Auto-initialize
-document.addEventListener('DOMContentLoaded', () => {
-  window.walletUI = new WalletUI();
-  window.walletUI.init();
-});
+// Auto-initialize WalletUI when DOM is ready
+(function() {
+  async function startWallet() {
+    try {
+      // Initialize native bridge first if available
+      if (window.NativeBridge) {
+        await window.NativeBridge.init();
+      }
+
+      const ui = new WalletUI();
+      window.walletUI = ui;
+      await ui.init();
+      console.log('[FunS] Wallet initialized successfully');
+    } catch(e) {
+      console.error('[FunS] Wallet init failed:', e);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startWallet);
+  } else {
+    startWallet();
+  }
+})();

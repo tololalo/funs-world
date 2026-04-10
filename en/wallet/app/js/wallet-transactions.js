@@ -8,6 +8,7 @@ class WalletTransactions {
   constructor() {
     this.transactionCache = new Map();
     this.gasEstimates = new Map();
+    this._pendingTxKey = 'funs_pending_txs';
   }
 
   /**
@@ -178,6 +179,7 @@ class WalletTransactions {
 
       // Estimate gas
       const estimateGasParams = {
+        from: signer.address,
         to: tokenAddress,
         data: contract.interface.encodeFunctionData('transfer', [to, parsedAmount])
       };
@@ -757,13 +759,29 @@ class WalletTransactions {
   }
 
   /**
-   * Get appropriate DEX router for network
+   * Get appropriate DEX router for network with testnet support
    * @private
    * @param {string} networkKey - Network identifier
-   * @returns {Object|null} Router config { address, type, name }
+   * @returns {Object|null} Router config { address, type, name, weth }
    */
   _getRouterForNetwork(networkKey) {
     const routers = window.WalletConfig.DEX_ROUTERS;
+
+    // Testnet-specific router configuration
+    const testnetRouters = {
+      'bscTestnet': {
+        address: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1',
+        type: 'pancakeswap',
+        name: 'PancakeSwap (Testnet)',
+        weth: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd'
+      }
+    };
+
+    // Check if testnet router is explicitly configured
+    if (testnetRouters[networkKey]) {
+      return testnetRouters[networkKey];
+    }
+
     if (!routers) {
       return null;
     }
@@ -790,7 +808,8 @@ class WalletTransactions {
     return {
       address: routerConfig.address,
       type: routerType,
-      name: routerType.charAt(0).toUpperCase() + routerType.slice(1)
+      name: routerType.charAt(0).toUpperCase() + routerType.slice(1),
+      weth: routerConfig.weth
     };
   }
 
@@ -863,6 +882,106 @@ class WalletTransactions {
       return address;
     }
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  }
+
+  /**
+   * Get transaction receipt and status
+   * @param {string} txHash - Transaction hash
+   * @returns {Promise<Object>} Transaction status
+   */
+  async getTransactionStatus(txHash) {
+    try {
+      const blockchain = window.walletBlockchain || new window.WalletBlockchain();
+      const provider = blockchain.getProvider();
+      const receipt = await provider.getTransactionReceipt(txHash);
+
+      if (!receipt) {
+        return { status: 'pending', confirmations: 0 };
+      }
+
+      const currentBlock = await provider.getBlockNumber();
+      const confirmations = currentBlock - receipt.blockNumber;
+
+      return {
+        status: receipt.status === 1 ? 'confirmed' : 'failed',
+        confirmations: confirmations,
+        gasUsed: receipt.gasUsed.toString(),
+        blockNumber: receipt.blockNumber,
+        transactionIndex: receipt.index
+      };
+    } catch (error) {
+      console.error('Failed to get transaction status:', error);
+      return { status: 'unknown', confirmations: 0 };
+    }
+  }
+
+  /**
+   * Wait for transaction confirmation
+   * @param {string} txHash - Transaction hash
+   * @param {number} confirmations - Number of confirmations to wait for (default 1)
+   * @param {number} timeout - Timeout in ms (default 60000)
+   * @returns {Promise<Object>} Transaction receipt
+   */
+  async waitForTransaction(txHash, confirmations = 1, timeout = 60000) {
+    try {
+      const blockchain = window.walletBlockchain || new window.WalletBlockchain();
+      const provider = blockchain.getProvider();
+      const receipt = await provider.waitForTransaction(txHash, confirmations, timeout);
+      return {
+        success: receipt.status === 1,
+        receipt: receipt,
+        gasUsed: receipt.gasUsed.toString()
+      };
+    } catch (error) {
+      console.error('Transaction wait failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Track pending transaction in localStorage
+   * @param {string} txHash - Transaction hash
+   * @param {Object} details - Transaction details
+   */
+  addPendingTransaction(txHash, details) {
+    try {
+      const pending = JSON.parse(localStorage.getItem(this._pendingTxKey) || '[]');
+      pending.push({
+        hash: txHash,
+        timestamp: Date.now(),
+        ...details
+      });
+      localStorage.setItem(this._pendingTxKey, JSON.stringify(pending));
+    } catch(e) {
+      console.error('Failed to add pending transaction:', e);
+    }
+  }
+
+  /**
+   * Remove pending transaction from localStorage
+   * @param {string} txHash - Transaction hash
+   */
+  removePendingTransaction(txHash) {
+    try {
+      let pending = JSON.parse(localStorage.getItem(this._pendingTxKey) || '[]');
+      pending = pending.filter(tx => tx.hash !== txHash);
+      localStorage.setItem(this._pendingTxKey, JSON.stringify(pending));
+    } catch(e) {
+      console.error('Failed to remove pending transaction:', e);
+    }
+  }
+
+  /**
+   * Get all pending transactions
+   * @returns {Array} Array of pending transaction objects
+   */
+  getPendingTransactions() {
+    try {
+      return JSON.parse(localStorage.getItem(this._pendingTxKey) || '[]');
+    } catch(e) {
+      console.error('Failed to get pending transactions:', e);
+      return [];
+    }
   }
 
   /**
