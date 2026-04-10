@@ -22,11 +22,11 @@
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: https:; frame-src *; frame-ancestors 'none'; base-uri 'self';">
     <script>
-    // Force clear old service worker caches on load (v39)
+    // Force clear old service worker caches on load (v43)
     if ('caches' in window) {
       caches.keys().then(names => {
         names.forEach(name => {
-          if (name !== 'funs-wallet-v41') caches.delete(name);
+          if (name !== 'funs-wallet-v43') caches.delete(name);
         });
       });
     }
@@ -85,8 +85,8 @@
             --border-light: rgba(0,0,0,0.12);
             --text: #111827;
             --text2: rgba(0,0,0,0.87);
-            --text3: rgba(0,0,0,0.55);
-            --text4: rgba(0,0,0,0.38);
+            --text3: rgba(0,0,0,0.60);
+            --text4: rgba(0,0,0,0.50);
         }
 
         html, body {
@@ -100,7 +100,8 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        button, .tab-bar-item, .action-item, .onboarding-btn {
+        button, .tab-bar-item, .action-item, .onboarding-btn,
+        .token-item, .dapp-item, .settings-item, .tx-item, .verify-word-option {
             touch-action: manipulation;
         }
 
@@ -138,19 +139,19 @@
         .header-title { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; }
         .header-right { display: flex; align-items: center; gap: 4px; }
         .header-btn {
-            width: 40px; height: 40px; border-radius: 50%;
+            width: 44px; height: 44px; border-radius: 50%;
             background: none; border: none; color: var(--text3);
             font-size: 18px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
         }
-        .header-btn:hover { background: rgba(255,255,255,0.06); color: var(--text2); }
-        .header-btn:active { background: rgba(255,255,255,0.08); color: var(--text); }
+        .header-btn:hover { background: rgba(128,128,128,0.1); color: var(--text2); }
+        .header-btn:active { background: rgba(128,128,128,0.15); color: var(--text); }
 
         /* Lang pill */
-        .lang-pill { display: flex; gap: 2px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; }
+        .lang-pill { display: flex; gap: 2px; background: rgba(128,128,128,0.08); border-radius: 8px; padding: 2px; }
         .lang-quick-btn { background: transparent; color: var(--text3); transition: color 0.2s, background 0.2s; }
-        .lang-quick-btn:hover { color: var(--text2); background: rgba(255,255,255,0.06); }
+        .lang-quick-btn:hover { color: var(--text2); background: rgba(128,128,128,0.1); }
         .lang-quick-btn.lang-active { background: var(--primary) !important; color: white !important; }
         .lang-pill a {
             padding: 6px 12px; border-radius: 6px; font-size: 12px;
@@ -177,6 +178,9 @@
             border: 1px solid rgba(255,107,53,0.12);
             box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
             position: relative; overflow: hidden;
+        }
+        body.light-mode .portfolio-card {
+            background: linear-gradient(145deg, #1e2a4a 0%, #0f1628 100%);
         }
         .portfolio-card::before {
             content: ''; position: absolute; top: -50%; right: -30%;
@@ -534,6 +538,9 @@
         .toggle input:checked + .toggle-track { background: var(--primary); }
         .toggle input:checked + .toggle-track:before { transform: translateX(20px); }
         .toggle input:disabled + .toggle-track { opacity: 0.4; cursor: not-allowed; }
+        body.light-mode .toggle-track { background: rgba(0,0,0,0.25); border: 1px solid rgba(0,0,0,0.15); }
+        body.light-mode .toggle-track:before { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        body.light-mode .toggle input:checked + .toggle-track { border-color: transparent; }
 
         /* Custom Token */
         .add-token-btn {
@@ -562,9 +569,8 @@
             width: 100%; max-width: 480px;
             height: calc(var(--tab-height) + var(--safe-bottom));
             padding-bottom: var(--safe-bottom);
-            background: rgba(7,10,18,0.99);
-            border-top: 1px solid transparent;
-            background-clip: padding-box;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
             box-shadow: 0 -1px 0 0 rgba(255,107,53,0.15), 0 -8px 24px rgba(255,107,53,0.06);
             display: flex; z-index: 200;
         }
@@ -898,7 +904,7 @@
             margin: 0 0 4px;
             font-size: 14px;
             font-weight: 700;
-            color: #ff6b35;
+            color: var(--primary);
         }
         .seed-security-banner .security-text p {
             margin: 0;
@@ -924,7 +930,7 @@
             width: 48px;
         }
         .seed-step.completed {
-            background: #34c759;
+            background: var(--green);
         }
         .mnemonic-reveal-container {
             position: relative;
@@ -1156,19 +1162,19 @@
             transform: scale(0.96);
         }
         .verify-word-option.selected {
-            background: rgba(0,122,255,0.12);
+            background: var(--primary-dim);
             border-color: var(--primary);
             color: var(--primary);
         }
         .verify-word-option.correct {
-            background: rgba(52,199,89,0.12);
-            border-color: #34c759;
-            color: #34c759;
+            background: var(--green-dim);
+            border-color: var(--green);
+            color: var(--green);
         }
         .verify-word-option.wrong {
-            background: rgba(255,59,48,0.12);
-            border-color: #ff3b30;
-            color: #ff3b30;
+            background: var(--red-dim);
+            border-color: var(--red);
+            color: var(--red);
             animation: shake 0.4s ease;
         }
         @keyframes shake {
@@ -1674,12 +1680,7 @@
                 <span class="header-title">FunS</span>
             </div>
             <div class="header-right">
-                <div class="lang-pill" style="display:flex;gap:2px;background:var(--card);border-radius:10px;border:1px solid var(--border);padding:2px;">
-                    <button id="langKrBtn" class="lang-quick-btn lang-active" style="font-size:11px;font-weight:600;padding:5px 10px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;">KR</button>
-                    <button id="langEnBtn" class="lang-quick-btn" style="font-size:11px;font-weight:600;padding:5px 10px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;">EN</button>
-                    <button id="langMoreBtn" style="font-size:11px;padding:5px 8px;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--text4);transition:all 0.2s;">⋯</button>
-                </div>
-                <button class="header-btn" id="scanBtn" title="Scan" aria-label="Scan QR code"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2h-3"/><path d="M23 5a2 2 0 00-2-2h-3"/><path d="M1 19a2 2 0 002 2h3"/><path d="M1 5a2 2 0 012-2h3"/><line x1="4" y1="12" x2="20" y2="12"/></svg></button>
+<button class="header-btn" id="scanBtn" title="Scan" aria-label="Scan QR code"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2h-3"/><path d="M23 5a2 2 0 00-2-2h-3"/><path d="M1 19a2 2 0 002 2h3"/><path d="M1 5a2 2 0 012-2h3"/><line x1="4" y1="12" x2="20" y2="12"/></svg></button>
                 <button class="header-btn" id="notifBtn" title="Notifications" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
             </div>
         </header>
@@ -1897,7 +1898,7 @@
                     </div>
                     <div class="settings-group">
                         <div class="settings-group-title" data-i18n="settings.general">General Settings</div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🌐</span><div><div class="settings-item-label" data-i18n="settings.language">Language</div><div class="settings-item-desc" data-i18n="settings.languageDesc">Language</div></div></div><div class="settings-item-right" style="display: flex; align-items: center; gap: 8px; cursor: pointer;" id="currentLanguageDisplay">Korean ›</div></div>
+                        <div class="settings-item" id="languageSettingsItem" style="cursor:pointer;"><div class="settings-item-left"><span class="settings-item-icon">🌐</span><div><div class="settings-item-label" data-i18n="settings.language">Language</div><div class="settings-item-desc" data-i18n="settings.languageDesc">Language</div></div></div><div class="settings-item-right" style="display: flex; align-items: center; gap: 8px;" id="currentLanguageDisplay">English ›</div></div>
                         <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">💱</span><div><div class="settings-item-label" data-i18n="settings.currency">Currency</div><div class="settings-item-desc" data-i18n="settings.currencyDesc">Currency</div></div></div><div class="settings-item-right" id="currentCurrencyDisplay" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">USD ›</div></div>
                         <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔒</span><div><div class="settings-item-label" data-i18n="settings.autoLock">Auto-Lock</div><div class="settings-item-desc" data-i18n="settings.autoLockDesc">Auto-Lock</div></div></div><div class="settings-item-right"><select class="form-input" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 10px; padding: 6px 12px; font-size: 13px;"><option data-i18n="settings.time1m">1 min</option><option selected data-i18n="settings.time5m">5 min</option><option data-i18n="settings.time15m">15 min</option><option data-i18n="settings.time30m">30 min</option></select></div></div>
                         <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🌙</span><div><div class="settings-item-label" data-i18n="settings.theme">Theme</div><div class="settings-item-desc" data-i18n="settings.themeDesc">Theme</div></div></div><label class="toggle" aria-label="Dark theme"><input type="checkbox" checked id="themeToggle" aria-label="Enable dark theme"><span class="toggle-track"></span></label></div>
@@ -1905,7 +1906,6 @@
                     <div class="settings-group">
                         <div class="settings-group-title" data-i18n="settings.notifications">Notification Settings</div>
                         <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔔</span><div><div class="settings-item-label" data-i18n="settings.txAlerts">Transaction Alerts</div><div class="settings-item-desc" data-i18n="settings.txAlertsDesc">Transaction Alerts</div></div></div><label class="toggle" aria-label="Transaction alerts"><input type="checkbox" checked id="txAlertsToggle" aria-label="Enable transaction alerts"><span class="toggle-track"></span></label></div>
-                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">💰</span><div><div class="settings-item-label" data-i18n="settings.priceAlerts">Price Alerts</div><div class="settings-item-desc" data-i18n="settings.priceAlertsDesc">Price Alerts</div></div></div><label class="toggle" aria-label="Price alerts"><input type="checkbox" id="priceAlertsToggle" aria-label="Enable price alerts"><span class="toggle-track"></span></label></div>
                     </div>
                     <div class="settings-group">
                         <div class="settings-group-title" data-i18n="settings.other">Other</div>
@@ -2218,16 +2218,9 @@
         });
         document.getElementById('browserCloseBtn')?.addEventListener('click', closeInAppBrowser);
         // ============ Language Selector ============
-        const langKrBtn = document.getElementById('langKrBtn');
-        const langEnBtn = document.getElementById('langEnBtn');
-        const langMoreBtn = document.getElementById('langMoreBtn');
         const languageSelector = document.getElementById('languageSelector');
 
         function updateLangButtons(lang) {
-            if (langKrBtn && langEnBtn) {
-                langKrBtn.classList.toggle('lang-active', lang === 'ko');
-                langEnBtn.classList.toggle('lang-active', lang === 'en');
-            }
             const display = document.getElementById('currentLanguageDisplay');
             if (display && window.i18n) {
                 const langData = window.i18n.getSupportedLanguages().find(l => l.code === lang);
@@ -2241,9 +2234,6 @@
                 updateLangButtons(lang);
             }
         }
-
-        if (langKrBtn) langKrBtn.addEventListener('click', () => switchLang('ko'));
-        if (langEnBtn) langEnBtn.addEventListener('click', () => switchLang('en'));
 
         function openLanguageModal() {
             const overlay = document.createElement('div');
@@ -2288,12 +2278,11 @@
             });
         }
 
-        if (langMoreBtn) langMoreBtn.addEventListener('click', openLanguageModal);
         if (languageSelector) languageSelector.addEventListener('click', openLanguageModal);
 
-        // Fix: attach language modal to the actual display element in settings
-        const currentLanguageDisplay = document.getElementById('currentLanguageDisplay');
-        if (currentLanguageDisplay) currentLanguageDisplay.addEventListener('click', openLanguageModal);
+        // Attach language modal to the entire language settings row
+        const languageSettingsItem = document.getElementById('languageSettingsItem');
+        if (languageSettingsItem) languageSettingsItem.addEventListener('click', openLanguageModal);
 
         // ============ Currency Selector ============
         const currencyDisplay = document.getElementById('currentCurrencyDisplay');

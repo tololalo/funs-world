@@ -701,12 +701,12 @@ class WalletUI {
         item.innerHTML = `
           <div class="tx-icon">${icon}</div>
           <div class="tx-info">
-            <div class="tx-type">${this.getTransactionTypeText(tx.type)}</div>
-            <div class="tx-time">${relativeTime}</div>
+            <div class="tx-type">${escapeHtml(this.getTransactionTypeText(tx.type))}</div>
+            <div class="tx-time">${escapeHtml(relativeTime)}</div>
           </div>
           <div class="tx-amount">
-            <div class="tx-value">${tx.type === 'send' ? '-' : '+'}${tx.amount} ${tx.token}</div>
-            <div class="tx-status ${statusClass}">${statusText}</div>
+            <div class="tx-value">${tx.type === 'send' ? '-' : '+'}${escapeHtml(tx.amount)} ${escapeHtml(tx.token)}</div>
+            <div class="tx-status ${statusClass}">${escapeHtml(statusText)}</div>
           </div>
         `;
 

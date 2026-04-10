@@ -3,7 +3,7 @@
  * Provides offline support by caching essential assets
  */
 
-const CACHE_NAME = 'funs-wallet-v42';
+const CACHE_NAME = 'funs-wallet-v43';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
