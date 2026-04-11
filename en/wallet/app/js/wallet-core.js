@@ -83,6 +83,13 @@ class WalletCore {
       localStorage.setItem("funs_wallet_data", JSON.stringify(encryptedData));
       localStorage.setItem("funs_wallet_address", address);
 
+      // Store encrypted mnemonic for backup
+      const encryptedMnemonic = await this._encryptPrivateKey(mnemonic, pin);
+      localStorage.setItem("funs_wallet_mnemonic_enc", JSON.stringify(encryptedMnemonic));
+
+      // Store creation timestamp
+      localStorage.setItem("funs_wallet_created", new Date().toISOString());
+
       // Set wallet state
       this.wallet = hdNode;
       this.address = address;
@@ -143,6 +150,13 @@ class WalletCore {
       // Store encrypted data in localStorage
       localStorage.setItem("funs_wallet_data", JSON.stringify(encryptedData));
       localStorage.setItem("funs_wallet_address", address);
+
+      // Store encrypted mnemonic for backup
+      const encryptedMnemonic = await this._encryptPrivateKey(mnemonic, pin);
+      localStorage.setItem("funs_wallet_mnemonic_enc", JSON.stringify(encryptedMnemonic));
+
+      // Store creation timestamp
+      localStorage.setItem("funs_wallet_created", new Date().toISOString());
 
       // Set wallet state
       this.wallet = hdNode;
@@ -265,6 +279,8 @@ class WalletCore {
     try {
       localStorage.removeItem("funs_wallet_data");
       localStorage.removeItem("funs_wallet_address");
+      localStorage.removeItem("funs_wallet_mnemonic_enc");
+      localStorage.removeItem("funs_wallet_created");
 
       this.wallet = null;
       this.address = null;
@@ -279,6 +295,103 @@ class WalletCore {
     } catch (error) {
       throw new Error(`Failed to delete wallet: ${error.message}`);
     }
+  }
+
+  /**
+   * Export encrypted mnemonic (requires PIN verification)
+   * @param {string} pin - Current PIN
+   * @returns {Promise<string>} Mnemonic phrase
+   */
+  async exportMnemonic(pin) {
+    try {
+      const mnemonicData = localStorage.getItem('funs_wallet_mnemonic_enc');
+      if (!mnemonicData) {
+        throw new Error('Mnemonic backup not available. Only available for wallets created through this app.');
+      }
+
+      const encryptedMnemonic = JSON.parse(mnemonicData);
+      const mnemonic = await this._decryptPrivateKey(encryptedMnemonic, pin);
+      return mnemonic;
+    } catch (error) {
+      throw new Error(`Failed to export mnemonic: ${error.message}`);
+    }
+  }
+
+  /**
+   * Change the wallet PIN
+   * @param {string} currentPin - Current PIN
+   * @param {string} newPin - New PIN
+   * @returns {Promise<boolean>}
+   */
+  async changePin(currentPin, newPin) {
+    try {
+      if (!newPin || newPin.length < 4) {
+        throw new Error('New PIN must be at least 4 characters');
+      }
+
+      // Verify current PIN by decrypting
+      const encryptedDataStr = localStorage.getItem("funs_wallet_data");
+      if (!encryptedDataStr) {
+        throw new Error('No wallet data found');
+      }
+
+      const encryptedData = JSON.parse(encryptedDataStr);
+      const privateKey = await this._decryptPrivateKey(encryptedData, currentPin);
+
+      // Re-encrypt with new PIN
+      const newEncryptedData = await this._encryptPrivateKey(privateKey, newPin);
+      localStorage.setItem("funs_wallet_data", JSON.stringify(newEncryptedData));
+
+      // Re-encrypt mnemonic if exists
+      const mnemonicEnc = localStorage.getItem("funs_wallet_mnemonic_enc");
+      if (mnemonicEnc) {
+        const mnemonic = await this._decryptPrivateKey(JSON.parse(mnemonicEnc), currentPin);
+        const newMnemonicEnc = await this._encryptPrivateKey(mnemonic, newPin);
+        localStorage.setItem("funs_wallet_mnemonic_enc", JSON.stringify(newMnemonicEnc));
+      }
+
+      // Update current state
+      this.pin = newPin;
+      this.encryptedData = newEncryptedData;
+
+      window.dispatchEvent(new CustomEvent('pinChanged', { detail: {} }));
+
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to change PIN: ${error.message}`);
+    }
+  }
+
+  /**
+   * Validate PIN without unlocking wallet
+   * @param {string} pin - PIN to validate
+   * @returns {Promise<boolean>}
+   */
+  async validatePin(pin) {
+    try {
+      const encryptedDataStr = localStorage.getItem("funs_wallet_data");
+      if (!encryptedDataStr) return false;
+
+      const encryptedData = JSON.parse(encryptedDataStr);
+      await this._decryptPrivateKey(encryptedData, pin);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Get wallet summary info (non-sensitive)
+   * @returns {Object} Wallet info
+   */
+  getWalletInfo() {
+    return {
+      exists: this.isWalletExists(),
+      address: this.getAddress(),
+      isLocked: this.isLocked,
+      hasMnemonicBackup: localStorage.getItem('funs_wallet_mnemonic_enc') !== null,
+      createdAt: localStorage.getItem('funs_wallet_created') || null
+    };
   }
 
   /**

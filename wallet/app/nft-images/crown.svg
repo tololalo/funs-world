@@ -1,0 +1,131 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkBgCrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a0a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2a1a1a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGradCrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE8A8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF9500;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="crownOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF4500;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="rubyRed" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF1493;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DC143C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sapphireBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00BFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0047AB;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="emeraldGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#50C878;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#228B22;stop-opacity:1" />
+    </linearGradient>
+    <filter id="crownGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="crownRadiance" cx="50%" cy="30%" r="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#darkBgCrown)"/>
+
+  <!-- Radiant glow behind crown -->
+  <circle cx="200" cy="160" r="140" fill="url(#crownRadiance)"/>
+
+  <!-- Light rays emanating -->
+  <g opacity="0.3" stroke="#FFD700" stroke-width="1.5">
+    <line x1="200" y1="40" x2="200" y2="100"/>
+    <line x1="280" y1="80" x2="320" y2="60"/>
+    <line x1="120" y1="80" x2="80" y2="60"/>
+    <line x1="300" y1="150" x2="340" y2="150"/>
+    <line x1="100" y1="150" x2="60" y2="150"/>
+  </g>
+
+  <!-- Main crown band -->
+  <g filter="url(#crownGlow)">
+    <ellipse cx="200" cy="220" rx="90" ry="35" fill="url(#goldGradCrown)" stroke="#FF6B35" stroke-width="2.5"/>
+    <ellipse cx="200" cy="220" rx="85" ry="30" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.6"/>
+  </g>
+
+  <!-- Crown peaks -->
+  <g filter="url(#crownGlow)">
+    <!-- Center peak (tallest) -->
+    <polygon points="200,100 190,180 210,180" fill="url(#goldGradCrown)" stroke="#FF6B35" stroke-width="2.5"/>
+    <polygon points="195,140 200,140 197,180" fill="#FFE8A8" stroke="none" opacity="0.5"/>
+
+    <!-- Left peaks -->
+    <polygon points="140,140 130,200 150,200" fill="url(#goldGradCrown)" stroke="#FF6B35" stroke-width="2"/>
+    <polygon points="100,160 90,220 110,220" fill="url(#goldGradCrown)" stroke="#FF6B35" stroke-width="2" opacity="0.9"/>
+
+    <!-- Right peaks -->
+    <polygon points="260,140 270,200 250,200" fill="url(#goldGradCrown)" stroke="#FF6B35" stroke-width="2"/>
+    <polygon points="300,160 310,220 290,220" fill="url(#goldGradCrown)" stroke="#FF6B35" stroke-width="2" opacity="0.9"/>
+  </g>
+
+  <!-- Large gemstones on peaks -->
+  <g filter="url(#crownGlow)">
+    <!-- Center ruby -->
+    <circle cx="200" cy="105" r="12" fill="url(#rubyRed)" stroke="#FFD700" stroke-width="2"/>
+    <circle cx="200" cy="105" r="8" fill="#FF69B4" opacity="0.4"/>
+    <circle cx="203" cy="102" r="3" fill="#FFD700" opacity="0.9"/>
+
+    <!-- Left sapphire -->
+    <circle cx="130" cy="155" r="11" fill="url(#sapphireBlue)" stroke="#FFD700" stroke-width="2"/>
+    <circle cx="130" cy="155" r="7" fill="#1E90FF" opacity="0.4"/>
+    <circle cx="133" cy="152" r="2.5" fill="#FFD700" opacity="0.8"/>
+
+    <!-- Right emerald -->
+    <circle cx="270" cy="155" r="11" fill="url(#emeraldGreen)" stroke="#FFD700" stroke-width="2"/>
+    <circle cx="270" cy="155" r="7" fill="#00FF7F" opacity="0.4"/>
+    <circle cx="273" cy="152" r="2.5" fill="#FFD700" opacity="0.8"/>
+
+    <!-- Far left accent gem -->
+    <circle cx="90" cy="175" r="9" fill="url(#rubyRed)" stroke="#FF6B35" stroke-width="1.5" opacity="0.85"/>
+    <circle cx="92" cy="173" r="2" fill="#FFD700" opacity="0.7"/>
+
+    <!-- Far right accent gem -->
+    <circle cx="310" cy="175" r="9" fill="url(#sapphireBlue)" stroke="#FF6B35" stroke-width="1.5" opacity="0.85"/>
+    <circle cx="312" cy="173" r="2" fill="#FFD700" opacity="0.7"/>
+  </g>
+
+  <!-- Small decorative jewels on band -->
+  <g filter="url(#crownGlow)" opacity="0.9">
+    <circle cx="150" cy="220" r="6" fill="url(#sapphireBlue)" stroke="#FFD700" stroke-width="1.5"/>
+    <circle cx="175" cy="235" r="5" fill="url(#emeraldGreen)" stroke="#FFD700" stroke-width="1.2"/>
+    <circle cx="225" cy="235" r="5" fill="url(#emeraldGreen)" stroke="#FFD700" stroke-width="1.2"/>
+    <circle cx="250" cy="220" r="6" fill="url(#sapphireBlue)" stroke="#FFD700" stroke-width="1.5"/>
+  </g>
+
+  <!-- Ornate decorative curves -->
+  <g fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.6">
+    <path d="M 160 240 Q 150 260 160 275"/>
+    <path d="M 240 240 Q 250 260 240 275"/>
+  </g>
+
+  <!-- Inner light effects on gems -->
+  <g opacity="0.5">
+    <circle cx="200" cy="105" r="4" fill="#FFD700" opacity="0.6"/>
+    <circle cx="130" cy="155" r="3" fill="#FFD700" opacity="0.5"/>
+    <circle cx="270" cy="155" r="3" fill="#FFD700" opacity="0.5"/>
+  </g>
+
+  <!-- Glowing aura rings -->
+  <g fill="none" opacity="0.25">
+    <circle cx="200" cy="165" r="115" stroke="#FFD700" stroke-width="1" stroke-dasharray="5,5"/>
+    <circle cx="200" cy="165" r="85" stroke="#FF6B35" stroke-width="0.8" stroke-dasharray="4,4"/>
+    <circle cx="200" cy="165" r="140" stroke="#FF6B35" stroke-width="0.8" stroke-dasharray="6,3"/>
+  </g>
+
+  <!-- Final outer glow line -->
+  <circle cx="200" cy="165" r="145" fill="none" stroke="url(#crownOrange)" stroke-width="1" opacity="0.3" filter="url(#crownGlow)"/>
+</svg>

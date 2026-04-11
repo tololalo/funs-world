@@ -13,19 +13,59 @@ const NETWORKS = {
     chainId: 56,
     name: 'BNB Smart Chain',
     rpc: 'https://bsc-dataseed1.binance.org',
+    rpcFallbacks: [
+      'https://bsc-dataseed2.binance.org',
+      'https://bsc-dataseed3.binance.org',
+      'https://bsc-dataseed4.binance.org'
+    ],
     explorer: 'https://bscscan.com',
     explorerApi: 'https://api.bscscan.com/api',
     symbol: 'BNB',
     decimals: 18
   },
+  bscTestnet: {
+    chainId: 97,
+    name: 'BSC Testnet',
+    rpc: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
+    rpcFallbacks: [
+      'https://data-seed-prebsc-2-s1.bnbchain.org:8545',
+      'https://data-seed-prebsc-1-s2.bnbchain.org:8545'
+    ],
+    explorer: 'https://testnet.bscscan.com',
+    explorerApi: 'https://api-testnet.bscscan.com/api',
+    symbol: 'tBNB',
+    decimals: 18,
+    isTestnet: true,
+    faucet: 'https://testnet.bnbchain.org/faucet-smart'
+  },
   ethereum: {
     chainId: 1,
     name: 'Ethereum',
     rpc: 'https://eth.llamarpc.com',
+    rpcFallbacks: [
+      'https://ethereum.publicnode.com',
+      'https://rpc.ankr.com/eth',
+      'https://cloudflare-eth.com'
+    ],
     explorer: 'https://etherscan.io',
     explorerApi: 'https://api.etherscan.io/api',
     symbol: 'ETH',
     decimals: 18
+  },
+  ethereumSepolia: {
+    chainId: 11155111,
+    name: 'Ethereum Sepolia',
+    rpc: 'https://ethereum-sepolia.publicnode.com',
+    rpcFallbacks: [
+      'https://rpc.sepolia.org',
+      'https://rpc.ankr.com/eth_sepolia'
+    ],
+    explorer: 'https://sepolia.etherscan.io',
+    explorerApi: 'https://api-sepolia.etherscan.io/api',
+    symbol: 'ETH',
+    decimals: 18,
+    isTestnet: true,
+    faucet: 'https://sepoliafaucet.com'
   }
 };
 
@@ -37,6 +77,7 @@ const NETWORKS = {
 const TOKENS = {
   bsc: {
     FUNS: {
+      // TODO: Replace with actual FUNS token contract address on BSC mainnet
       address: '0x0000000000000000000000000000000000000000',
       decimals: 18,
       symbol: 'FUNS',
@@ -77,6 +118,32 @@ const TOKENS = {
       coingeckoId: 'pancakeswap-token'
     }
   },
+  bscTestnet: {
+    tBNB: {
+      native: true,
+      decimals: 18,
+      symbol: 'tBNB',
+      name: 'Test BNB',
+      icon: '../../dex/icons/bnb.svg',
+      coingeckoId: 'binancecoin'
+    },
+    USDT: {
+      address: '0x337610d27c682E347C9cD60BD4b3b107C9d34dDd',
+      decimals: 18,
+      symbol: 'USDT',
+      name: 'Test USDT',
+      icon: '../../dex/icons/usdt.svg',
+      coingeckoId: 'tether'
+    },
+    BUSD: {
+      address: '0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee',
+      decimals: 18,
+      symbol: 'BUSD',
+      name: 'Test BUSD',
+      icon: '../../dex/icons/usdt.svg',
+      coingeckoId: 'binance-usd'
+    }
+  },
   ethereum: {
     ETH: {
       native: true,
@@ -102,6 +169,24 @@ const TOKENS = {
       icon: '../../dex/icons/usdc.svg',
       coingeckoId: 'usd-coin'
     }
+  },
+  ethereumSepolia: {
+    ETH: {
+      native: true,
+      decimals: 18,
+      symbol: 'ETH',
+      name: 'Test ETH',
+      icon: '../../dex/icons/eth.svg',
+      coingeckoId: 'ethereum'
+    },
+    USDC: {
+      address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+      decimals: 6,
+      symbol: 'USDC',
+      name: 'Test USDC',
+      icon: '../../dex/icons/usdc.svg',
+      coingeckoId: 'usd-coin'
+    }
   }
 };
 
@@ -116,6 +201,12 @@ const DEX_ROUTERS = {
     network: 'bsc',
     factory: '0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73',
     weth: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+  },
+  pancakeswapTestnet: {
+    address: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1',
+    network: 'bscTestnet',
+    factory: '0x6725f303b657a9451d8ba641348b6761a6cc7a17',
+    weth: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd'
   },
   uniswap: {
     address: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
@@ -251,8 +342,28 @@ const ROUTER_ABI = [
  * @type {Object}
  */
 const API_KEYS = {
-  bscscan: '',
-  etherscan: ''
+  bscscan: '', // TODO: Get free tier API key from https://bscscan.com/apis
+  etherscan: '' // TODO: Get free tier API key from https://etherscan.io/apis
+};
+
+/**
+ * Fiat on-ramp providers configuration
+ * Integration with third-party services for buying crypto with fiat currency
+ * @type {Object}
+ */
+const FIAT_PROVIDERS = {
+  moonpay: {
+    apiKey: '', // TODO: Get from https://dashboard.moonpay.com
+    apiUrl: 'https://api.moonpay.com/v3',
+    widgetUrl: 'https://buy.moonpay.com',
+    supportedCurrencies: ['BNB', 'ETH', 'USDT', 'USDC'],
+    supportedPayments: ['credit_card', 'bank_transfer', 'apple_pay', 'google_pay']
+  },
+  simplex: {
+    apiKey: '', // TODO: Get from https://dashboard.simplex.com
+    widgetUrl: 'https://checkout.simplexcc.com',
+    supportedCurrencies: ['BNB', 'ETH']
+  }
 };
 
 /**
@@ -276,11 +387,13 @@ const CUSTOM_TOKEN_TEMPLATE = {
  */
 const WALLET_CONFIG = {
   defaultNetwork: 'bsc',
-  enabledNetworks: ['bsc'], // Only BSC enabled by default. User can add 'ethereum' in settings
+  enabledNetworks: ['bsc'], // Production: BSC mainnet enabled by default
+  isTestnetMode: false,
   sessionTimeout: 5 * 60 * 1000, // 5 minutes in milliseconds
   maxGasPrice: '50', // in gwei
   defaultSlippage: 0.5, // percentage
-  refreshInterval: 30000 // milliseconds
+  refreshInterval: 30000, // milliseconds
+  walletConnectProjectId: '' // Get from https://cloud.walletconnect.com
 };
 
 /**
@@ -295,6 +408,7 @@ const WalletConfig = {
   ERC20_ABI,
   ROUTER_ABI,
   API_KEYS,
+  FIAT_PROVIDERS,
   WALLET_CONFIG,
 
   /**
@@ -443,12 +557,36 @@ const WalletConfig = {
    */
   getNetworkTokens: function(networkName) {
     return this.getAllTokens(networkName);
+  },
+
+  /**
+   * Get RPC URLs with fallbacks for a network
+   * @param {string} networkName - Network name
+   * @returns {string[]} Array of RPC URLs (primary + fallbacks)
+   */
+  getRpcUrls: function(networkName) {
+    const network = this.NETWORKS[networkName];
+    if (!network) return [];
+    const urls = [network.rpc];
+    if (network.rpcFallbacks) {
+      urls.push(...network.rpcFallbacks);
+    }
+    return urls;
+  },
+
+  /**
+   * Get the currently active network
+   * @returns {string} Active network name
+   */
+  getActiveNetwork: function() {
+    return this.WALLET_CONFIG.defaultNetwork;
   }
 };
 
 // Load saved settings on startup
 if (typeof window !== 'undefined') {
   window.WalletConfig = WalletConfig;
+  window.FIAT_PROVIDERS = FIAT_PROVIDERS;
   WalletConfig.loadEnabledNetworks();
 }
 

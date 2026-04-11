@@ -2,7 +2,7 @@
  * FunS Wallet Service Worker
  * Provides offline support and caching for PWA
  */
-const CACHE_NAME = 'funs-wallet-v1';
+const CACHE_NAME = 'funs-wallet-v6';
 const STATIC_ASSETS = [
   './',
   './index.html',

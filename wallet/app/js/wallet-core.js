@@ -30,7 +30,7 @@ class WalletCore {
    * Generate a new 12-word mnemonic phrase
    * @returns {string} The generated mnemonic phrase
    */
-  async generateMnemonic() {
+  generateMnemonic() {
     try {
       // Generate 16 random bytes (128 bits) for 12-word mnemonic
       const randomBytes = new Uint8Array(16);
@@ -41,8 +41,9 @@ class WalletCore {
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
 
-      // Use ethers to generate mnemonic from entropy
-      const mnemonic = ethers.Mnemonic.entropyToMnemonic("0x" + hexString);
+      // Use ethers v6 to generate mnemonic from entropy
+      const mnemonicObj = ethers.Mnemonic.fromEntropy("0x" + hexString);
+      const mnemonic = mnemonicObj.phrase;
 
       return mnemonic;
     } catch (error) {
@@ -58,13 +59,15 @@ class WalletCore {
    */
   async createWallet(mnemonic, pin) {
     try {
-      // Validate mnemonic
-      if (!ethers.Mnemonic.isValidMnemonic(mnemonic)) {
+      // Validate mnemonic using ethers v6 approach
+      try {
+        ethers.Mnemonic.fromPhrase(mnemonic);
+      } catch {
         throw new Error("Invalid mnemonic phrase");
       }
 
-      if (!pin || pin.length < 4) {
-        throw new Error("PIN must be at least 4 characters");
+      if (!pin || pin.length < 6) {
+        throw new Error("PIN must be at least 6 characters");
       }
 
       // Create HD wallet from mnemonic using BIP44 path
@@ -83,11 +86,17 @@ class WalletCore {
       localStorage.setItem("funs_wallet_data", JSON.stringify(encryptedData));
       localStorage.setItem("funs_wallet_address", address);
 
+      // Store encrypted mnemonic for backup
+      const encryptedMnemonic = await this._encryptPrivateKey(mnemonic, pin);
+      localStorage.setItem("funs_wallet_mnemonic_enc", JSON.stringify(encryptedMnemonic));
+
+      // Store creation timestamp
+      localStorage.setItem("funs_wallet_created", new Date().toISOString());
+
       // Set wallet state
       this.wallet = hdNode;
       this.address = address;
       this.isLocked = false;
-      this.pin = pin;
       this.encryptedData = encryptedData;
 
       // Start session timer
@@ -112,13 +121,15 @@ class WalletCore {
    */
   async importWallet(mnemonic, pin) {
     try {
-      // Validate mnemonic
-      if (!ethers.Mnemonic.isValidMnemonic(mnemonic)) {
+      // Validate mnemonic using ethers v6 approach
+      try {
+        ethers.Mnemonic.fromPhrase(mnemonic);
+      } catch {
         throw new Error("Invalid mnemonic phrase");
       }
 
-      if (!pin || pin.length < 4) {
-        throw new Error("PIN must be at least 4 characters");
+      if (!pin || pin.length < 6) {
+        throw new Error("PIN must be at least 6 characters");
       }
 
       // Check if wallet already exists
@@ -144,11 +155,17 @@ class WalletCore {
       localStorage.setItem("funs_wallet_data", JSON.stringify(encryptedData));
       localStorage.setItem("funs_wallet_address", address);
 
+      // Store encrypted mnemonic for backup
+      const encryptedMnemonic = await this._encryptPrivateKey(mnemonic, pin);
+      localStorage.setItem("funs_wallet_mnemonic_enc", JSON.stringify(encryptedMnemonic));
+
+      // Store creation timestamp
+      localStorage.setItem("funs_wallet_created", new Date().toISOString());
+
       // Set wallet state
       this.wallet = hdNode;
       this.address = address;
       this.isLocked = false;
-      this.pin = pin;
       this.encryptedData = encryptedData;
 
       // Start session timer
@@ -172,6 +189,14 @@ class WalletCore {
    */
   async unlockWallet(pin) {
     try {
+      // Enforce rate limiting at the core layer (cannot be bypassed by clearing localStorage)
+      const now = Date.now();
+      if (this._unlockLockUntil && now < this._unlockLockUntil) {
+        const remaining = Math.ceil((this._unlockLockUntil - now) / 1000);
+        throw new Error(`Too many attempts. Wait ${remaining}s`);
+      }
+      if (!this._unlockAttempts) this._unlockAttempts = 0;
+
       // Load encrypted data from localStorage
       const encryptedDataStr = localStorage.getItem("funs_wallet_data");
       const address = localStorage.getItem("funs_wallet_address");
@@ -192,10 +217,13 @@ class WalletCore {
         throw new Error("Decrypted address does not match stored address");
       }
 
+      // Reset rate limiting on success
+      this._unlockAttempts = 0;
+      this._unlockLockUntil = null;
+
       // Set state
       this.address = address;
       this.isLocked = false;
-      this.pin = pin;
       this.encryptedData = encryptedData;
 
       // Start session timer
@@ -208,6 +236,14 @@ class WalletCore {
 
       return true;
     } catch (error) {
+      // Track failed attempts at core layer; exponential backoff (30s, 60s, 120s …)
+      if (!error.message.startsWith('Too many attempts')) {
+        this._unlockAttempts = (this._unlockAttempts || 0) + 1;
+        if (this._unlockAttempts >= 5) {
+          const lockSeconds = Math.min(30 * Math.pow(2, this._unlockAttempts - 5), 3600);
+          this._unlockLockUntil = Date.now() + lockSeconds * 1000;
+        }
+      }
       throw new Error(`Failed to unlock wallet: ${error.message}`);
     }
   }
@@ -223,6 +259,14 @@ class WalletCore {
     if (this.sessionTimer) {
       clearTimeout(this.sessionTimer);
       this.sessionTimer = null;
+    }
+
+    // Remove activity listeners when locked to avoid unnecessary background resets
+    if (this._activityHandler) {
+      window.removeEventListener("mousemove", this._activityHandler);
+      window.removeEventListener("keypress", this._activityHandler);
+      window.removeEventListener("click", this._activityHandler);
+      this._activityHandler = null;
     }
 
     // Dispatch event
@@ -265,6 +309,8 @@ class WalletCore {
     try {
       localStorage.removeItem("funs_wallet_data");
       localStorage.removeItem("funs_wallet_address");
+      localStorage.removeItem("funs_wallet_mnemonic_enc");
+      localStorage.removeItem("funs_wallet_created");
 
       this.wallet = null;
       this.address = null;
@@ -279,6 +325,103 @@ class WalletCore {
     } catch (error) {
       throw new Error(`Failed to delete wallet: ${error.message}`);
     }
+  }
+
+  /**
+   * Export encrypted mnemonic (requires PIN verification)
+   * @param {string} pin - Current PIN
+   * @returns {Promise<string>} Mnemonic phrase
+   */
+  async exportMnemonic(pin) {
+    try {
+      const mnemonicData = localStorage.getItem('funs_wallet_mnemonic_enc');
+      if (!mnemonicData) {
+        throw new Error('Mnemonic backup not available. Only available for wallets created through this app.');
+      }
+
+      const encryptedMnemonic = JSON.parse(mnemonicData);
+      const mnemonic = await this._decryptPrivateKey(encryptedMnemonic, pin);
+      return mnemonic;
+    } catch (error) {
+      throw new Error(`Failed to export mnemonic: ${error.message}`);
+    }
+  }
+
+  /**
+   * Change the wallet PIN
+   * @param {string} currentPin - Current PIN
+   * @param {string} newPin - New PIN
+   * @returns {Promise<boolean>}
+   */
+  async changePin(currentPin, newPin) {
+    try {
+      if (!newPin || newPin.length < 6) {
+        throw new Error('New PIN must be at least 6 characters');
+      }
+
+      // Verify current PIN by decrypting
+      const encryptedDataStr = localStorage.getItem("funs_wallet_data");
+      if (!encryptedDataStr) {
+        throw new Error('No wallet data found');
+      }
+
+      const encryptedData = JSON.parse(encryptedDataStr);
+      const privateKey = await this._decryptPrivateKey(encryptedData, currentPin);
+
+      // Re-encrypt with new PIN
+      const newEncryptedData = await this._encryptPrivateKey(privateKey, newPin);
+      localStorage.setItem("funs_wallet_data", JSON.stringify(newEncryptedData));
+
+      // Re-encrypt mnemonic if exists
+      const mnemonicEnc = localStorage.getItem("funs_wallet_mnemonic_enc");
+      if (mnemonicEnc) {
+        const mnemonic = await this._decryptPrivateKey(JSON.parse(mnemonicEnc), currentPin);
+        const newMnemonicEnc = await this._encryptPrivateKey(mnemonic, newPin);
+        localStorage.setItem("funs_wallet_mnemonic_enc", JSON.stringify(newMnemonicEnc));
+      }
+
+      // Update current state
+      this.pin = newPin;
+      this.encryptedData = newEncryptedData;
+
+      window.dispatchEvent(new CustomEvent('pinChanged', { detail: {} }));
+
+      return true;
+    } catch (error) {
+      throw new Error(`Failed to change PIN: ${error.message}`);
+    }
+  }
+
+  /**
+   * Validate PIN without unlocking wallet
+   * @param {string} pin - PIN to validate
+   * @returns {Promise<boolean>}
+   */
+  async validatePin(pin) {
+    try {
+      const encryptedDataStr = localStorage.getItem("funs_wallet_data");
+      if (!encryptedDataStr) return false;
+
+      const encryptedData = JSON.parse(encryptedDataStr);
+      await this._decryptPrivateKey(encryptedData, pin);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Get wallet summary info (non-sensitive)
+   * @returns {Object} Wallet info
+   */
+  getWalletInfo() {
+    return {
+      exists: this.isWalletExists(),
+      address: this.getAddress(),
+      isLocked: this.isLocked,
+      hasMnemonicBackup: localStorage.getItem('funs_wallet_mnemonic_enc') !== null,
+      createdAt: localStorage.getItem('funs_wallet_created') || null
+    };
   }
 
   /**
@@ -422,11 +565,19 @@ class WalletCore {
       this.lockWallet();
     }, timeout);
 
-    // Reset timer on user activity
-    const resetTimer = () => this._resetSessionTimer();
-    window.addEventListener("mousemove", resetTimer, { once: true });
-    window.addEventListener("keypress", resetTimer, { once: true });
-    window.addEventListener("click", resetTimer, { once: true });
+    // Register persistent activity listeners once; _resetSessionTimer re-arms the timeout
+    if (!this._activityHandler) {
+      this._activityHandler = () => this._resetSessionTimer();
+      window.addEventListener("mousemove", this._activityHandler);
+      window.addEventListener("keypress", this._activityHandler);
+      window.addEventListener("click", this._activityHandler);
+    }
+
+    // Clean up listeners on page unload to prevent memory leaks
+    if (!this._unloadHandler) {
+      this._unloadHandler = () => this.lockWallet();
+      window.addEventListener("beforeunload", this._unloadHandler);
+    }
   }
 
   /**
