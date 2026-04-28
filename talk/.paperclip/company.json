@@ -1,0 +1,11 @@
+{
+  "name": "FUNS Talk Landing Review",
+  "mission": "FUNS Talk 소개 페이지 품질 검증 및 개선",
+  "created_at": "2026-04-01T10:00:00Z",
+  "agents": [
+    { "id": "ceo", "role": "CEO", "persona": "전략적 관점에서 페이지 메시지/구조 검토", "reports_to": null, "status": "active" },
+    { "id": "cto", "role": "CTO", "persona": "프론트엔드 기술/UX/접근성/반응형 검토", "reports_to": "ceo", "status": "active" },
+    { "id": "qa", "role": "QA", "persona": "콘텐츠 정확성, 링크, 렌더링, 일관성 검증", "reports_to": "cto", "status": "active" },
+    { "id": "eng1", "role": "Engineer", "persona": "HTML/CSS 수정 구현", "reports_to": "cto", "status": "active" }
+  ]
+}

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FunS Wallet - Privacy Policy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0B0E17;
+            color: #E8E9EB;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF6B35;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 10px;
+            background-color: rgba(255, 107, 53, 0.1);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .language-toggle button {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: #E8E9EB;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle button.active {
+            background-color: #FF6B35;
+            color: #0B0E17;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #FFD700;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #FF6B35;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #C4C7CC;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: #C4C7CC;
+        }
+
+        .highlight {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        .contact-info {
+            background-color: rgba(255, 107, 53, 0.1);
+            border-left: 3px solid #FF6B35;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 6px;
+        }
+
+        .effective-date {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 107, 53, 0.2);
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">FunS Wallet</div>
+            <div class="language-toggle">
+                <button class="lang-btn active" data-lang="en">English</button>
+                <button class="lang-btn" data-lang="ko">한국어</button>
+            </div>
+        </div>
+
+        <!-- English Version -->
+        <div id="en" class="content-section active">
+            <h1>Privacy Policy</h1>
+            <p class="effective-date">Effective Date: April 2026</p>
+
+            <h2>1. Introduction</h2>
+            <p>FunS Wallet ("we," "us," "our," or "Company") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application (the "App").</p>
+
+            <h2>2. Data Collection</h2>
+            <p>We believe in minimal data collection. FunS Wallet operates with a privacy-first approach:</p>
+            <ul>
+                <li><span class="highlight">Local Storage Only:</span> All wallet data, including private keys, seed phrases, and transaction history, is stored exclusively on your device.</li>
+                <li><span class="highlight">No Account Registration:</span> You do not need to create an account or provide personal information to use FunS Wallet.</li>
+                <li><span class="highlight">No Server-Side Storage:</span> We do not transmit, store, or have access to your wallet data on any server.</li>
+            </ul>
+
+            <h2>3. Information We Collect</h2>
+            <p>FunS Wallet may collect the following limited information:</p>
+            <ul>
+                <li><span class="highlight">Blockchain Transaction Data:</span> Public transaction hashes and addresses are recorded on the blockchain (this is not controlled by us).</li>
+                <li><span class="highlight">Anonymous Analytics:</span> We may collect anonymized, non-identifiable usage analytics to improve app performance and user experience. This does not include personal or wallet information.</li>
+                <li><span class="highlight">Device Identifiers:</span> Temporary device identifiers for API rate limiting purposes only.</li>
+            </ul>
+
+            <h2>4. Third-Party Services</h2>
+            <p>FunS Wallet integrates with external services for enhanced functionality:</p>
+            <ul>
+                <li><span class="highlight">CoinGecko API:</span> For real-time cryptocurrency price data. Visit their privacy policy at https://www.coingecko.com/en/privacy</li>
+                <li><span class="highlight">Blockchain RPC Nodes:</span> To interact with blockchain networks (BSC, Ethereum, etc.). These are decentralized services that may log transaction requests.</li>
+                <li><span class="highlight">QR Code Libraries:</span> Open-source libraries for scanning QR codes (processed entirely on-device).</li>
+            </ul>
+            <p>We are not responsible for the privacy practices of third-party services. Please review their privacy policies.</p>
+
+            <h2>5. Camera Usage</h2>
+            <p>FunS Wallet requests camera access exclusively for:</p>
+            <ul>
+                <li>Scanning QR codes for wallet addresses and payment requests</li>
+                <li>All QR code processing occurs on your device; camera data is never transmitted or stored</li>
+            </ul>
+
+            <h2>6. Biometric Data</h2>
+            <p>If you enable biometric authentication (Face ID, Touch ID, or fingerprint):</p>
+            <ul>
+                <li><span class="highlight">Local Processing Only:</span> Biometric data is processed entirely on your device using the operating system's secure enclave or trusted execution environment.</li>
+                <li><span class="highlight">Never Transmitted:</span> We never access, store, or transmit biometric data to any server.</li>
+                <li><span class="highlight">Device Control:</span> Your device's operating system manages all biometric authentication, not FunS Wallet.</li>
+            </ul>
+
+            <h2>7. User Rights and Data Control</h2>
+            <p>You maintain complete control over your data:</p>
+            <ul>
+                <li><span class="highlight">Data Deletion:</span> All data stored by FunS Wallet is deleted when you uninstall the application.</li>
+                <li><span class="highlight">Self-Custody:</span> You are the sole custodian of your private keys and wallet data.</li>
+                <li><span class="highlight">No Account Dependence:</span> FunS Wallet does not maintain accounts or records that persist after app uninstallation.</li>
+            </ul>
+
+            <h2>8. Security Measures</h2>
+            <p>We implement industry-standard security practices:</p>
+            <ul>
+                <li>End-to-end encryption for sensitive data on-device</li>
+                <li>Secure local storage using platform-provided key management systems</li>
+                <li>Regular security audits and updates</li>
+                <li>No transmission of private keys or seed phrases</li>
+            </ul>
+
+            <h2>9. Children's Privacy</h2>
+            <p>FunS Wallet is not intended for users under 13 years of age. We do not knowingly collect information from children under 13. If we become aware that a child under 13 has provided us with information, we will promptly delete such information.</p>
+
+            <h2>10. Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the revised policy in the App with an updated "Effective Date." Your continued use of the App constitutes your acceptance of the revised Privacy Policy.</p>
+
+            <h2>11. Contact Us</h2>
+            <div class="contact-info">
+                <p>If you have questions or concerns about this Privacy Policy or our privacy practices, please contact us at:</p>
+                <p><strong>Email:</strong> funsxofficial@gmail.com</p>
+                <p><strong>Organization:</strong> FunS Wallet Team</p>
+            </div>
+
+            <h2>12. Compliance</h2>
+            <p>FunS Wallet complies with applicable privacy laws and regulations, including GDPR (for EU residents) and other regional privacy requirements.</p>
+
+            <div class="footer">
+                <p>This Privacy Policy is provided "as-is" for informational purposes. For the most current version, please refer to the App or our official website.</p>
+            </div>
+        </div>
+
+        <!-- Korean Version -->
+        <div id="ko" class="content-section">
+            <h1>개인정보 보호정책</h1>
+            <p class="effective-date">시행일: 2026년 4월</p>
+
+            <h2>1. 소개</h2>
+            <p>FunS Wallet ("당사"라 함)은 귀하의 개인정보 보호에 최선을 다하고 있습니다. 본 개인정보 보호정책은 당사의 모바일 애플리케이션 ("앱")을 사용할 때 귀하의 정보를 어떻게 수집, 사용, 공개 및 보호하는지 설명합니다.</p>
+
+            <h2>2. 데이터 수집</h2>
+            <p>당사는 최소한의 데이터 수집 원칙을 따르고 있습니다. FunS Wallet은 개인정보 보호 우선 방식으로 운영됩니다:</p>
+            <ul>
+                <li><span class="highlight">로컬 저장소만 사용:</span> 개인 키, 시드 문구, 거래 내역을 포함한 모든 지갑 데이터는 사용자 기기에만 저장됩니다.</li>
+                <li><span class="highlight">회원가입 불필요:</span> FunS Wallet을 사용하기 위해 계정을 생성하거나 개인정보를 제공할 필요가 없습니다.</li>
+                <li><span class="highlight">서버 저장 없음:</span> 당사는 지갑 데이터를 전송, 저장하지 않으며 서버에서 접근할 수 없습니다.</li>
+            </ul>
+
+            <h2>3. 수집하는 정보</h2>
+            <p>FunS Wallet은 다음의 제한된 정보만 수집할 수 있습니다:</p>
+            <ul>
+                <li><span class="highlight">블록체인 거래 데이터:</span> 공개 거래 해시 및 주소는 블록체인에 기록됩니다 (이는 당사가 통제하지 않음).</li>
+                <li><span class="highlight">익명 분석:</span> 앱 성능 및 사용자 경험 개선을 위해 익명화되고 식별 불가능한 사용 통계를 수집할 수 있습니다. 이는 개인정보나 지갑 정보를 포함하지 않습니다.</li>
+                <li><span class="highlight">기기 식별자:</span> API 속도 제한 목적의 임시 기기 식별자만 사용됩니다.</li>
+            </ul>
+
+            <h2>4. 제3자 서비스</h2>
+            <p>FunS Wallet은 향상된 기능을 위해 외부 서비스와 통합됩니다:</p>
+            <ul>
+                <li><span class="highlight">CoinGecko API:</span> 실시간 암호화폐 가격 데이터 제공. https://www.coingecko.com/en/privacy의 개인정보 보호정책을 참조하세요.</li>
+                <li><span class="highlight">블록체인 RPC 노드:</span> 블록체인 네트워크 (BSC, Ethereum 등)와의 상호작용. 분산화된 서비스로 거래 요청을 로깅할 수 있습니다.</li>
+                <li><span class="highlight">QR 코드 라이브러리:</span> QR 코드 스캔을 위한 오픈소스 라이브러리 (기기 내에서만 처리).</li>
+            </ul>
+            <p>당사는 제3자 서비스의 개인정보 보호정책에 대한 책임이 없습니다. 각 서비스의 개인정보 보호정책을 검토하기 바랍니다.</p>
+
+            <h2>5. 카메라 사용</h2>
+            <p>FunS Wallet은 카메라 접근을 다음의 목적으로만 요청합니다:</p>
+            <ul>
+                <li>지갑 주소 및 결제 요청에 대한 QR 코드 스캔</li>
+                <li>모든 QR 코드 처리는 사용자 기기 내에서만 수행되며 절대 전송되거나 저장되지 않습니다</li>
+            </ul>
+
+            <h2>6. 생체인식 데이터</h2>
+            <p>생체인식 인증 (Face ID, Touch ID 또는 지문)을 활성화하는 경우:</p>
+            <ul>
+                <li><span class="highlight">로컬 처리만 수행:</span> 생체인식 데이터는 기기의 보안 enclave 또는 신뢰 실행 환경을 사용하여 기기 내에서만 처리됩니다.</li>
+                <li><span class="highlight">전송 금지:</span> 당사는 생체인식 데이터를 접근, 저장 또는 어떤 서버로도 전송하지 않습니다.</li>
+                <li><span class="highlight">기기 제어:</span> 기기의 운영체제가 모든 생체인식 인증을 관리하며 FunS Wallet은 관여하지 않습니다.</li>
+            </ul>
+
+            <h2>7. 사용자 권리 및 데이터 제어</h2>
+            <p>사용자는 자신의 데이터에 대한 완전한 통제권을 유지합니다:</p>
+            <ul>
+                <li><span class="highlight">데이터 삭제:</span> FunS Wallet에 저장된 모든 데이터는 애플리케이션을 제거할 때 삭제됩니다.</li>
+                <li><span class="highlight">자기 보관:</span> 사용자는 개인 키 및 지갑 데이터의 유일한 관리자입니다.</li>
+                <li><span class="highlight">계정 독립성:</span> FunS Wallet은 앱 제거 후에도 지속되는 계정이나 기록을 유지하지 않습니다.</li>
+            </ul>
+
+            <h2>8. 보안 조치</h2>
+            <p>당사는 업계 표준 보안 관행을 구현합니다:</p>
+            <ul>
+                <li>기기 내 민감 데이터에 대한 엔드-투-엔드 암호화</li>
+                <li>플랫폼 제공 키 관리 시스템을 사용한 보안 로컬 저장소</li>
+                <li>정기적인 보안 감사 및 업데이트</li>
+                <li>개인 키 또는 시드 문구의 전송 금지</li>
+            </ul>
+
+            <h2>9. 아동의 개인정보</h2>
+            <p>FunS Wallet은 13세 미만의 사용자를 대상으로 하지 않습니다. 당사는 13세 미만 아동의 정보를 의도적으로 수집하지 않습니다. 만약 13세 미만 아동의 정보를 수집한 사실을 알게 되면 즉시 삭제하겠습니다.</p>
+
+            <h2>10. 정책 변경</h2>
+            <p>당사는 이 개인정보 보호정책을 수시로 업데이트할 수 있습니다. 중대한 변경 사항은 앱에 업데이트된 "시행일"을 포함하여 공지하겠습니다. 앱의 지속적인 사용은 개정된 개인정보 보호정책의 승인을 의미합니다.</p>
+
+            <h2>11. 문의</h2>
+            <div class="contact-info">
+                <p>본 개인정보 보호정책 또는 당사의 개인정보 보호 관행에 대해 질문이나 우려사항이 있으면 다음으로 연락 바랍니다:</p>
+                <p><strong>이메일:</strong> funsxofficial@gmail.com</p>
+                <p><strong>조직:</strong> FunS Wallet 팀</p>
+            </div>
+
+            <h2>12. 규정 준수</h2>
+            <p>FunS Wallet은 GDPR (EU 거주자용) 및 기타 지역 개인정보 보호 규정을 포함한 적용 가능한 개인정보 보호 법률 및 규정을 준수합니다.</p>
+
+            <div class="footer">
+                <p>본 개인정보 보호정책은 정보 제공 목적으로 "있는 그대로" 제공됩니다. 최신 버전은 앱 또는 공식 웹사이트를 참조하세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const lang = this.getAttribute('data-lang');
+
+                // Update active button
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // Update active content
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(lang).classList.add('active');
+
+                // Scroll to top
+                window.scrollTo(0, 0);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FunS Platform</title>
+    <meta name="description" content="FunS Dashboard - View your game progress, rewards, and assets at a glance.">
+    <meta name="keywords" content="Dashboard, Game Progress, Rewards, FUNS, Token, Asset Management">
+    <meta property="og:title" content="Dashboard - FunS Platform">
+    <meta property="og:description" content="FunS Dashboard - View your game progress, rewards, and assets at a glance.">
+    <meta property="og:image" content="https://funs.world/funs-nugi.png">
+    <meta property="og:url" content="https://funs.world/en/dashboard/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Dashboard - FunS Platform">
+    <meta property="twitter:description" content="FunS Dashboard - View your game progress, rewards, and assets at a glance.">
+    <link rel="canonical" href="https://funs.world/en/dashboard/">
+    <link rel="alternate" hreflang="ko" href="https://funs.world/dashboard/">
+    <link rel="alternate" hreflang="en" href="https://funs.world/en/dashboard/">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #FFD700;
+            --accent: #4FC3F7;
+            --dark: #080B14;
+            --dark2: #0D1120;
+            --dark3: #141828;
+            --card: #1a1f35;
+            --card2: #222842;
+            --border: rgba(255,107,53,0.2);
+            --text: #e8eaf0;
+            --muted: #8892b0;
+            --green: #4caf50;
+            --red: #ef5350;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Noto Sans KR', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { font-size: 17px; }
+
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+            color: var(--text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(79, 195, 247, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── NAV ── */
+        nav {
+            background: rgba(13, 17, 32, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-title {
+            font-family: var(--font-heading);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(79, 195, 247, 0.1);
+            border-color: var(--accent);
+        }
+
+        .wallet-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary), #ff8c42);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .wallet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+        }
+
+        .wallet-btn.connected {
+            background: linear-gradient(135deg, var(--green), #66bb6a);
+        }
+
+        /* Language Switcher */
+        .lang-switch {
+            display: flex;
+            gap: 2px;
+            background: var(--dark3);
+            border-radius: 8px;
+            padding: 2px;
+        }
+
+        .lang-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: var(--text);
+        }
+
+        /* ── MAIN CONTENT ── */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        main {
+            padding: 40px 0;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* ── PORTFOLIO OVERVIEW SECTION ── */
+        .portfolio-header {
+            margin-bottom: 40px;
+        }
+
+        .total-balance-card {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .total-balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .balance-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .balance-label {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-amount {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--secondary);
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+
+        .balance-usd {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .balance-change {
+            font-size: 0.9rem;
+            color: var(--green);
+            margin-top: 8px;
+        }
+
+        .balance-change.negative {
+            color: var(--red);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 107, 53, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(255, 107, 53, 0.15);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-usd {
+            font-size: 0.85rem;
+            color: var(--accent);
+        }
+
+        /* ── TWO COLUMN LAYOUT ── */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        /* ── TOKEN HOLDINGS ── */
+        .token-holdings-section {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+        }
+
+        .section-title {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .token-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .token-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: rgba(13, 17, 32, 0.5);
+            border: 1px solid rgba(255, 107, 53, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .token-row:hover {
+            background: rgba(13, 17, 32, 0.8);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .token-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: rgba(255, 107, 53, 0.1);
+            padding: 4px;
+        }
+
+        .token-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .token-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .token-balance {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .token-values {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: right;
+        }
+
+        .token-value {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .token-usd {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.95rem;
+        }
+
+        .token-change {
+            font-size: 0.8rem;
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .token-change.negative {
+            color: var(--red);
+        }
+
+        /* ── RECENT ACTIVITY ── */
+        .recent-activity-section {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: rgba(13, 17, 32, 0.5);
+            border: 1px solid rgba(255, 107, 53, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(13, 17, 32, 0.8);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .activity-status {
+            width: 12px;
+            height: 12px;
+            background: var(--green);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .activity-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .activity-action {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .activity-description {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .activity-amount {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .activity-value {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ── STAKING SUMMARY ── */
+        .staking-section {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .staking-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .stake-card {
+            background: rgba(13, 17, 32, 0.5);
+            border: 1px solid rgba(255, 107, 53, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .stake-card:hover {
+            background: rgba(13, 17, 32, 0.8);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .stake-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stake-pool-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .stake-apr {
+            background: rgba(79, 195, 247, 0.2);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stake-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stake-detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .stake-detail-label {
+            color: var(--muted);
+        }
+
+        .stake-detail-value {
+            color: var(--secondary);
+            font-family: var(--font-heading);
+            font-weight: 700;
+        }
+
+        .stake-progress {
+            margin-bottom: 16px;
+        }
+
+        .stake-progress-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 107, 53, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .claim-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), #ff8c42);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .claim-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .claim-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ── QUICK ACTIONS ── */
+        .quick-actions-section {
+            margin-bottom: 40px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .action-card:hover {
+            border-color: rgba(255, 107, 53, 0.5);
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px rgba(255, 107, 53, 0.2);
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(79, 195, 247, 0.05));
+        }
+
+        .action-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 107, 53, 0.15);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .action-title {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .action-description {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .staking-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            html { font-size: 15px; }
+
+            .nav-title {
+                font-size: 18px;
+            }
+
+            main {
+                padding: 24px 0;
+            }
+
+            .portfolio-header {
+                margin-bottom: 32px;
+            }
+
+            .total-balance-card {
+                padding: 28px;
+            }
+
+            .balance-amount {
+                font-size: 2.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .token-holdings-section,
+            .recent-activity-section,
+            .staking-section {
+                padding: 24px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .action-card {
+                padding: 24px;
+            }
+
+            .action-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 1.8rem;
+            }
+
+            .action-title {
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            html { font-size: 14px; }
+
+            .nav-content {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .nav-left, .nav-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .nav-title {
+                font-size: 16px;
+            }
+
+            .nav-right {
+                flex-wrap: wrap;
+            }
+
+            .balance-amount {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .token-row,
+            .activity-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .token-values,
+            .activity-amount {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+
+            .staking-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .wallet-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            html { font-size: 13px; }
+
+            nav {
+                padding: 0 12px;
+            }
+
+            .logo span {
+                font-size: 0.9rem;
+            }
+
+            .nav-title {
+                font-size: 0.9rem;
+                display: none;
+            }
+
+            main {
+                padding: 16px 0;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            .total-balance-card {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .balance-amount {
+                font-size: 1.8rem;
+            }
+
+            .balance-label {
+                font-size: 0.8rem;
+            }
+
+            .stats-grid {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .stat-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+
+            .stat-usd {
+                font-size: 0.7rem;
+            }
+
+            .section-title {
+                font-size: 1rem;
+            }
+
+            .token-holdings-section,
+            .recent-activity-section,
+            .staking-section {
+                padding: 16px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+            }
+
+            .token-row,
+            .activity-item {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .token-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .action-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .action-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+
+            .action-title {
+                font-size: 0.9rem;
+            }
+
+            .action-description {
+                font-size: 0.75rem;
+            }
+
+            .claim-btn {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* ── WALLET BANNER ── */
+        .wallet-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            margin: 20px auto;
+            max-width: 1400px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.08), rgba(79,195,247,0.05));
+            border: 1px solid rgba(255,107,53,0.2);
+            border-radius: 12px;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .wallet-banner-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: #e8eaf0;
+        }
+
+        .wallet-banner-icon { font-size: 1.3rem; }
+
+        .wallet-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-banner-btn {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #FF6B35, #ff9a00);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .wallet-banner-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255,107,53,0.4);
+        }
+
+        .wallet-banner-close {
+            background: none;
+            border: none;
+            color: #8892b0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .wallet-banner-close:hover { color: #e8eaf0; }
+
+        @media (max-width: 600px) {
+            .wallet-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+                padding: 12px 20px;
+                margin: 16px auto;
+            }
+
+            .wallet-banner-text {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .wallet-banner-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .wallet-banner-btn {
+                flex: 1;
+                max-width: 150px;
+            }
+        }
+
+        /* ── FOOTER STYLES ── */
+        footer {
+            margin-top: 80px;
+            padding: 40px 0 60px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-family: var(--font-heading);
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-link {
+            display: block;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ── NAV ── -->
+    <nav>
+        <div class="nav-content">
+            <div class="nav-left">
+                <img src="../../funs-nugi.png" alt="FunS Logo" class="nav-logo">
+                <div class="nav-title">FunS Dashboard</div>
+            </div>
+            <div class="nav-right">
+                <a href="../" class="back-link">&larr; FunS Platform</a>
+                <div class="lang-switch">
+                    <a href="../../dashboard/" class="lang-btn">KR</a>
+                    <a href="./" class="lang-btn active">EN</a>
+                </div>
+                <button class="wallet-btn" id="walletBtn">Connect Wallet</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── WALLET BANNER ── -->
+    <div class="wallet-banner" id="walletBanner">
+        <div class="wallet-banner-text">
+            <span class="wallet-banner-icon">&#128279;</span>
+            <span>You are viewing demo data. <strong>Connect your wallet</strong> to see your actual portfolio.</span>
+        </div>
+        <div class="wallet-banner-actions">
+            <button class="wallet-banner-btn" onclick="document.getElementById('walletBtn').click()">Connect Wallet</button>
+            <button class="wallet-banner-close" onclick="this.closest('.wallet-banner').style.display='none'">&#10005;</button>
+        </div>
+    </div>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main>
+        <div class="container">
+            <!-- Portfolio Overview -->
+            <section class="portfolio-header">
+                <div class="total-balance-card">
+                    <div class="balance-content">
+                        <div class="balance-label">Total Portfolio Balance</div>
+                        <div class="balance-amount" id="totalBalance">$4,258.40</div>
+                        <div class="balance-usd" id="totalChange">&uarr; $324.50 (8.2%) in 24h</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">&#129689;</div>
+                        <div class="stat-label">FUNS Balance</div>
+                        <div class="stat-value" id="funsBalance">1,840</div>
+                        <div class="stat-usd" id="funsBUSD">$1,472.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">&#128279;</div>
+                        <div class="stat-label">BNB Balance</div>
+                        <div class="stat-value" id="bnbBalance">2.45</div>
+                        <div class="stat-usd" id="bnbUSD">$1,029.40</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">&#128200;</div>
+                        <div class="stat-label">Staking Rewards</div>
+                        <div class="stat-value" id="stakingRewards">24.5</div>
+                        <div class="stat-usd" id="stakingUSD">$19.60</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">&#127912;</div>
+                        <div class="stat-label">NFTs Owned</div>
+                        <div class="stat-value" id="nftsCount">3</div>
+                        <div class="stat-usd" id="nftFloor">Floor: $2,400</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Two Column: Token Holdings & Recent Activity -->
+            <div class="dashboard-grid">
+                <!-- Token Holdings -->
+                <section class="token-holdings-section">
+                    <h2 class="section-title">Token Holdings</h2>
+                    <div class="token-list" id="tokenList">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Recent Activity -->
+                <section class="recent-activity-section">
+                    <h2 class="section-title">Recent Activity</h2>
+                    <div class="activity-list" id="activityList">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Staking Summary -->
+            <section class="staking-section">
+                <h2 class="section-title">Staking Summary</h2>
+                <div class="staking-grid" id="stakingGrid">
+                    <!-- Populated by JS -->
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions-section">
+                <h2 class="section-title">Quick Actions</h2>
+                <div class="actions-grid">
+                    <a href="../../dex/en.html" class="action-card">
+                        <div class="action-icon">&#9889;</div>
+                        <div class="action-title">Swap Tokens</div>
+                        <div class="action-description">Exchange tokens in DEX</div>
+                    </a>
+                    <a href="../staking/" class="action-card">
+                        <div class="action-icon">&#128204;</div>
+                        <div class="action-title">Stake FUNS</div>
+                        <div class="action-description">Earn rewards from staking</div>
+                    </a>
+                    <a href="../games/" class="action-card">
+                        <div class="action-icon">&#127918;</div>
+                        <div class="action-title">Play Games</div>
+                        <div class="action-description">Browse game ecosystem</div>
+                    </a>
+                    <a href="../nft/" class="action-card">
+                        <div class="action-icon">&#128444;&#65039;</div>
+                        <div class="action-title">NFT Market</div>
+                        <div class="action-description">Trade NFTs & collectibles</div>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // ── DATA ──
+        const tokenData = [
+            {
+                name: 'FUNS',
+                symbol: 'FUNS',
+                balance: '1,840',
+                balanceNum: 1840,
+                value: '$1,472.00',
+                change: '+12.5%',
+                changeNum: 12.5,
+                icon: '../../funs-nugi.png'
+            },
+            {
+                name: 'BNB',
+                symbol: 'BNB',
+                balance: '2.45',
+                balanceNum: 2.45,
+                value: '$1,029.40',
+                change: '+5.8%',
+                changeNum: 5.8,
+                icon: '../../dex/icons/bnb.svg'
+            },
+            {
+                name: 'USDT',
+                symbol: 'USDT',
+                balance: '450.50',
+                balanceNum: 450.50,
+                value: '$450.50',
+                change: '+0.2%',
+                changeNum: 0.2,
+                icon: '../../dex/icons/usdt.svg'
+            },
+            {
+                name: 'USDC',
+                symbol: 'USDC',
+                balance: '250.00',
+                balanceNum: 250,
+                value: '$250.00',
+                change: '+0.1%',
+                changeNum: 0.1,
+                icon: '../../dex/icons/usdc.svg'
+            },
+            {
+                name: 'CAKE',
+                symbol: 'CAKE',
+                balance: '15.25',
+                balanceNum: 15.25,
+                value: '$56.50',
+                change: '-2.3%',
+                changeNum: -2.3,
+                icon: '../../dex/icons/cake.svg'
+            }
+        ];
+
+        const activityData = [
+            {
+                time: '2 hours ago',
+                action: 'Swap',
+                details: '100 FUNS → 0.25 BNB',
+                amount: '+$209.50',
+                status: 'success'
+            },
+            {
+                time: '5 hours ago',
+                action: 'Stake',
+                details: 'Staked 200 FUNS',
+                amount: '-200 FUNS',
+                status: 'success'
+            },
+            {
+                time: '1 day ago',
+                action: 'Unstake',
+                details: 'Unstaked FUNS rewards',
+                amount: '+24.5 FUNS',
+                status: 'success'
+            },
+            {
+                time: '2 days ago',
+                action: 'Buy NFT',
+                details: 'Purchased Dream Avatar',
+                amount: '-0.5 BNB',
+                status: 'success'
+            },
+            {
+                time: '3 days ago',
+                action: 'Swap',
+                details: '500 USDT → FUNS',
+                amount: '+625 FUNS',
+                status: 'success'
+            }
+        ];
+
+        const stakingData = [
+            {
+                name: 'FUNS Pool',
+                staked: '120 FUNS',
+                apr: '8.5%',
+                rewards: '2.35 FUNS',
+                lockDays: 30,
+                totalDays: 30,
+                rewardsUSD: '$1.88'
+            },
+            {
+                name: 'BNB/FUNS LP',
+                staked: '0.5 BNB + 245 FUNS',
+                apr: '128%',
+                rewards: '1.85 BNB',
+                lockDays: 15,
+                totalDays: 30,
+                rewardsUSD: '$777.50'
+            }
+        ];
+
+        // ── WALLET CONNECTION ──
+        let walletConnected = false;
+
+        function checkWalletState() {
+            const btn = document.getElementById('walletBtn');
+            walletConnected = btn.classList.contains('connected');
+        }
+
+        // ── RENDER TOKEN LIST ──
+        function renderTokens() {
+            const tokenList = document.getElementById('tokenList');
+            tokenList.innerHTML = tokenData.map(token => `
+                <div class="token-row">
+                    <div class="token-info">
+                        <img src="${token.icon}" alt="${token.symbol}" class="token-icon">
+                        <div class="token-details">
+                            <div class="token-name">${token.name}</div>
+                            <div class="token-balance">${token.balance} ${token.symbol}</div>
+                        </div>
+                    </div>
+                    <div class="token-values">
+                        <div class="token-value">
+                            <div class="token-usd">${token.value}</div>
+                            <div class="token-change ${token.changeNum < 0 ? 'negative' : ''}">
+                                ${token.change}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ── RENDER ACTIVITY ──
+        function renderActivity() {
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = activityData.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-status"></div>
+                    <div class="activity-details">
+                        <div class="activity-time">${activity.time}</div>
+                        <div class="activity-action">${activity.action}</div>
+                        <div class="activity-description">${activity.details}</div>
+                    </div>
+                    <div class="activity-amount">
+                        <div class="activity-value">${activity.amount}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ── RENDER STAKING ──
+        function renderStaking() {
+            const stakingGrid = document.getElementById('stakingGrid');
+            stakingGrid.innerHTML = stakingData.map(stake => {
+                const progressPercent = (stake.lockDays / stake.totalDays) * 100;
+                return `
+                    <div class="stake-card">
+                        <div class="stake-header">
+                            <div class="stake-pool-name">${stake.name}</div>
+                            <div class="stake-apr">${stake.apr} APR</div>
+                        </div>
+                        <div class="stake-details">
+                            <div class="stake-detail-row">
+                                <span class="stake-detail-label">Staked:</span>
+                                <span class="stake-detail-value">${stake.staked}</span>
+                            </div>
+                            <div class="stake-detail-row">
+                                <span class="stake-detail-label">Pending Rewards:</span>
+                                <span class="stake-detail-value">${stake.rewards}</span>
+                            </div>
+                            <div class="stake-detail-row">
+                                <span class="stake-detail-label">Rewards Value:</span>
+                                <span class="stake-detail-value">${stake.rewardsUSD}</span>
+                            </div>
+                        </div>
+                        <div class="stake-progress">
+                            <div class="stake-progress-label">
+                                <span>Lock Period</span>
+                                <span>${stake.lockDays}/${stake.totalDays} days</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                            </div>
+                        </div>
+                        <button class="claim-btn" onclick="claimRewards('${stake.name}')">
+                            Claim Rewards
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ── CLAIM REWARDS HANDLER ──
+        function claimRewards(poolName) {
+            alert(`Claimed rewards from ${poolName}!`);
+        }
+
+        // ── INITIALIZE ──
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTokens();
+            renderActivity();
+            renderStaking();
+            checkWalletState();
+        });
+    </script>
+
+    <!-- Unified Wallet Connection -->
+    <script>
+    (function() {
+      const btn = document.getElementById('walletBtn');
+      if (!btn) return;
+
+      const saved = sessionStorage.getItem('funsPlatformWallet');
+      if (saved) {
+        btn.textContent = saved;
+        btn.classList.add('connected');
+      }
+
+      btn.addEventListener('click', function() {
+        if (btn.classList.contains('connected')) {
+          sessionStorage.removeItem('funsPlatformWallet');
+          btn.textContent = 'Connect Wallet';
+          btn.classList.remove('connected');
+        } else {
+          // Simulate wallet connection
+          const addr = '0x1a2B...3c4D';
+          sessionStorage.setItem('funsPlatformWallet', addr);
+          btn.textContent = addr;
+          btn.classList.add('connected');
+        }
+      });
+    })();
+    </script>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>FunS Platform</h3>
+                    <a href="../" class="footer-link">FunS Platform</a>
+                    <a href="../../dex/en.html" class="footer-link">DEX</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <a href="../games/" class="footer-link">Games</a>
+                    <a href="../staking/" class="footer-link">Staking</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 FunS Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+<!-- TEST VERSION MODAL -->
+<div id="test-version-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;" onclick="this.style.display='none'">
+  <img src="../../funs-nugi.png" alt="FunS Logo" style="width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(255,107,53,0.5));animation:tvFloat 2s ease-in-out infinite;">
+  <div style="font-family:'Orbitron',monospace;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900;background:linear-gradient(135deg,#FF6B35,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;">TEST VERSION</div>
+  <p style="color:rgba(255,255,255,0.7);font-size:1rem;text-align:center;max-width:400px;line-height:1.6;">This is currently a test version.<br>Stay tuned for the official launch!</p>
+  <style>@keyframes tvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var btns=document.querySelectorAll('[class*="wallet"],[id*="wallet"],[class*="connect"],[id*="connect"],[class*="swap-btn"]');
+  btns.forEach(function(b){
+    if(b.tagName==='BUTTON'||b.tagName==='A'){
+      b.addEventListener('click',function(e){
+        e.preventDefault();e.stopPropagation();
+        document.getElementById('test-version-modal').style.display='flex';
+      });
+    }
+  });
+});
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,2573 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>FunS Wallet</title>
+    <!-- Disable Google Translate (TWA) -->
+    <meta name="google" content="notranslate">
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6B35">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FunS Wallet">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-192.png">
+    <!-- iOS Splash Screens -->
+    <link rel="apple-touch-startup-image" href="./icons/splash.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="./icons/splash.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="./icons/splash.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="./icons/splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="./icons/splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="./icons/splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: https:; frame-src *; frame-ancestors 'none'; base-uri 'self';">
+    <script>
+    // Force clear old service worker caches on load (v43)
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          if (name !== 'funs-wallet-v45') caches.delete(name);
+        });
+      });
+    }
+    </script>
+    <meta name="description" content="FunS Wallet - Secure Multi-Chain Wallet">
+    <meta property="og:title" content="FunS Wallet">
+    <meta property="og:image" content="https://funs.world/funs-nugi.png">
+    <link rel="canonical" href="https://funs.world/wallet/app/">
+    <link rel="alternate" hreflang="ko" href="https://funs.world/wallet/app/">
+    <link rel="alternate" hreflang="en" href="https://funs.world/en/wallet/app/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" integrity="sha384-Izc791esqyEy3BEIC42q7jbE0AaOkACziN+dyyXgYeDmpeMCLz0xA+xYN3aCd5zz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        /* ============================================
+           FUNS WALLET - OKX-STYLE APP UI
+           Mobile-first native app experience
+           ============================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #070A12;
+            --bg2: #0C1020;
+            --bg3: #121929;
+            --card: #141B2D;
+            --card-hover: #1B2438;
+            --border: rgba(255,255,255,0.05);
+            --border-light: rgba(255,255,255,0.09);
+            --text: #FFFFFF;
+            --text2: rgba(255,255,255,0.87);
+            --text3: rgba(255,255,255,0.65);
+            --text4: rgba(255,255,255,0.45);
+            --primary: #FF6B35;
+            --primary-gradient: linear-gradient(135deg, #FF6B35 0%, #FF9500 100%);
+            --primary-dim: rgba(255,107,53,0.15);
+            --secondary: #FFD700;
+            --accent: #4FC3F7;
+            --green: #00D18C;
+            --green-dim: rgba(0,209,140,0.12);
+            --red: #FF4466;
+            --red-dim: rgba(255,68,102,0.12);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --tab-height: 64px;
+        }
+
+        body.light-mode {
+            --bg: #F0F2F8;
+            --bg2: #E4E8F0;
+            --bg3: #D8DCE8;
+            --card: #FFFFFF;
+            --card-hover: #F5F7FC;
+            --border: rgba(0,0,0,0.08);
+            --border-light: rgba(0,0,0,0.12);
+            --text: #111827;
+            --text2: rgba(0,0,0,0.87);
+            --text3: rgba(0,0,0,0.60);
+            --text4: rgba(0,0,0,0.50);
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.55;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button, .tab-bar-item, .action-item, .onboarding-btn,
+        .token-item, .dapp-item, .settings-item, .tx-item, .verify-word-option {
+            touch-action: manipulation;
+        }
+
+        /* App Shell */
+        .app-shell {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: var(--bg);
+        }
+
+        @media (min-width: 481px) {
+            body { background: #050810; }
+            .app-shell {
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+                box-shadow: 0 0 80px rgba(255,107,53,0.05);
+            }
+        }
+
+        /* ===== APP HEADER ===== */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            padding: calc(var(--safe-top) + 8px) 20px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-logo { width: 32px; height: 32px; border-radius: 50%; }
+        .header-title { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; }
+        .header-right { display: flex; align-items: center; gap: 4px; }
+        .header-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: none; border: none; color: var(--text3);
+            font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .header-btn:hover { background: rgba(128,128,128,0.1); color: var(--text2); }
+        .header-btn:active { background: rgba(128,128,128,0.15); color: var(--text); }
+
+        /* Lang pill */
+        .lang-pill { display: flex; gap: 2px; background: rgba(128,128,128,0.08); border-radius: 8px; padding: 2px; }
+        .lang-quick-btn { background: transparent; color: var(--text3); transition: color 0.2s, background 0.2s; }
+        .lang-quick-btn:hover { color: var(--text2); background: rgba(128,128,128,0.1); }
+        .lang-quick-btn.lang-active { background: var(--primary) !important; color: white !important; }
+        .lang-pill a {
+            padding: 6px 12px; border-radius: 6px; font-size: 12px;
+            color: var(--text4); text-decoration: none; font-weight: 500;
+        }
+        .lang-pill a.active { background: var(--primary); color: white; }
+
+        /* ===== MAIN CONTENT ===== */
+        .app-content {
+            padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 16px);
+        }
+        .tab-page { display: none; }
+        .tab-page.active { display: block; animation: tabEnter 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94); contain: layout style paint; }
+        @keyframes tabEnter {
+            from { opacity: 0; transform: translateY(10px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ===== PORTFOLIO CARD ===== */
+        .portfolio-card {
+            margin: 0 16px 20px; padding: 28px 24px 24px;
+            background: linear-gradient(145deg, rgba(26,34,64,0.97) 0%, rgba(12,16,32,0.99) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255,107,53,0.12);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            position: relative; overflow: hidden;
+        }
+        body.light-mode .portfolio-card {
+            background: linear-gradient(145deg, #1e2a4a 0%, #0f1628 100%);
+        }
+        .portfolio-card::before {
+            content: ''; position: absolute; top: -50%; right: -30%;
+            width: 240px; height: 240px;
+            background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .portfolio-card::after {
+            content: ''; position: absolute; bottom: -40%; left: -20%;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(255,149,0,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .network-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px; padding: 0 0 0 10px; font-size: 13px;
+            color: var(--text3); cursor: pointer; margin-bottom: 20px;
+            position: relative;
+        }
+        .network-chip .network-current {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: none; color: var(--text3);
+            font-size: 13px; padding: 6px 14px; cursor: pointer;
+            font-family: inherit;
+        }
+        .network-chip .network-current::after {
+            content: '▼'; font-size: 10px; margin-left: 2px;
+        }
+        .network-chip .network-dropdown {
+            display: none; position: absolute; top: 100%; left: 0;
+            min-width: 160px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 4px; margin-top: 4px; z-index: 100;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .network-chip.open .network-dropdown { display: block; }
+        .network-chip .network-option {
+            display: block; width: 100%; text-align: left;
+            background: none; border: none; color: var(--text3);
+            font-size: 13px; padding: 8px 12px; border-radius: 8px;
+            cursor: pointer; font-family: inherit;
+        }
+        .network-chip .network-option:hover { background: rgba(255,255,255,0.06); }
+        .network-chip .network-option.active { color: var(--primary); font-weight: 600; }
+        .network-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+        .portfolio-label { font-size: 13px; color: var(--text3); margin-bottom: 6px; }
+        .portfolio-balance {
+            font-family: 'Orbitron', monospace; font-size: 34px; font-weight: 900;
+            color: var(--text); letter-spacing: -1px; margin-bottom: 8px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .portfolio-change {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 14px; font-weight: 600; padding: 4px 10px; border-radius: 8px;
+        }
+        .portfolio-change.up { color: var(--green); background: var(--green-dim); }
+        .portfolio-change.down { color: var(--red); background: var(--red-dim); }
+        .address-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);
+        }
+        .address-text { font-family: 'Orbitron', monospace; font-size: 12px; color: var(--text4); flex: 1; }
+        .copy-address-btn {
+            width: 44px; height: 44px; border-radius: 8px;
+            background: rgba(255,255,255,0.06); border: none;
+            color: var(--text3); font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .copy-address-btn:hover { background: rgba(255,255,255,0.12); color: var(--text2); }
+        .copy-address-btn:active { background: rgba(255,255,255,0.16); }
+
+        /* ===== ACTION BUTTONS ===== */
+        .actions-row { display: flex; justify-content: center; gap: 24px; padding: 0 20px 24px; }
+        .action-item {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            background: none; border: none; padding: 0;
+        }
+        .action-circle {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: var(--primary-gradient); display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: white; transition: transform 0.15s;
+            box-shadow: 0 6px 24px rgba(255,107,53,0.45), 0 2px 8px rgba(0,0,0,0.3);
+            will-change: transform;
+        }
+        .action-circle.blue { background: var(--accent); box-shadow: 0 4px 16px rgba(79,195,247,0.3); }
+        .action-circle.gold { background: linear-gradient(135deg, #FFD700, #FF9800); box-shadow: 0 4px 16px rgba(255,215,0,0.3); }
+        .action-circle.green { background: var(--green); box-shadow: 0 4px 16px rgba(0,209,140,0.3); }
+        .action-item:hover .action-circle { transform: scale(1.06); }
+        .action-item:active .action-circle { transform: scale(0.92); }
+        .action-label { font-size: 12px; color: var(--text3); font-weight: 500; }
+
+        /* ===== SECTION HEADERS ===== */
+        .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 12px; }
+        .section-title {
+            font-size: 16px; font-weight: 700; color: var(--text2); letter-spacing: 0.3px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title::before {
+            content: ''; display: inline-block;
+            width: 3px; height: 14px;
+            background: var(--primary); border-radius: 2px; flex-shrink: 0;
+        }
+        .section-action { font-size: 13px; color: var(--text4); background: none; border: none; cursor: pointer; padding: 8px; min-height: 44px; transition: color 0.2s; }
+        .section-action:hover { color: var(--primary); }
+
+        /* ===== TOKEN LIST ===== */
+        .token-list { padding: 0 16px 8px; }
+        .token-search-input {
+            width: 100%; box-sizing: border-box;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 10px 14px;
+            color: var(--text); font-size: 14px;
+            outline: none; transition: border-color 0.2s;
+        }
+        .token-search-input:focus { border-color: var(--primary); }
+        .token-search-input::placeholder { color: var(--text4); }
+
+        /* ===== FOCUS INDICATORS ===== */
+        *:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        .tab-bar-item:focus-visible { outline-offset: -2px; border-radius: 12px; }
+        .toggle input:focus-visible + .toggle-track { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 14px; }
+
+        /* ===== RTL SUPPORT (Arabic) ===== */
+        [dir="rtl"] .address-row { flex-direction: row-reverse; }
+        [dir="rtl"] .action-label { direction: rtl; }
+        [dir="rtl"] .token-item { flex-direction: row-reverse; }
+        [dir="rtl"] .token-info { text-align: right; }
+        [dir="rtl"] .token-value { text-align: left; }
+        [dir="rtl"] .settings-item-left { flex-direction: row-reverse; }
+        [dir="rtl"] .settings-item { flex-direction: row-reverse; }
+        [dir="rtl"] .sheet-header { flex-direction: row-reverse; }
+        [dir="rtl"] .form-label { text-align: right; display: block; }
+        [dir="rtl"] .tx-item { flex-direction: row-reverse; }
+        [dir="rtl"] .tx-info { text-align: right; }
+        [dir="rtl"] .tx-amount { text-align: left; }
+        [dir="rtl"] .tab-bar { direction: rtl; }
+        [dir="rtl"] .network-chip { flex-direction: row-reverse; }
+        [dir="rtl"] .app-header { flex-direction: row-reverse; }
+        [dir="rtl"] .section-header { flex-direction: row-reverse; }
+
+        /* ===== SKELETON LOADING ===== */
+        @keyframes skeleton-shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .skeleton-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 4px; border-bottom: 1px solid var(--border);
+        }
+        .skeleton-item:last-child { border-bottom: none; }
+        .skeleton-pulse {
+            background: linear-gradient(90deg, var(--bg3) 25%, var(--card-hover) 50%, var(--bg3) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.5s infinite;
+            border-radius: 6px;
+        }
+        .skeleton-icon { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+        .skeleton-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .skeleton-name { height: 14px; width: 70px; }
+        .skeleton-balance { height: 12px; width: 100px; }
+        .skeleton-value { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .skeleton-usd { height: 14px; width: 60px; }
+        .skeleton-change { height: 12px; width: 40px; }
+
+        .token-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 12px; margin-bottom: 4px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .token-item:hover { background: var(--card-hover); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 12px rgba(0,0,0,0.2); }
+        .token-item:active { background: var(--card-hover); transform: scale(0.98); }
+        .token-icon {
+            width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            background: var(--bg3);
+        }
+        .token-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .token-icon-fallback {
+            display: none; width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B35, #FF8C52);
+            align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700; color: #fff;
+        }
+        .token-info { flex: 1; min-width: 0; }
+        .token-details { display: flex; flex-direction: column; gap: 2px; }
+        .token-name { font-size: 15px; font-weight: 700; color: var(--text); }
+        .token-subtitle { font-size: 12px; color: var(--text4); letter-spacing: 0.3px; }
+        .token-values { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+        .token-balance { font-size: 15px; font-weight: 600; color: var(--text); font-family: 'Orbitron', monospace; }
+        .token-usd { font-size: 13px; color: var(--text3); }
+        .token-change-badge { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; }
+        .token-change-badge.up { color: var(--green); background: var(--green-dim); }
+        .token-change-badge.down { color: var(--red); background: var(--red-dim); }
+
+        /* ===== CHART CARD ===== */
+        .chart-card {
+            margin: 20px 16px; padding: 16px 16px 12px;
+            background: var(--card); border-radius: 16px; border: 1px solid var(--border);
+        }
+        .chart-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .chart-token-info { display: flex; align-items: center; gap: 8px; }
+        .chart-token-icon { width: 28px; height: 28px; border-radius: 50%; }
+        .chart-token-name { font-size: 15px; font-weight: 700; }
+        .chart-price { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; color: var(--text2); }
+        .time-range { display: flex; gap: 2px; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 3px; }
+        .time-btn {
+            padding: 6px 12px; border: none; background: none;
+            color: var(--text4); font-size: 12px; font-weight: 600;
+            border-radius: 8px; cursor: pointer;
+        }
+        .time-btn.active { background: var(--primary); color: white; }
+        .chart-area { height: 160px; position: relative; }
+        .chart-svg { width: 100%; height: 100%; }
+        .chart-stats { display: flex; gap: 20px; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 10px; }
+        .chart-stat { display: flex; flex-direction: column; gap: 2px; }
+        .chart-stat-label { font-size: 11px; color: var(--text4); text-transform: uppercase; letter-spacing: 0.5px; }
+        .chart-stat-value { font-size: 13px; font-weight: 600; color: var(--text2); font-family: 'Orbitron', monospace; }
+
+        /* ===== TRANSACTIONS ===== */
+        .tx-filters {
+            display: flex; gap: 8px; padding: 0 16px; margin-bottom: 12px;
+            overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        }
+        .tx-filters::-webkit-scrollbar { display: none; }
+        .tx-filter-chip {
+            padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border-light);
+            background: none; color: var(--text3); font-size: 13px; font-weight: 500;
+            cursor: pointer; white-space: nowrap; transition: all 0.2s; min-height: 44px;
+        }
+        .tx-filter-chip:hover { border-color: rgba(255,255,255,0.2); color: var(--text2); background: rgba(255,255,255,0.04); }
+        .tx-filter-chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .tx-list { padding: 0 16px; }
+        .tx-item { display: flex; align-items: center; gap: 12px; padding: 14px 4px; border-bottom: 1px solid var(--border); }
+        .tx-item:last-child { border-bottom: none; }
+        .tx-icon-wrap {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .tx-icon-wrap.send { background: var(--red-dim); color: var(--red); }
+        .tx-icon-wrap.receive { background: var(--green-dim); color: var(--green); }
+        .tx-icon-wrap.swap { background: rgba(79,195,247,0.12); color: var(--accent); }
+        .tx-info { flex: 1; }
+        .tx-title { font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 2px; }
+        .tx-time { font-size: 12px; color: var(--text4); }
+        .tx-right { text-align: right; }
+        .tx-amount { font-size: 14px; font-weight: 600; font-family: 'Orbitron', monospace; margin-bottom: 2px; }
+        .tx-amount.negative { color: var(--red); }
+        .tx-amount.positive { color: var(--green); }
+        .tx-status { font-size: 11px; color: var(--text4); }
+        .tx-status.completed { color: var(--green); }
+        .tx-status.pending { color: var(--secondary); }
+
+        /* ===== DeFi TAB ===== */
+        .defi-card {
+            margin: 8px 16px; padding: 18px; background: var(--card);
+            border-radius: 16px; border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 14px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .defi-card:hover { background: var(--card-hover); }
+        .defi-card:active { background: var(--card-hover); }
+        .defi-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .defi-info { flex: 1; }
+        .defi-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .defi-desc { font-size: 13px; color: var(--text4); }
+        .defi-apy { text-align: right; }
+        .defi-apy-value { font-size: 16px; font-weight: 700; color: var(--green); font-family: 'Orbitron', monospace; }
+        .defi-apy-label { font-size: 11px; color: var(--text4); }
+
+        /* DApp List */
+        .dapp-list { padding: 0 16px; }
+        .dapp-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .dapp-item:hover { background: rgba(255,255,255,0.03); }
+        .dapp-item:last-child { border-bottom: none; }
+        .dapp-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; background: linear-gradient(135deg, var(--primary-dim), rgba(79,195,247,0.1));
+            border: 1px solid var(--border-light); flex-shrink: 0;
+        }
+        .dapp-info { flex: 1; }
+        .dapp-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .dapp-desc { font-size: 13px; color: var(--text4); }
+        .dapp-arrow { color: var(--text4); font-size: 16px; }
+
+        /* ===== NFT TAB ===== */
+        .nft-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 16px; }
+        .nft-card {
+            background: var(--card); border-radius: 16px; overflow: hidden;
+            border: 1px solid var(--border); cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .nft-card:hover { border-color: var(--border-light); transform: scale(1.02); }
+        .nft-card:active { transform: scale(0.97); }
+        .nft-img {
+            width: 100%; aspect-ratio: 1; background: var(--bg2);
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .nft-img img { width: 100%; height: 100%; object-fit: cover; }
+        .nft-meta { padding: 12px; }
+        .nft-name { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nft-collection { font-size: 11px; color: var(--text4); margin-bottom: 6px; }
+        .nft-price { font-size: 13px; font-weight: 700; color: var(--primary); font-family: 'Orbitron', monospace; }
+
+        /* ===== SETTINGS TAB ===== */
+        .settings-list { padding: 0 16px; }
+        .settings-group { margin-bottom: 24px; }
+        .settings-group-title {
+            font-size: 12px; color: var(--primary); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; padding: 0 4px; margin-bottom: 10px;
+        }
+        .settings-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px; background: var(--card); border-radius: 14px;
+            margin-bottom: 6px; cursor: pointer; border: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        .settings-item:hover { background: var(--card-hover); }
+        .settings-item:active { background: var(--card-hover); }
+        .settings-item-left { display: flex; align-items: center; gap: 12px; }
+        .settings-item-icon { font-size: 18px; width: 20px; text-align: center; }
+        .settings-item-label { font-size: 15px; font-weight: 500; }
+        .settings-item-desc { font-size: 12px; color: var(--text4); margin-top: 2px; }
+        .settings-item-right { display: flex; align-items: center; gap: 6px; color: var(--text4); font-size: 13px; }
+
+        /* Toggle */
+        .toggle { position: relative; width: 48px; height: 28px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-track {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.15); border-radius: 28px; transition: 0.3s;
+        }
+        .toggle-track:before {
+            content: ''; position: absolute; height: 22px; width: 22px;
+            left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s;
+        }
+        .toggle input:checked + .toggle-track { background: var(--primary); }
+        .toggle input:checked + .toggle-track:before { transform: translateX(20px); }
+        .toggle input:disabled + .toggle-track { opacity: 0.4; cursor: not-allowed; }
+        body.light-mode .toggle-track { background: rgba(0,0,0,0.25); border: 1px solid rgba(0,0,0,0.15); }
+        body.light-mode .toggle-track:before { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        body.light-mode .toggle input:checked + .toggle-track { border-color: transparent; }
+
+        /* Custom Token */
+        .add-token-btn {
+            width: 100%; padding: 14px; background: var(--primary-dim);
+            border: 1px dashed rgba(255,107,53,0.3); color: var(--primary);
+            border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600;
+        }
+        .custom-token-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px; background: var(--card); border-radius: 12px;
+            margin-bottom: 6px; border: 1px solid var(--border);
+        }
+        .ct-info { display: flex; flex-direction: column; gap: 1px; }
+        .ct-symbol { font-size: 14px; font-weight: 700; color: var(--secondary); font-family: 'Orbitron', monospace; }
+        .ct-name { font-size: 12px; color: var(--text3); }
+        .ct-addr { font-size: 11px; color: var(--text4); font-family: monospace; }
+        .ct-remove {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--red-dim); border: none; color: var(--red);
+            font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ===== BOTTOM TAB BAR (OKX Style) ===== */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px;
+            height: calc(var(--tab-height) + var(--safe-bottom));
+            padding-bottom: var(--safe-bottom);
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -1px 0 0 rgba(255,107,53,0.15), 0 -8px 24px rgba(255,107,53,0.06);
+            display: flex; z-index: 200;
+        }
+        .tab-bar-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 4px; background: none; border: none;
+            color: var(--text4); font-size: 10px; font-weight: 500; letter-spacing: 0.2px;
+            cursor: pointer; padding: 6px 0; -webkit-tap-highlight-color: transparent;
+            position: relative; transition: color 0.2s;
+        }
+        .tab-bar-item .tab-icon {
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s;
+            will-change: transform;
+        }
+        .tab-bar-item .tab-icon svg { width: 24px; height: 24px; }
+        .tab-bar-item .tab-icon .icon-filled { display: none; }
+        .tab-bar-item .tab-icon .icon-outline { display: block; }
+
+        .tab-bar-item.active {
+            color: var(--primary);
+        }
+        .tab-bar-item.active .tab-icon .icon-filled { display: block; }
+        .tab-bar-item.active .tab-icon .icon-outline { display: none; }
+        .tab-bar-item.active .tab-icon { transform: scale(1.08); }
+        .tab-bar-item.active { font-weight: 600; }
+        .tab-bar-item::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+            box-shadow: 0 0 8px rgba(255,107,53,0.5);
+            transition: width 0.2s ease;
+        }
+        .tab-bar-item.active::before {
+            width: 24px;
+        }
+        .tab-bar-item:active .tab-icon { transform: scale(0.9); }
+
+        /* Center Swap Tab - Elevated */
+        .tab-bar-item.swap-tab .tab-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary) 0%, #FF8C52 100%);
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.4);
+            margin-top: -14px;
+        }
+        .tab-bar-item.swap-tab .tab-icon svg { width: 22px; height: 22px; }
+        .tab-bar-item.swap-tab .tab-icon .icon-outline,
+        .tab-bar-item.swap-tab .tab-icon .icon-filled { display: block; }
+        .tab-bar-item.swap-tab.active .tab-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, #FF8C52 100%);
+            box-shadow: 0 4px 24px rgba(255,107,53,0.5);
+        }
+        .tab-bar-item.swap-tab.active::before { display: none; }
+        .tab-bar-item.swap-tab:active .tab-icon { transform: scale(0.92); }
+
+        /* ===== BOTTOM SHEET MODALS ===== */
+        .bottom-sheet-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            z-index: 500;
+        }
+        .bottom-sheet-overlay.active { display: flex; align-items: flex-end; justify-content: center; }
+        .bottom-sheet {
+            width: 100%; max-width: 480px;
+            background: linear-gradient(180deg, #141b2d 0%, #0c1020 100%);
+            border-radius: 24px 24px 0 0;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            border-left: 1px solid rgba(255,255,255,0.04);
+            border-right: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 -4px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+            padding: 0 0 calc(var(--safe-bottom) + 16px);
+            max-height: 90vh; overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+        @supports (backdrop-filter: blur(1px)) {
+            .bottom-sheet { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); background: linear-gradient(180deg, rgba(20,27,45,0.97) 0%, rgba(12,16,32,0.99) 100%); }
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sheet-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 12px auto 8px; }
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px 16px; }
+        .sheet-title { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; }
+        .sheet-close {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); border: none; color: var(--text3);
+            font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sheet-close:hover { background: rgba(255,255,255,0.14); color: var(--text); }
+        .sheet-body { padding: 0 20px; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 13px; color: var(--text3); font-weight: 500; margin-bottom: 8px; }
+        .form-input {
+            width: 100%; padding: 14px 16px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-light);
+            border-radius: 14px; color: var(--text); font-size: 16px;
+            font-family: 'Noto Sans KR', sans-serif; outline: none; -webkit-appearance: none;
+        }
+        .form-input:focus { border-color: var(--primary); }
+        .form-input::placeholder { color: var(--text4); }
+        .form-input option { background: var(--card); color: var(--text); }
+        .form-btn {
+            width: 100%; padding: 16px; background: var(--primary); color: white;
+            border: none; border-radius: 14px; font-size: 16px; font-weight: 700;
+            cursor: pointer; margin-top: 8px; transition: opacity 0.2s, transform 0.15s;
+        }
+        .form-btn:hover { opacity: 0.9; }
+        .form-btn:active { opacity: 0.85; transform: scale(0.99); }
+        .form-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .form-btn-secondary { background: rgba(255,255,255,0.08); color: var(--text2); }
+
+        /* Send Token Picker */
+        .send-token-picker { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+        .send-token-card {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; border-radius: 14px;
+            background: rgba(255,255,255,0.04); border: 1.5px solid var(--border-light);
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.12s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .send-token-card:active { transform: scale(0.98); }
+        .send-token-card.selected {
+            background: rgba(255,165,0,0.1); border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+        .send-token-card .stc-icon {
+            width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; background: var(--bg3);
+        }
+        .send-token-card .stc-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .send-token-card .stc-icon-fallback {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, #FF6B35, #FF8C52);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .send-token-card .stc-info { flex: 1; min-width: 0; }
+        .send-token-card .stc-symbol { font-size: 15px; font-weight: 700; color: var(--text); }
+        .send-token-card .stc-name { font-size: 12px; color: var(--text4); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .send-token-card .stc-balance { text-align: right; flex-shrink: 0; }
+        .send-token-card .stc-bal-amount { font-size: 14px; font-weight: 600; color: var(--text); font-family: 'Orbitron', monospace; }
+        .send-token-card .stc-bal-usd { font-size: 11px; color: var(--text4); margin-top: 1px; }
+        .send-token-card .stc-check {
+            width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-left: 4px;
+            border: 1.5px solid var(--border-light); display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .send-token-card.selected .stc-check {
+            background: var(--primary); border-color: var(--primary);
+        }
+        .send-token-card .stc-check svg { display: none; }
+        .send-token-card.selected .stc-check svg { display: block; }
+
+        /* QR */
+        .qr-section { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        .qr-box { background: white; padding: 16px; border-radius: 16px; margin-bottom: 20px; }
+        .qr-address {
+            background: rgba(255,255,255,0.05); padding: 14px; border-radius: 12px;
+            font-family: 'Orbitron', monospace; font-size: 12px; word-break: break-all;
+            color: var(--accent); text-align: center; width: 100%;
+        }
+
+        .swap-divider { display: flex; align-items: center; justify-content: center; padding: 8px 0; }
+        .swap-arrow {
+            width: 44px; height: 44px; border-radius: 50%; background: var(--primary);
+            color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer;
+        }
+
+        .token-loading { color: var(--accent); font-size: 13px; margin-top: 6px; animation: pulse 1.5s ease infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+        /* Token Select with Icon */
+        .token-select-wrap {
+            position: relative;
+        }
+        .token-select-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .token-select {
+            padding-left: 44px !important;
+        }
+
+        /* ============================================
+           WALLET FLOWS (Onboarding / Import / PIN)
+           Generated dynamically by wallet-ui.js
+           ============================================ */
+
+        /* Base overlay for all flows */
+        .onboarding-overlay,
+        .pin-entry-overlay,
+        .pin-confirmation-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 9999;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .onboarding-container,
+        .pin-entry-container,
+        .pin-confirmation-container {
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            margin: auto 0;
+            padding-bottom: 40px;
+        }
+
+        .onboarding-header,
+        .pin-entry-header,
+        .pin-confirmation-header {
+            margin-bottom: 10px;
+        }
+
+        .onboarding-header h1,
+        .pin-entry-header h1,
+        .pin-confirmation-header h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .onboarding-header p,
+        .pin-entry-header p,
+        .pin-confirmation-header p {
+            color: var(--text3);
+            font-size: 14px;
+        }
+
+        .onboarding-logo {
+            margin-bottom: 8px;
+        }
+
+        /* Onboarding options */
+        .onboarding-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .onboarding-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 18px 20px;
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .onboarding-btn:hover {
+            background: var(--card-hover);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .onboarding-btn:active {
+            background: var(--card-hover);
+            transform: scale(0.98);
+        }
+
+        .onboarding-btn .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--primary-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* ===== Seed Phrase Premium Design ===== */
+        .seed-security-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(255,59,48,0.12), rgba(255,149,0,0.08));
+            border: 1px solid rgba(255,59,48,0.25);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .seed-security-banner .security-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,59,48,0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .seed-security-banner .security-text {
+            flex: 1;
+        }
+        .seed-security-banner .security-text h4 {
+            margin: 0 0 4px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .seed-security-banner .security-text p {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text3);
+        }
+        .seed-step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .seed-step {
+            width: 32px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            transition: all 0.3s ease;
+        }
+        .seed-step.active {
+            background: var(--primary);
+            width: 48px;
+        }
+        .seed-step.completed {
+            background: var(--green);
+        }
+        .mnemonic-reveal-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .mnemonic-blur-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 2;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            border-radius: 20px;
+        }
+        .mnemonic-blur-overlay.revealed {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .mnemonic-blur-overlay .reveal-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .mnemonic-blur-overlay .reveal-text {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .mnemonic-blur-overlay .reveal-hint {
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+        }
+        .mnemonic-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            padding: 10px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 0;
+        }
+        .mnemonic-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .mnemonic-item:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.06);
+        }
+        .word-number {
+            font-size: 10px;
+            color: var(--primary);
+            font-weight: 800;
+            min-width: 18px;
+            text-align: center;
+            opacity: 0.7;
+        }
+        .word-text {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 600;
+            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+            letter-spacing: 0.3px;
+        }
+        .seed-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .seed-action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text2);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .seed-action-btn:hover { background: rgba(255,255,255,0.08); }
+        .seed-action-btn:active {
+            transform: scale(0.97);
+            background: rgba(255,255,255,0.08);
+        }
+        .seed-action-btn .action-icon {
+            font-size: 16px;
+        }
+        .seed-action-btn.copied {
+            background: rgba(52,199,89,0.12);
+            border-color: rgba(52,199,89,0.3);
+            color: #34c759;
+        }
+        .seed-checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+        .seed-check-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            padding: 6px 4px;
+            border-radius: 10px;
+            transition: background 0.15s;
+        }
+        .seed-check-item:hover {
+            background: rgba(255,107,53,0.08);
+        }
+        .seed-check-item:focus-within {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        .seed-check-item .check-box {
+            width: 26px;
+            height: 26px;
+            border: 2px solid var(--primary);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: transparent;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            background: rgba(255,107,53,0.08);
+        }
+        .seed-check-item:hover .check-box {
+            border-color: var(--primary);
+            background: rgba(255,107,53,0.1);
+        }
+        .seed-check-item.checked .check-box {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 8px rgba(255,107,53,0.45);
+        }
+        .seed-check-item .check-label {
+            font-size: 13px;
+            color: var(--text2);
+            line-height: 1.4;
+        }
+        .seed-check-item.checked .check-label {
+            color: var(--text);
+        }
+
+        /* Mnemonic Verification - Word Selection */
+        .verify-prompt {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .verify-prompt h3 {
+            font-size: 16px;
+            color: var(--text);
+            margin: 0 0 6px;
+            font-weight: 700;
+        }
+        .verify-prompt p {
+            font-size: 13px;
+            color: var(--text3);
+            margin: 0;
+        }
+        .verify-word-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 8px;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            margin: 0 4px;
+        }
+        .verify-word-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .verify-word-option {
+            padding: 14px 10px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+        }
+        .verify-word-option:active {
+            transform: scale(0.96);
+        }
+        .verify-word-option.selected {
+            background: var(--primary-dim);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .verify-word-option.correct {
+            background: var(--green-dim);
+            border-color: var(--green);
+            color: var(--green);
+        }
+        .verify-word-option.wrong {
+            background: var(--red-dim);
+            border-color: var(--red);
+            color: var(--red);
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .verify-progress {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .verify-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s;
+        }
+        .verify-dot.correct {
+            background: #34c759;
+        }
+        .verify-dot.current {
+            background: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255,107,53,0.2);
+        }
+
+        /* Warning overlay for mnemonic */
+        .mnemonic-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 14px 16px;
+            background: rgba(255,107,53,0.08);
+            border: 1px solid rgba(255,107,53,0.2);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .mnemonic-warning .warning-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+        .mnemonic-warning p { color: var(--text3); font-size: 13px; line-height: 1.5; margin: 0; }
+
+        /* Import options */
+        .import-options {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .import-option-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            background: none;
+            color: var(--text3);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .import-option-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .mnemonic-inputs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .mnemonic-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            text-align: center;
+            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+        }
+        .mnemonic-input:focus { border-color: var(--primary); }
+        .mnemonic-input::placeholder { color: var(--text4); font-size: 13px; }
+        .import-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            resize: vertical;
+            margin-bottom: 20px;
+            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+            line-height: 1.6;
+        }
+        .import-textarea:focus { border-color: var(--primary); }
+
+        /* Confirmation styles */
+        .confirmation-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .confirmation-item { text-align: left; }
+        .confirmation-item label {
+            display: block;
+            font-size: 13px;
+            color: var(--text3);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .confirmation-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+        }
+        .confirmation-input:focus { border-color: var(--primary); }
+        .import-textarea::placeholder { color: var(--text4); }
+
+        /* PIN Display */
+        .pin-display {
+            margin-bottom: 24px;
+            width: 100%;
+        }
+        .pin-keyboard-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        .pin-keyboard-input {
+            width: 100%;
+            padding: 14px 48px 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            color: var(--primary);
+            font-size: 22px;
+            text-align: center;
+            letter-spacing: 6px;
+            outline: none;
+            font-family: 'Orbitron', monospace;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .pin-keyboard-input:focus {
+            border-color: var(--accent, #6c63ff);
+        }
+        .pin-keyboard-input::placeholder {
+            letter-spacing: 4px;
+            font-size: 18px;
+            color: rgba(255,255,255,0.2);
+        }
+        .pin-toggle-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            transition: color 0.15s;
+        }
+        .pin-toggle-btn:hover { color: rgba(255,255,255,0.8); }
+        .pin-toggle-btn svg { width: 20px; height: 20px; }
+        .pin-display.shake {
+            animation: pinShake 0.4s ease;
+        }
+        @keyframes pinShake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* PIN Error */
+        .pin-error {
+            color: var(--red);
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(11,14,23,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            border-radius: 16px;
+            z-index: 10;
+        }
+        .loading-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            color: var(--text3);
+            font-size: 14px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            min-width: 200px;
+            max-width: calc(100vw - 40px);
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .toast-success, .toast.success { background: rgba(0,209,140,0.95); color: white; border: 1px solid rgba(0,209,140,0.4); }
+        .toast-error, .toast.error { background: rgba(255,68,102,0.95); color: white; border: 1px solid rgba(255,68,102,0.4); }
+        .toast-info { background: rgba(79,195,247,0.95); color: white; border: 1px solid rgba(79,195,247,0.4); }
+        .toast-warning { background: rgba(255,178,0,0.95); color: #111; border: 1px solid rgba(255,178,0,0.4); }
+        .toast-icon { font-size: 16px; flex-shrink: 0; }
+        .toast-message { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Loader overlay (used by showLoading()) */
+        .loader-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(11,14,23,0.85);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: inherit;
+            z-index: 20;
+        }
+        .loader-content { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .loader-content p { color: var(--text3); font-size: 13px; }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Transaction Confirmation Modal */
+        .confirmation-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .confirmation-content {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid var(--border-light);
+        }
+        .confirmation-content h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .confirmation-details { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .detail-row span { color: var(--text3); }
+        .detail-row strong { color: var(--text); font-weight: 600; text-align: right; max-width: 60%; word-break: break-all; }
+        .confirmation-buttons { display: flex; gap: 12px; }
+        .btn-cancel, .btn-confirm {
+            flex: 1; padding: 14px; border-radius: 14px; border: none;
+            font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-cancel { background: var(--card-hover); color: var(--text3); border: 1px solid var(--border-light); }
+        .btn-confirm { background: var(--primary); color: white; }
+        .btn-cancel:active, .btn-confirm:active { opacity: 0.8; }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .counter { font-family: 'Orbitron', monospace; font-weight: 700; }
+
+        /* Desktop enhancement */
+        @media (min-width: 481px) {
+            .portfolio-balance { font-size: 36px; }
+            .nft-grid { grid-template-columns: repeat(3, 1fr); }
+            .action-item:hover .action-circle { transform: scale(1.1); filter: brightness(1.12); }
+            .token-item:hover { background: var(--card-hover); transform: translateX(2px); }
+            .settings-item:hover { background: var(--card-hover); }
+            .defi-card:hover { background: var(--card-hover); }
+            .nft-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+            .onboarding-btn:hover { background: var(--card-hover); border-color: var(--primary); }
+        }
+
+        /* Small mobile (320px) fixes */
+        @media (max-width: 360px) {
+            .portfolio-balance { font-size: 26px; }
+            .actions-row { gap: 14px; padding: 0 10px 20px; }
+            .action-circle { width: 46px; height: 46px; }
+            .action-circle svg { width: 18px; height: 18px; }
+            .action-label { font-size: 11px; }
+            .section-header { padding: 0 14px; }
+            .token-list { padding: 0 12px 8px; }
+            .tx-list { padding: 0 12px; }
+            .settings-list { padding: 0 12px; }
+            .sheet-title { font-size: 15px; }
+            .nft-grid { gap: 8px; padding: 0 12px; }
+            .portfolio-card { margin: 0 12px 16px; padding: 20px 16px 16px; }
+            .tab-bar-item { font-size: 9px; }
+            .portfolio-balance { font-size: 24px; }
+            .header-title { font-size: 14px; }
+            /* Prevent header overflow on 320px */
+            .app-header { padding-left: 14px; padding-right: 14px; }
+            .header-right { gap: 2px; }
+            #langMoreBtn { display: none; }
+            .lang-quick-btn { padding: 4px 8px !important; font-size: 10px !important; }
+            .header-btn { width: 36px; height: 36px; font-size: 16px; }
+        }
+
+        /* PWA Standalone */
+        @media (display-mode: standalone) {
+            body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+            .address-text, .form-input, .token-balance, .qr-address { -webkit-user-select: text; user-select: text; }
+        }
+
+        /* Connection Status Dot */
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+            transition: background 0.3s;
+        }
+        .connection-dot.connected {
+            background: var(--green);
+            box-shadow: 0 0 6px rgba(0, 209, 140, 0.5);
+        }
+        .connection-dot.disconnected {
+            background: var(--red);
+            box-shadow: 0 0 6px rgba(255, 68, 102, 0.5);
+        }
+        .network-chip-sep {
+            width: 1px;
+            height: 14px;
+            background: var(--border-light);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* Testnet Badge */
+        .testnet-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: #000;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+        }
+
+        /* Transaction Status */
+        .tx-pending {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Faucet Button */
+        .faucet-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .faucet-btn:hover { opacity: 0.88; }
+        .faucet-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Browser bookmarks & dapp items hover */
+        .browser-bookmark {
+            transition: transform 0.2s, background 0.2s !important;
+        }
+        .browser-bookmark:hover {
+            transform: scale(1.05) !important;
+            background: var(--card-hover) !important;
+        }
+        .browser-dapp {
+            transition: background 0.2s, transform 0.15s !important;
+        }
+        .browser-dapp:hover {
+            background: var(--card-hover) !important;
+        }
+        .browser-dapp:active {
+            transform: scale(0.98) !important;
+        }
+
+        /* defi-card active state */
+        .defi-card:active { transform: scale(0.98); }
+
+        .dapp-item:active { background: rgba(255,255,255,0.05); }
+
+        /* add-token-btn hover */
+        .add-token-btn { transition: background 0.2s, border-color 0.2s; }
+        .add-token-btn:hover { background: rgba(255,107,53,0.2); border-color: rgba(255,107,53,0.5); }
+        .add-token-btn:active { transform: scale(0.99); }
+
+        /* Bottom sheet close animation */
+        @keyframes slideDown { from { transform: translateY(0); } to { transform: translateY(100%); } }
+        .bottom-sheet.closing { animation: slideDown 0.25s ease-in forwards; }
+        .bottom-sheet-overlay { transition: background 0.25s; }
+        .bottom-sheet-overlay.closing { background: rgba(0,0,0,0) !important; }
+
+        /* Empty state */
+        .empty-state {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 48px 20px; gap: 12px; text-align: center;
+        }
+        .empty-state-icon {
+            width: 64px; height: 64px; border-radius: 20px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; margin-bottom: 4px;
+        }
+        .empty-state-title { font-size: 15px; font-weight: 700; color: var(--text3); }
+        .empty-state-desc { font-size: 13px; color: var(--text4); line-height: 1.5; max-width: 220px; }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Testnet Banner -->
+        <div id="testnet-banner" style="display:none; background: linear-gradient(90deg, #f59e0b, #d97706); color: #000; text-align: center; padding: 4px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 1000;">
+            <span data-i18n="testnet.banner">⚠️ BSC TESTNET — Test network in use (not real assets)</span>
+            <a href="https://testnet.bnbchain.org/faucet-smart" target="_blank" style="color: #000; margin-left: 8px; text-decoration: underline; font-weight: 700;" data-i18n="testnet.faucet">Get free tBNB →</a>
+        </div>
+
+        <!-- APP HEADER -->
+        <header class="app-header">
+            <div class="header-left">
+                <img src="./icons/funs-nugi.png" alt="FunS" class="header-logo">
+                <span class="header-title">FunS</span>
+            </div>
+            <div class="header-right">
+<button class="header-btn" id="scanBtn" title="Scan" aria-label="Scan QR code"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2h-3"/><path d="M23 5a2 2 0 00-2-2h-3"/><path d="M1 19a2 2 0 002 2h3"/><path d="M1 5a2 2 0 012-2h3"/><line x1="4" y1="12" x2="20" y2="12"/></svg></button>
+                <button class="header-btn" id="notifBtn" title="Notifications" aria-label="Notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="app-content">
+            <!-- HOME TAB -->
+            <div class="tab-page active" id="page-home">
+                <div class="portfolio-card">
+                    <div class="network-chip" id="networkSelector" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                        <span id="connection-status" class="connection-dot"></span>
+                        <button class="network-current" aria-label="Select network: BNB Chain">BNB Chain</button>
+                        <div class="network-dropdown" role="listbox" aria-label="Network options"></div>
+                    </div>
+                    <div class="portfolio-label">Total Assets</div>
+                    <div class="portfolio-balance" id="portfolioBalance">$0.00</div>
+                    <div class="portfolio-change" id="portfolioChange" style="display:none"></div>
+                    <div class="address-row">
+                        <span class="address-text" id="portfolioAddress" data-i18n="home.createWallet">Create a wallet</span>
+                        <button class="copy-address-btn" id="copyBtn" title="Copy address" aria-label="Copy wallet address"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                    </div>
+                </div>
+
+                <div class="actions-row">
+                    <button class="action-item" id="sendBtn" aria-label="Send" type="button">
+                        <div class="action-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div>
+                        <span class="action-label" data-i18n="action.send">Send</span>
+                    </button>
+                    <button class="action-item" id="receiveBtn" aria-label="Receive" type="button">
+                        <div class="action-circle blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
+                        <span class="action-label" data-i18n="action.receive">Receive</span>
+                    </button>
+                    <button class="action-item" id="swapBtn" aria-label="Swap" type="button">
+                        <div class="action-circle gold"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+                        <span class="action-label" data-i18n="action.swap">Swap</span>
+                    </button>
+                    <button class="action-item" id="buyBtn" aria-label="Buy" type="button">
+                        <div class="action-circle green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                        <span class="action-label" data-i18n="action.buy">Buy</span>
+                    </button>
+                </div>
+
+                <div class="section-header">
+                    <span class="section-title" data-i18n="home.tokens">Tokens</span>
+                    <button class="section-action" id="manageTokensBtn" data-i18n="home.manageTokens">Manage ›</button>
+                </div>
+                <div style="padding:0 16px 8px;">
+                    <input type="search" id="tokenSearchInput" class="token-search-input" data-i18n="home.searchTokens" placeholder="Search tokens..." data-i18n-aria="home.searchTokens" autocomplete="off">
+                </div>
+                <div class="token-list" id="tokenListContainer">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🪙</div>
+                        <div class="empty-state-title" data-i18n="home.noTokens">No tokens yet</div>
+                        <div class="empty-state-desc" data-i18n="home.noTokensDesc">Create or import a wallet to view your token balances</div>
+                    </div>
+                </div>
+
+                <!-- Chart removed -->
+
+                <div class="section-header" style="margin-top:8px;"><span class="section-title" data-i18n="home.recentTx">Recent Transactions</span><button class="section-action" data-i18n="home.allTx">All ›</button></div>
+                <div class="tx-filters">
+                    <button class="tx-filter-chip active" data-filter="all" data-i18n="tx.all">All</button>
+                    <button class="tx-filter-chip" data-filter="send" data-i18n="tx.send">Send</button>
+                    <button class="tx-filter-chip" data-filter="receive" data-i18n="tx.receive">Receive</button>
+                    <button class="tx-filter-chip" data-filter="swap" data-i18n="tx.swap">Swap</button>
+                </div>
+                <div class="tx-list" id="txListContainer">
+                    <div class="empty-state" style="padding:32px 20px;">
+                        <div class="empty-state-icon">📋</div>
+                        <div class="empty-state-title" data-i18n="home.noTx">No transactions</div>
+                        <div class="empty-state-desc" data-i18n="home.noTxDesc">Your transaction history will appear here</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BROWSER TAB -->
+            <div class="tab-page" id="page-browser">
+                <!-- Browser Header (visible when no iframe) -->
+                <div id="browserHome">
+                    <!-- URL Bar -->
+                    <div style="padding:12px 16px;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="flex:1;display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;gap:8px;">
+                                <span style="color:var(--text4);font-size:16px;">🔍</span>
+                                <input type="text" id="browserUrlInput" placeholder="Enter URL or search..." style="flex:1;background:none;border:none;color:var(--text);font-size:14px;outline:none;" data-i18n="browser.search" />
+                            </div>
+                            <button id="browserGoBtn" style="width:44px;height:44px;border-radius:12px;background:var(--primary);border:none;color:white;font-size:16px;cursor:pointer;flex-shrink:0;">→</button>
+                        </div>
+                    </div>
+                    <!-- Quick Access Bookmarks -->
+                    <div style="padding:0 16px 16px;">
+                        <div class="section-header"><span class="section-title" data-i18n="browser.bookmarks">Bookmarks</span></div>
+                        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;">
+                            <div class="browser-bookmark" data-url="https://tololalo.github.io/funs-platform/dex/app/" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;background:var(--card);border-radius:12px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C52);display:flex;align-items:center;justify-content:center;font-size:18px;">🔄</div>
+                                <span style="font-size:11px;color:var(--text3);text-align:center;">FunSwap</span>
+                            </div>
+                            <div class="browser-bookmark" data-url="https://pancakeswap.finance" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;background:var(--card);border-radius:12px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#D1884F,#E6A15E);display:flex;align-items:center;justify-content:center;font-size:18px;">🥞</div>
+                                <span style="font-size:11px;color:var(--text3);text-align:center;">PancakeSwap</span>
+                            </div>
+                            <div class="browser-bookmark" data-url="https://app.venus.io" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;background:var(--card);border-radius:12px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#4FC3F7,#2196F3);display:flex;align-items:center;justify-content:center;font-size:18px;">🏦</div>
+                                <span style="font-size:11px;color:var(--text3);text-align:center;">Venus</span>
+                            </div>
+                            <div class="browser-bookmark" data-url="https://dappradar.com" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;background:var(--card);border-radius:12px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#9C27B0,#BA68C8);display:flex;align-items:center;justify-content:center;font-size:18px;">📊</div>
+                                <span style="font-size:11px;color:var(--text3);text-align:center;">DappRadar</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Popular dApps -->
+                    <div style="padding:0 16px;">
+                        <div class="section-header"><span class="section-title" data-i18n="browser.dapps">Popular dApps</span></div>
+                        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+                            <div class="browser-dapp" data-url="https://tololalo.github.io/funs-platform/dex/app/" style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--card);border-radius:14px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#FF6B35,#FF8C52);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><img src="./icons/funs-nugi.png" style="width:32px;height:32px;border-radius:50%;"></div>
+                                <div style="flex:1;"><div style="font-size:15px;font-weight:600;color:var(--text);">FunSwap DEX</div><div style="font-size:12px;color:var(--text4);margin-top:2px;">FunS Official DEX</div></div>
+                                <span style="color:var(--text4);font-size:18px;">›</span>
+                            </div>
+                            <div class="browser-dapp" data-url="https://pancakeswap.finance/swap" style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--card);border-radius:14px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:44px;height:44px;border-radius:12px;background:#1E2037;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;">🥞</div>
+                                <div style="flex:1;"><div style="font-size:15px;font-weight:600;color:var(--text);">PancakeSwap</div><div style="font-size:12px;color:var(--text4);margin-top:2px;">Largest BSC DEX · Swap & LP</div></div>
+                                <span style="color:var(--text4);font-size:18px;">›</span>
+                            </div>
+                            <div class="browser-dapp" data-url="https://app.venus.io" style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--card);border-radius:14px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:44px;height:44px;border-radius:12px;background:#1a2035;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;">🏦</div>
+                                <div style="flex:1;"><div style="font-size:15px;font-weight:600;color:var(--text);">Venus Protocol</div><div style="font-size:12px;color:var(--text4);margin-top:2px;">Lending & Deposits · BSC DeFi</div></div>
+                                <span style="color:var(--text4);font-size:18px;">›</span>
+                            </div>
+                            <div class="browser-dapp" data-url="https://www.stargate.finance" style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--card);border-radius:14px;border:1px solid var(--border);cursor:pointer;">
+                                <div style="width:44px;height:44px;border-radius:12px;background:#1a2035;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;">🌉</div>
+                                <div style="flex:1;"><div style="font-size:15px;font-weight:600;color:var(--text);">Stargate</div><div style="font-size:12px;color:var(--text4);margin-top:2px;">Cross-Chain Bridge</div></div>
+                                <span style="color:var(--text4);font-size:18px;">›</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- In-App Browser View (hidden by default) -->
+                <div id="browserView" style="display:none;height:calc(100vh - var(--tab-height) - var(--safe-bottom) - 20px);flex-direction:column;">
+                    <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);">
+                        <button id="browserBackBtn" style="width:44px;height:44px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--text3);font-size:16px;cursor:pointer;">←</button>
+                        <div style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--text3);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" id="browserCurrentUrl"></div>
+                        <button id="browserCloseBtn" style="width:44px;height:44px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--red);font-size:14px;cursor:pointer;font-weight:700;">✕</button>
+                    </div>
+                    <iframe id="browserIframe" style="flex:1;width:100%;border:none;background:var(--bg);" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+                </div>
+            </div>
+
+            <!-- NFT TAB -->
+            <div class="tab-page" id="page-nft">
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 180px);padding:20px;">
+                    <!-- Membership Card Container -->
+                    <div style="position:relative;width:100%;max-width:320px;">
+                        <!-- Glow Effect -->
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:320px;height:420px;background:radial-gradient(ellipse at center,rgba(255,107,53,0.22) 0%,rgba(255,215,0,0.12) 35%,rgba(255,107,53,0.04) 60%,transparent 80%);z-index:0;border-radius:50%;"></div>
+                        <!-- Card -->
+                        <div style="position:relative;z-index:1;border-radius:20px;overflow:hidden;border:1px solid rgba(255,215,0,0.3);box-shadow:0 8px 40px rgba(255,107,53,0.15),0 0 80px rgba(255,215,0,0.05);background:linear-gradient(160deg,#1a1f35 0%,#0d1020 100%);">
+                            <!-- NFT Image -->
+                            <div style="padding:16px 16px 0;">
+                                <img src="./nft-images/founder_nft.png" alt="FunS Founder NFT" style="width:100%;border-radius:14px;display:block;">
+                            </div>
+                            <!-- Card Info -->
+                            <div style="padding:20px;text-align:center;">
+                                <div style="font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:rgba(255,215,0,0.7);margin-bottom:8px;">MEMBERSHIP</div>
+                                <div style="font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#FFD700;margin-bottom:6px;">FOUNDER #001</div>
+                                <div style="font-size:13px;color:var(--text3);margin-bottom:16px;">FunS Platform · Limited Edition 2026</div>
+                                <div style="display:flex;justify-content:center;gap:20px;padding-top:14px;border-top:1px solid rgba(255,215,0,0.1);">
+                                    <div style="text-align:center;">
+                                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--primary);">ACTIVE</div>
+                                        <div style="font-size:11px;color:var(--text4);margin-top:2px;">Status</div>
+                                    </div>
+                                    <div style="width:1px;background:rgba(255,215,0,0.1);"></div>
+                                    <div style="text-align:center;">
+                                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#FFD700;">GENESIS</div>
+                                        <div style="font-size:11px;color:var(--text4);margin-top:2px;">Tier</div>
+                                    </div>
+                                    <div style="width:1px;background:rgba(255,215,0,0.1);"></div>
+                                    <div style="text-align:center;">
+                                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--green);">VIP</div>
+                                        <div style="font-size:11px;color:var(--text4);margin-top:2px;">Access</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS TAB -->
+            <div class="tab-page" id="page-settings">
+                <div class="section-header" style="margin-top:8px;"><span class="section-title" data-i18n="settings.title">Settings</span></div>
+                <div class="settings-list">
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.network">Network</div>
+                        <div class="settings-item"><div class="settings-item-left"><img src="./icons/bnb.svg" style="width:24px;height:24px;border-radius:50%;" alt="BNB"><div><div class="settings-item-label" data-i18n="settings.bsc">BNB Smart Chain</div><div class="settings-item-desc" data-i18n="settings.defaultNetwork">Default Network</div></div></div><label class="toggle" aria-label="BNB Smart Chain network"><input type="checkbox" checked disabled id="bscToggle" aria-label="Enable BNB Smart Chain"><span class="toggle-track"></span></label></div>
+                        <div class="settings-item"><div class="settings-item-left"><img src="./icons/eth.svg" style="width:24px;height:24px;border-radius:50%;" alt="ETH"><div><div class="settings-item-label" data-i18n="settings.eth">Ethereum</div><div class="settings-item-desc" data-i18n="settings.optional">Optional</div></div></div><label class="toggle" aria-label="Ethereum network"><input type="checkbox" id="ethToggle" aria-label="Enable Ethereum"><span class="toggle-track"></span></label></div>
+                        <div class="settings-item"><div class="settings-item-left"><img src="./icons/eth.svg" style="width:24px;height:24px;border-radius:50%;opacity:0.6;" alt="ETH Sepolia"><div><div class="settings-item-label" data-i18n="settings.ethSepolia">Ethereum Sepolia</div><div class="settings-item-desc" data-i18n="settings.testnet">Testnet</div></div></div><label class="toggle" aria-label="Ethereum Sepolia testnet"><input type="checkbox" id="ethSepoliaToggle" aria-label="Enable Ethereum Sepolia"><span class="toggle-track"></span></label></div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.customTokens">Custom Tokens</div>
+                        <div id="customTokenList"></div>
+                        <button class="add-token-btn" id="addCustomTokenBtn" data-i18n="settings.addToken">+ Add Token</button>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.security">Security</div>
+                        <div class="settings-item" id="seedBackupBtn" style="cursor:pointer;"><div class="settings-item-left"><span class="settings-item-icon">⚠️</span><div><div class="settings-item-label" data-i18n="settings.seedBackup">Seed Phrase Backup</div><div class="settings-item-desc" data-i18n="settings.seedBackupDesc">Keep your wallet secure</div></div></div><div class="settings-item-right">›</div></div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔐</span><div><div class="settings-item-label" data-i18n="settings.biometric">Biometric Lock</div><div class="settings-item-desc" data-i18n="settings.biometricDesc">Fingerprint or Face Recognition</div></div></div><label class="toggle" aria-label="Biometric lock"><input type="checkbox" checked id="biometricToggle" aria-label="Enable biometric lock"><span class="toggle-track"></span></label></div>
+
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.transaction">Transaction Settings</div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">⛽</span><div><div class="settings-item-label" data-i18n="settings.gas">Default Gas Fee</div><div class="settings-item-desc" data-i18n="settings.gasDesc">Default Gas</div></div></div><div class="settings-item-right"><select id="gas-preference-select" class="form-input" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 10px; padding: 6px 12px; font-size: 13px;"><option value="slow" data-i18n="settings.gasSlow">Slow</option><option value="normal" selected data-i18n="settings.gasNormal">Normal</option><option value="fast" data-i18n="settings.gasFast">Fast</option></select></div></div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">📊</span><div><div class="settings-item-label" data-i18n="settings.slippage">Default Slippage</div><div class="settings-item-desc" data-i18n="settings.slippageDesc">Default Slippage</div></div></div><div class="settings-item-right"><select id="slippage-preference-select" class="form-input" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 10px; padding: 6px 12px; font-size: 13px;"><option value="0.1">0.1%</option><option value="0.5" selected>0.5%</option><option value="1">1%</option><option value="3">3%</option></select></div></div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.general">General Settings</div>
+                        <div class="settings-item" id="languageSettingsItem" style="cursor:pointer;"><div class="settings-item-left"><span class="settings-item-icon">🌐</span><div><div class="settings-item-label" data-i18n="settings.language">Language</div><div class="settings-item-desc" data-i18n="settings.languageDesc">Language</div></div></div><div class="settings-item-right" style="display: flex; align-items: center; gap: 8px;" id="currentLanguageDisplay">English ›</div></div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">💱</span><div><div class="settings-item-label" data-i18n="settings.currency">Currency</div><div class="settings-item-desc" data-i18n="settings.currencyDesc">Currency</div></div></div><div class="settings-item-right" id="currentCurrencyDisplay" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">USD ›</div></div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔒</span><div><div class="settings-item-label" data-i18n="settings.autoLock">Auto-Lock</div><div class="settings-item-desc" data-i18n="settings.autoLockDesc">Auto-Lock</div></div></div><div class="settings-item-right"><select class="form-input" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); border-radius: 10px; padding: 6px 12px; font-size: 13px;"><option data-i18n="settings.time1m">1 min</option><option selected data-i18n="settings.time5m">5 min</option><option data-i18n="settings.time15m">15 min</option><option data-i18n="settings.time30m">30 min</option></select></div></div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🌙</span><div><div class="settings-item-label" data-i18n="settings.theme">Theme</div><div class="settings-item-desc" data-i18n="settings.themeDesc">Theme</div></div></div><label class="toggle" aria-label="Dark theme"><input type="checkbox" checked id="themeToggle" aria-label="Enable dark theme"><span class="toggle-track"></span></label></div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.notifications">Notification Settings</div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">🔔</span><div><div class="settings-item-label" data-i18n="settings.txAlerts">Transaction Alerts</div><div class="settings-item-desc" data-i18n="settings.txAlertsDesc">Transaction Alerts</div></div></div><label class="toggle" aria-label="Transaction alerts"><input type="checkbox" checked id="txAlertsToggle" aria-label="Enable transaction alerts"><span class="toggle-track"></span></label></div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.other">Other</div>
+                        <div class="settings-item" id="walletBackupBtn" style="cursor:pointer;"><div class="settings-item-left"><span class="settings-item-icon">💾</span><div><div class="settings-item-label" data-i18n="settings.backup">Wallet Backup/Export</div><div class="settings-item-desc" data-i18n="settings.backupDesc">Backup/Export Wallet</div></div></div><div class="settings-item-right">›</div></div>
+                        <div class="settings-item" id="tosBtn" style="cursor:pointer;"><div class="settings-item-left"><span class="settings-item-icon">📄</span><div><div class="settings-item-label" data-i18n="settings.terms">Terms of Service</div><div class="settings-item-desc" data-i18n="settings.termsDesc">Terms of Service</div></div></div><div class="settings-item-right">›</div></div>
+                        <div class="settings-item" id="privacyBtn" style="cursor:pointer;"><div class="settings-item-left"><span class="settings-item-icon">🔐</span><div><div class="settings-item-label" data-i18n="settings.privacy">Privacy Policy</div><div class="settings-item-desc" data-i18n="settings.privacyDesc">Privacy Policy</div></div></div><div class="settings-item-right">›</div></div>
+                    </div>
+                    <div class="settings-group">
+                        <div class="settings-group-title" data-i18n="settings.about">About</div>
+                        <div class="settings-item"><div class="settings-item-left"><span class="settings-item-icon">ℹ️</span><div class="settings-item-label" data-i18n="settings.version">Version</div></div><div class="settings-item-right">1.0.0</div></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- BOTTOM TAB BAR -->
+        <nav class="tab-bar">
+            <button class="tab-bar-item active" data-page="home" aria-label="Home">
+                <span class="tab-icon">
+                    <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 9v11a2 2 0 002 2h4v-8a1 1 0 011-1h4a1 1 0 011 1v8h4a2 2 0 002-2V9L12 2z"/></svg>
+                </span>
+                <span data-i18n="tab.home">Home</span>
+            </button>
+            <button class="tab-bar-item" data-page="browser" aria-label="Browser">
+                <span class="tab-icon">
+                    <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" fill="currentColor" opacity="0.5"/></svg>
+                </span>
+                <span data-i18n="tab.browser">Browser</span>
+            </button>
+            <button class="tab-bar-item swap-tab" data-page="swap-action" aria-label="Swap">
+                <span class="tab-icon">
+                    <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+                </span>
+                <span data-i18n="tab.swap">Swap</span>
+            </button>
+            <button class="tab-bar-item" data-page="nft" aria-label="NFT">
+                <span class="tab-icon">
+                    <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H5zm3.5 4a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM5 21l11-11 5 5v4a2 2 0 01-2 2H5z"/></svg>
+                </span>
+                <span>NFT</span>
+            </button>
+            <button class="tab-bar-item" data-page="settings" aria-label="Settings">
+                <span class="tab-icon">
+                    <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                    <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                </span>
+                <span data-i18n="tab.settings">Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- BOTTOM SHEET MODALS -->
+    <div class="bottom-sheet-overlay" id="sendModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title" data-i18n="send.title">Send</span><button class="sheet-close" id="closeSendModal">✕</button></div><div class="sheet-body"><form id="sendForm"><div class="form-group"><label class="form-label" data-i18n="send.to">Recipient Address</label><input type="text" class="form-input" name="address" placeholder="0x..." required></div><div class="form-group"><label class="form-label" data-i18n="send.token">Tokens</label><div class="send-token-picker" id="sendTokenPicker"></div><input type="hidden" name="token" id="sendTokenValue" value="BNB"></div><div class="form-group"><label class="form-label" data-i18n="send.amount">Amount</label><input type="number" class="form-input" name="amount" placeholder="0.00" step="0.01" required></div><button type="submit" class="form-btn" data-i18n="send.confirm">Confirm Send</button></form></div></div></div>
+
+    <div class="bottom-sheet-overlay" id="receiveModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title" data-i18n="receive.title">Receive</span><button class="sheet-close" id="closeReceiveModal">✕</button></div><div class="sheet-body"><div class="qr-section"><div class="qr-box"><canvas id="qrCanvas" width="160" height="160" style="border-radius:8px;" data-qr></canvas></div><div class="qr-address" id="receiveAddress" data-address></div><button type="button" class="form-btn" style="margin-top:16px;" data-copy-address data-i18n="receive.copy">Copy Address</button></div></div></div></div></div>
+
+    <div class="bottom-sheet-overlay" id="swapModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title" data-i18n="swap.title">Swap</span><button class="sheet-close" id="closeSwapModal">✕</button></div><div class="sheet-body"><form id="swapForm"><div class="form-group"><label class="form-label" data-i18n="swap.sell">Sell</label><div class="token-select-wrap"><select class="form-input token-select" id="swapFromToken" name="fromToken" required><option value="FUNS" data-icon="./icons/funs-nugi.png">FUNS</option><option value="BNB" data-icon="./icons/bnb.svg">BNB</option><option value="USDT" data-icon="./icons/usdt.svg">USDT</option><option value="ETH" data-icon="./icons/eth.svg">ETH</option><option value="CAKE" data-icon="./icons/cake.svg">CAKE</option></select><img class="token-select-icon" id="swapFromIcon" src="./icons/funs-nugi.png" alt=""></div></div><div class="form-group"><label class="form-label" data-i18n="swap.amount">Amount</label><input type="number" class="form-input" name="amount" placeholder="0.00" step="0.01" required></div><div class="swap-divider"><div class="swap-arrow">⇅</div></div><div class="form-group"><label class="form-label" data-i18n="swap.buy">Buy</label><div class="token-select-wrap"><select class="form-input token-select" id="swapToToken" name="toToken" required><option value="BNB" data-icon="./icons/bnb.svg">BNB</option><option value="FUNS" data-icon="./icons/funs-nugi.png">FUNS</option><option value="USDT" data-icon="./icons/usdt.svg">USDT</option><option value="ETH" data-icon="./icons/eth.svg">ETH</option><option value="CAKE" data-icon="./icons/cake.svg">CAKE</option></select><img class="token-select-icon" id="swapToIcon" src="./icons/bnb.svg" alt=""></div></div><div class="form-group"><label class="form-label" data-i18n="swap.estimated">Estimated Amount</label><input type="number" class="form-input" name="toAmount" placeholder="0.00" disabled></div><button type="submit" class="form-btn" data-i18n="swap.confirm">Confirm Swap</button></form></div></div></div>
+
+    <div class="bottom-sheet-overlay" id="buyModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title" data-i18n="buy.title">Buy</span><button class="sheet-close" id="closeBuyModal">✕</button></div><div class="sheet-body"><form id="buyForm"><div class="form-group"><label class="form-label" data-i18n="buy.token">Tokens</label><select class="form-input" name="token" required><option>FUNS</option><option>BNB</option><option>USDT</option><option>ETH</option><option>CAKE</option></select></div><div class="form-group"><label class="form-label" data-i18n="buy.amount">Purchase Amount (USD)</label><input type="number" class="form-input" name="amount" placeholder="0.00" step="0.01" required></div><div class="form-group"><label class="form-label" data-i18n="buy.method">Payment Method</label><select class="form-input" name="paymentMethod" required><option data-i18n="buy.creditCard">Credit Card</option><option data-i18n="buy.bankTransfer">Bank Transfer</option><option data-i18n="buy.paypal">PayPal</option></select></div><button type="submit" class="form-btn" data-i18n="buy.confirm">Confirm Purchase</button></form></div></div></div>
+
+    <div class="bottom-sheet-overlay" id="addTokenModal"><div class="bottom-sheet"><div class="sheet-handle"></div><div class="sheet-header"><span class="sheet-title" data-i18n="addToken.title">Add Token</span><button class="sheet-close" id="closeAddTokenModal">✕</button></div><div class="sheet-body"><form id="addTokenForm"><div class="form-group"><label class="form-label" data-i18n="addToken.address">Contract Address</label><input type="text" class="form-input" id="tokenAddress" placeholder="0x..." required><div class="token-loading hidden" id="tokenLoading" data-i18n="addToken.loading">Loading token info...</div></div><div class="form-group"><label class="form-label" data-i18n="addToken.symbol">Symbol</label><input type="text" class="form-input" id="tokenSymbol" readonly placeholder="Auto-filled"></div><div class="form-group"><label class="form-label" data-i18n="addToken.name">Name</label><input type="text" class="form-input" id="tokenName" readonly placeholder="Auto-filled"></div><div class="form-group"><label class="form-label" data-i18n="addToken.decimals">Decimals</label><input type="number" class="form-input" id="tokenDecimals" readonly placeholder="Auto-filled"></div><div style="display:flex;gap:10px;margin-top:8px;"><button type="button" class="form-btn form-btn-secondary" id="cancelAddToken" style="flex:1;" data-i18n="addToken.cancel">Cancel</button><button type="submit" class="form-btn" id="confirmAddToken" style="flex:1;" disabled data-i18n="addToken.add">Add</button></div></form></div></div></div>
+
+    <!-- Swap Coming Soon Overlay -->
+    <div class="bottom-sheet-overlay" id="swapComingSoon">
+        <div class="bottom-sheet" style="text-align:center;padding-bottom:40px;">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header"><span class="sheet-title" data-i18n="swap.title">Swap</span><button class="sheet-close" onclick="document.getElementById('swapComingSoon').classList.remove('active')">✕</button></div>
+            <div style="padding:40px 20px;">
+                <img src="./icons/funs-nugi.png" alt="FunS" style="width:100px;height:100px;border-radius:50%;margin-bottom:20px;box-shadow:0 0 32px rgba(255,107,53,0.5),0 0 8px rgba(255,107,53,0.3);">
+                <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--primary);margin-bottom:12px;letter-spacing:3px;" data-i18n="swap.comingSoon">COMING SOON</div>
+                <p style="color:var(--text3);font-size:14px;line-height:1.6;" data-i18n="swap.comingSoonDesc">FunSwap DEX integration coming soon.<br>Look forward to faster and more secure on-chain swaps!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FunSwap DEX Coming Soon Overlay -->
+    <div class="bottom-sheet-overlay" id="funswapComingSoon">
+        <div class="bottom-sheet" style="text-align:center;padding-bottom:40px;">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header"><span class="sheet-title">FunSwap DEX</span><button class="sheet-close" onclick="document.getElementById('funswapComingSoon').classList.remove('active')">✕</button></div>
+            <div style="padding:40px 20px;">
+                <img src="./icons/funs-nugi.png" alt="FunS" style="width:100px;height:100px;border-radius:50%;margin-bottom:20px;box-shadow:0 0 32px rgba(255,107,53,0.5),0 0 8px rgba(255,107,53,0.3);">
+                <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--primary);margin-bottom:12px;letter-spacing:3px;">COMING SOON</div>
+                <p style="color:var(--text3);font-size:14px;line-height:1.6;">FunSwap DEX is launching soon!<br>The next-gen decentralized exchange on BNB Chain.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Coming Soon Overlay -->
+    <div class="bottom-sheet-overlay" id="buyComingSoon">
+        <div class="bottom-sheet" style="text-align:center;padding-bottom:40px;">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header"><span class="sheet-title" data-i18n="buy.title">Buy</span><button class="sheet-close" onclick="document.getElementById('buyComingSoon').classList.remove('active')">✕</button></div>
+            <div style="padding:40px 20px;">
+                <img src="./icons/funs-nugi.png" alt="FunS" style="width:100px;height:100px;border-radius:50%;margin-bottom:20px;box-shadow:0 0 32px rgba(255,107,53,0.5),0 0 8px rgba(255,107,53,0.3);">
+                <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--primary);margin-bottom:12px;letter-spacing:3px;">COMING SOON</div>
+                <p style="color:var(--text3);font-size:14px;line-height:1.6;">Token purchase feature coming soon.<br>Stay tuned for easy and secure crypto buying!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/native-bridge.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/wallet-core.js"></script>
+    <script src="js/wallet-blockchain.js"></script>
+    <script src="js/wallet-transactions.js"></script>
+    <script src="js/wallet-ui.js"></script>
+    <script>
+    (function() {
+        // Bottom Tab Navigation
+        const tabItems = document.querySelectorAll('.tab-bar-item');
+        const tabPages = document.querySelectorAll('.tab-page');
+        tabItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                // Center swap button opens swap modal instead of page
+                if (page === 'swap-action') {
+                    document.getElementById('swapComingSoon').classList.add('active');
+                    return;
+                }
+                tabItems.forEach(t => { if (!t.classList.contains('swap-tab')) t.classList.remove('active'); });
+                tabPages.forEach(p => p.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById('page-' + page).classList.add('active');
+            });
+        });
+
+        // Bottom Sheet Modals
+        const openSheet = (id) => document.getElementById(id).classList.add('active');
+        const closeSheet = (id) => {
+            const overlay = document.getElementById(id);
+            if (!overlay) return;
+            const sheet = overlay.querySelector('.bottom-sheet');
+            if (sheet) {
+                overlay.classList.add('closing');
+                sheet.classList.add('closing');
+                setTimeout(() => {
+                    overlay.classList.remove('active', 'closing');
+                    sheet.classList.remove('closing');
+                }, 240);
+            } else {
+                overlay.classList.remove('active');
+            }
+        };
+
+        document.getElementById('sendBtn').addEventListener('click', () => openSheet('sendModal'));
+        document.getElementById('closeSendModal').addEventListener('click', () => closeSheet('sendModal'));
+        document.getElementById('receiveBtn').addEventListener('click', () => openSheet('receiveModal'));
+        document.getElementById('closeReceiveModal').addEventListener('click', () => closeSheet('receiveModal'));
+        document.getElementById('swapBtn').addEventListener('click', () => openSheet('swapModal'));
+        document.getElementById('closeSwapModal').addEventListener('click', () => closeSheet('swapModal'));
+        document.getElementById('buyBtn').addEventListener('click', () => document.getElementById('buyComingSoon').classList.add('active'));
+        document.getElementById('closeBuyModal').addEventListener('click', () => closeSheet('buyModal'));
+        document.getElementById('addCustomTokenBtn').addEventListener('click', () => openSheet('addTokenModal'));
+        document.getElementById('closeAddTokenModal').addEventListener('click', () => closeSheet('addTokenModal'));
+        document.getElementById('cancelAddToken').addEventListener('click', () => closeSheet('addTokenModal'));
+
+        document.querySelectorAll('.bottom-sheet-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSheet(overlay.id); });
+        });
+
+        // Transaction Filters
+        document.querySelectorAll('.tx-filter-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.dataset.filter;
+                document.querySelectorAll('.tx-filter-chip').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tx-item').forEach(item => {
+                    item.style.display = (filter === 'all' || item.dataset.txType === filter) ? 'flex' : 'none';
+                });
+            });
+        });
+
+        // Time Range
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Token select icon sync
+        document.querySelectorAll('.token-select').forEach(sel => {
+            sel.addEventListener('change', function() {
+                const opt = this.options[this.selectedIndex];
+                const icon = opt.getAttribute('data-icon');
+                const imgEl = this.parentElement.querySelector('.token-select-icon');
+                if (imgEl && icon) imgEl.src = icon;
+            });
+        });
+
+        // Portfolio balance handled by wallet-ui.js updateBalanceDisplay()
+        // Removed: updatePortfolioBalance function and MutationObserver to prevent duplicate computations
+        // wallet-ui.js manages balance display after token updates
+
+        // Scan button - QR camera scanner
+        document.getElementById('scanBtn').addEventListener('click', () => {
+            const t = (key) => window.i18n ? window.i18n.t(key) : key;
+
+            // Check for jsQR and camera API support
+            if (typeof jsQR === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                if (window.walletUI) window.walletUI.showToast(t('qr.notSupported'), 'info');
+                return;
+            }
+
+            // Build scanner overlay
+            const scanOverlay = document.createElement('div');
+            scanOverlay.id = 'qrScanOverlay';
+            scanOverlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+            scanOverlay.innerHTML = `
+                <div style="width:100%;max-width:480px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+                    <div style="font-size:18px;font-weight:700;color:#FF6B35;">${t('qr.scanTitle')}</div>
+                    <video id="qrVideo" autoplay playsinline style="width:100%;max-width:300px;border-radius:12px;border:2px solid #FF6B35;"></video>
+                    <canvas id="qrCanvas2" style="display:none;"></canvas>
+                    <div id="qrStatus" style="color:#aaa;font-size:14px;">${t('qr.scanStatus')}</div>
+                    <button id="qrCloseBtn" style="padding:10px 24px;background:rgba(255,107,53,0.15);border:1px solid #FF6B35;border-radius:10px;color:#FF6B35;font-size:14px;cursor:pointer;">${t('misc.cancel')}</button>
+                </div>
+            `;
+            document.body.appendChild(scanOverlay);
+
+            let stream = null;
+            let animFrame = null;
+
+            const video = document.getElementById('qrVideo');
+            const canvas = document.getElementById('qrCanvas2');
+            const ctx = canvas.getContext('2d');
+            const statusEl = document.getElementById('qrStatus');
+
+            function stopScanner() {
+                if (animFrame) cancelAnimationFrame(animFrame);
+                if (stream) stream.getTracks().forEach(t => t.stop());
+                scanOverlay.remove();
+            }
+
+            document.getElementById('qrCloseBtn').addEventListener('click', stopScanner);
+
+            function scanFrame() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    if (code) {
+                        stopScanner();
+                        // If send modal is open, fill recipient address
+                        const recipientInput = document.getElementById('sendAddress');
+                        if (recipientInput) {
+                            recipientInput.value = code.data;
+                            recipientInput.dispatchEvent(new Event('input'));
+                        }
+                        if (window.walletUI) window.walletUI.showToast(code.data.substring(0, 20) + '...', 'success');
+                        return;
+                    }
+                }
+                animFrame = requestAnimationFrame(scanFrame);
+            }
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(s => {
+                    stream = s;
+                    video.srcObject = s;
+                    video.play();
+                    animFrame = requestAnimationFrame(scanFrame);
+                })
+                .catch(err => {
+                    stopScanner();
+                    const msg = err.name === 'NotAllowedError' ? t('qr.permDenied') : t('qr.camError');
+                    if (window.walletUI) window.walletUI.showToast(msg, 'error');
+                });
+        });
+
+        // Notification button
+        document.getElementById('notifBtn').addEventListener('click', () => {
+            if (window.walletUI) window.walletUI.showToast('No new notifications', 'info');
+        });
+
+        // Manage tokens → go to settings
+        const manageBtn = document.getElementById('manageTokensBtn');
+        if (manageBtn) {
+            manageBtn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-bar-item').forEach(t => { if (!t.classList.contains('swap-tab')) t.classList.remove('active'); });
+                document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-settings').classList.add('active');
+                document.querySelector('[data-page="settings"]').classList.add('active');
+            });
+        }
+
+        // Token search filter
+        const tokenSearchInput = document.getElementById('tokenSearchInput');
+        if (tokenSearchInput) {
+            tokenSearchInput.addEventListener('input', () => {
+                const query = tokenSearchInput.value.trim().toLowerCase();
+                const container = document.getElementById('tokenListContainer');
+                if (!container) return;
+                container.querySelectorAll('.token-item').forEach(item => {
+                    const name = (item.dataset.symbol || item.querySelector('.token-name')?.textContent || '').toLowerCase();
+                    item.style.display = (!query || name.includes(query)) ? '' : 'none';
+                });
+            });
+        }
+
+        // Network selector - handled by wallet-ui.js setupNetworkSelector()
+        // Removed: click handler that navigated to settings (causes conflicts with dropdown behavior)
+
+
+        // Receive modal copy button - handled by wallet-ui.js via data-copy-address attribute
+
+        // Generate QR code on receive modal open - handled by wallet-ui.js
+
+        // Modal close → reset forms via event listener (replaces MutationObserver for better performance)
+        document.addEventListener('modal-closing', (e) => {
+            const modalId = e.detail?.modalId;
+            if (modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    const form = modal.querySelector('form');
+                    if (form) form.reset();
+                }
+            }
+        });
+
+        // Copy Address - handled by wallet-ui.js via data-copy-address attribute
+        // Removed: duplicate copyBtn listener (wallet-ui.js version at line 1162)
+
+        // Browser tab — in-app navigation
+        function openInAppBrowser(url) {
+            if (!url) return;
+            if (!url.startsWith('http')) url = 'https://' + url;
+            // Intercept FunSwap DEX — show COMING SOON instead of loading the DEX
+            if (url.includes('tololalo.github.io/funs-platform/dex')) {
+                document.getElementById('funswapComingSoon').classList.add('active');
+                return;
+            }
+            // Only use in-app iframe for internal FUNA platform pages we control.
+            // External sites (PancakeSwap, Venus, etc.) block iframe embedding via
+            // X-Frame-Options, so open them in a new tab instead.
+            const internalHosts = ['tololalo.github.io'];
+            let hostname = '';
+            try { hostname = new URL(url).hostname; } catch(e) {}
+            const isInternal = internalHosts.some(h => hostname === h || hostname.endsWith('.' + h));
+            if (!isInternal) {
+                window.open(url, '_blank');
+                return;
+            }
+            const browserHome = document.getElementById('browserHome');
+            const browserView = document.getElementById('browserView');
+            const iframe = document.getElementById('browserIframe');
+            const urlDisplay = document.getElementById('browserCurrentUrl');
+            browserHome.style.display = 'none';
+            browserView.style.display = 'flex';
+            iframe.src = url;
+            urlDisplay.textContent = url;
+            document.getElementById('browserUrlInput').value = url;
+        }
+        function closeInAppBrowser() {
+            const browserHome = document.getElementById('browserHome');
+            const browserView = document.getElementById('browserView');
+            const iframe = document.getElementById('browserIframe');
+            browserView.style.display = 'none';
+            browserHome.style.display = 'block';
+            iframe.src = '';
+        }
+
+        document.querySelectorAll('.browser-bookmark, .browser-dapp').forEach(item => {
+            item.addEventListener('click', () => openInAppBrowser(item.dataset.url));
+        });
+        document.getElementById('browserGoBtn')?.addEventListener('click', () => {
+            openInAppBrowser(document.getElementById('browserUrlInput').value.trim());
+        });
+        document.getElementById('browserUrlInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('browserGoBtn')?.click();
+        });
+        document.getElementById('browserBackBtn')?.addEventListener('click', () => {
+            const iframe = document.getElementById('browserIframe');
+            try { iframe.contentWindow.history.back(); } catch(e) { closeInAppBrowser(); }
+        });
+        document.getElementById('browserCloseBtn')?.addEventListener('click', closeInAppBrowser);
+        // ============ Language Selector ============
+        const languageSelector = document.getElementById('languageSelector');
+
+        function updateLangButtons(lang) {
+            const display = document.getElementById('currentLanguageDisplay');
+            if (display && window.i18n) {
+                const langData = window.i18n.getSupportedLanguages().find(l => l.code === lang);
+                display.textContent = (langData ? langData.name : lang) + ' ›';
+            }
+        }
+
+        function switchLang(lang) {
+            if (window.i18n) {
+                window.i18n.setLanguage(lang);
+                updateLangButtons(lang);
+            }
+        }
+
+        function openLanguageModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'bottom-sheet-overlay active';
+            overlay.id = 'langModal';
+
+            const languages = window.i18n ? window.i18n.getSupportedLanguages() : [
+                {code:'ko', name:'한국어'}, {code:'en', name:'English'}
+            ];
+            const currentLang = window.i18n ? window.i18n.getLanguage() : 'ko';
+
+            const langItems = languages.map(l =>
+                `<div class="settings-item lang-option" data-lang="${l.code}" style="cursor:pointer;${l.code === currentLang ? 'background:var(--primary-dim);border-radius:12px;' : ''}">
+                    <span class="settings-item-label">${l.name}</span>
+                    <div class="settings-item-right">${l.code === currentLang ? '✓' : ''}</div>
+                </div>`
+            ).join('');
+
+            overlay.innerHTML = `
+                <div class="bottom-sheet">
+                    <div class="sheet-handle"></div>
+                    <div class="sheet-header">
+                        <span class="sheet-title" data-i18n="settings.language">Language</span>
+                        <button class="sheet-close" id="closeLangModal">✕</button>
+                    </div>
+                    <div class="sheet-body" style="max-height:60vh;overflow-y:auto;">
+                        ${langItems}
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            document.getElementById('closeLangModal').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+            overlay.querySelectorAll('.lang-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    const lang = opt.dataset.lang;
+                    switchLang(lang);
+                    overlay.remove();
+                });
+            });
+        }
+
+        if (languageSelector) languageSelector.addEventListener('click', openLanguageModal);
+
+        // Attach language modal to the entire language settings row
+        const languageSettingsItem = document.getElementById('languageSettingsItem');
+        if (languageSettingsItem) languageSettingsItem.addEventListener('click', openLanguageModal);
+
+        // ============ Currency Selector ============
+        const currencyDisplay = document.getElementById('currentCurrencyDisplay');
+        const CURRENCIES = ['USD', 'KRW', 'EUR', 'JPY', 'GBP', 'CNY', 'SGD'];
+        let currentCurrency = localStorage.getItem('funs_currency') || 'USD';
+
+        function updateCurrencyDisplay() {
+            if (currencyDisplay) currencyDisplay.textContent = currentCurrency + ' ›';
+        }
+        updateCurrencyDisplay();
+
+        function openCurrencyModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'bottom-sheet-overlay active';
+            overlay.id = 'currencyModal';
+            const items = CURRENCIES.map(c =>
+                `<div class="settings-item lang-option" data-currency="${c}" style="cursor:pointer;${c === currentCurrency ? 'background:var(--primary-dim);border-radius:12px;' : ''}">
+                    <span class="settings-item-label">${c}</span>
+                    <div class="settings-item-right">${c === currentCurrency ? '✓' : ''}</div>
+                </div>`
+            ).join('');
+            overlay.innerHTML = `
+                <div class="bottom-sheet">
+                    <div class="sheet-handle"></div>
+                    <div class="sheet-header">
+                        <span class="sheet-title" data-i18n="settings.currency">Currency</span>
+                        <button class="sheet-close" id="closeCurrencyModal">✕</button>
+                    </div>
+                    <div class="sheet-body" style="max-height:60vh;overflow-y:auto;">${items}</div>
+                </div>`;
+            document.body.appendChild(overlay);
+            document.getElementById('closeCurrencyModal').addEventListener('click', () => overlay.remove());
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+            overlay.querySelectorAll('.lang-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    currentCurrency = opt.dataset.currency;
+                    localStorage.setItem('funs_currency', currentCurrency);
+                    updateCurrencyDisplay();
+                    overlay.remove();
+                });
+            });
+        }
+
+        if (currencyDisplay) currencyDisplay.addEventListener('click', openCurrencyModal);
+
+        // ============ Theme Toggle ============
+        const themeToggle = document.getElementById('themeToggle');
+        function applyTheme(isDark) {
+            if (isDark) {
+                document.body.classList.remove('light-mode');
+            } else {
+                document.body.classList.add('light-mode');
+            }
+            localStorage.setItem('funs_dark_mode', isDark ? '1' : '0');
+        }
+        // Restore saved theme preference
+        const savedDark = localStorage.getItem('funs_dark_mode');
+        if (savedDark === '0') {
+            applyTheme(false);
+            if (themeToggle) themeToggle.checked = false;
+        }
+        if (themeToggle) {
+            themeToggle.addEventListener('change', () => applyTheme(themeToggle.checked));
+        }
+
+        // Apply i18n on load
+        if (window.i18n) {
+            window.i18n.applyToDOM();
+            updateLangButtons(window.i18n.getLanguage());
+        }
+
+    })();
+    </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                console.log('[FunS] SW:', reg.scope);
+                // Force update check on every page load
+                reg.update();
+                // When new SW is waiting, activate it immediately
+                if (reg.waiting) {
+                    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'activated') {
+                            console.log('[FunS] New SW activated, reloading...');
+                            window.location.reload();
+                        }
+                    });
+                });
+            }).catch(e => console.warn('[FunS] SW fail:', e));
+        });
+    }
+    </script>
+
+    <!-- Testnet Management Scripts -->
+    <script>
+    // Testnet banner visibility
+    (function() {
+        function updateTestnetBanner() {
+            const banner = document.getElementById('testnet-banner');
+            if (!banner) return;
+            const config = window.WalletConfig;
+            if (config && config.WALLET_CONFIG) {
+                const network = config.NETWORKS[config.WALLET_CONFIG.defaultNetwork];
+                if (network && network.isTestnet) {
+                    banner.style.display = 'block';
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
+        }
+
+        // Run when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateTestnetBanner);
+        } else {
+            updateTestnetBanner();
+        }
+
+        // Also listen for network changes
+        window.addEventListener('networkChanged', updateTestnetBanner);
+    })();
+
+    // Connection status indicator
+    // Note: wallet-ui.js loadDashboard() already checks connection on load and every 30 seconds
+    // Removed: duplicate setInterval(checkConnection, 15000) to reduce performance overhead
+    (function() {
+        async function checkConnection() {
+            const indicator = document.getElementById('connection-status');
+            if (!indicator) return;
+
+            try {
+                if (window.walletBlockchain || window.WalletBlockchain) {
+                    const blockchain = window.walletBlockchain || window.WalletBlockchain;
+                    if (typeof blockchain.isConnected === 'function') {
+                        const connected = await blockchain.isConnected();
+                        indicator.className = connected ? 'connection-dot connected' : 'connection-dot disconnected';
+                        indicator.title = connected ? 'Blockchain connected' : 'Disconnected';
+                    }
+                }
+            } catch(e) {}
+        }
+
+        // Only run on initial load, wallet-ui handles periodic checks
+        setTimeout(checkConnection, 3000);
+    })();
+
+    // Replace Buy with Faucet in testnet mode
+    (function() {
+        function updateBuyButton() {
+            const config = window.WalletConfig;
+            if (!config) return;
+            const network = config.NETWORKS[config.WALLET_CONFIG.defaultNetwork];
+            if (network && network.isTestnet && network.faucet) {
+                const buyBtns = document.querySelectorAll('[data-action="buy"], .buy-btn, .action-buy');
+                buyBtns.forEach(btn => {
+                    // Skip if already processed
+                    if (btn.dataset.testnetProcessed === 'true') return;
+
+                    btn.innerHTML = btn.innerHTML.replace(/Free|Buy/gi, 'Get Free');
+
+                    // Remove old onclick if exists, use addEventListener instead for better integration with wallet-ui.js
+                    btn.onclick = null;
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.open(network.faucet, '_blank');
+                    });
+
+                    btn.dataset.testnetProcessed = 'true';
+                });
+            }
+        }
+        // Increased from 1000ms to 2000ms to ensure wallet-ui.js fully initializes before overriding
+        setTimeout(updateBuyButton, 2000);
+    })();
+    </script>
+    <script>
+    // Gas fee and slippage preference persistence
+    (function() {
+        function initTxPreferences() {
+            var gasSelect = document.getElementById('gas-preference-select');
+            var slippageSelect = document.getElementById('slippage-preference-select');
+            if (!gasSelect || !slippageSelect) return;
+
+            // Restore saved values
+            var savedGas = localStorage.getItem('funs_gas_preference');
+            var savedSlippage = localStorage.getItem('funs_slippage');
+            if (savedGas) gasSelect.value = savedGas;
+            if (savedSlippage) slippageSelect.value = savedSlippage;
+
+            // Save on change
+            gasSelect.addEventListener('change', function() {
+                localStorage.setItem('funs_gas_preference', this.value);
+            });
+            slippageSelect.addEventListener('change', function() {
+                localStorage.setItem('funs_slippage', this.value);
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTxPreferences);
+        } else {
+            initTxPreferences();
+        }
+    })();
+    </script>
+</body>
+</html>
