@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FunSwap — Decentralized Exchange</title>
-<meta name="description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange, low fees, multiple token support.">
-<meta name="keywords" content="DEX, Decentralized Exchange, Cryptocurrency Swap, FunSwap, FUNS Token">
+<meta name="description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange with low fees and diverse token support.">
+<meta name="keywords" content="DEX, decentralized exchange, crypto swap, FunSwap, FUNS token">
 <meta property="og:title" content="FunSwap — Decentralized Exchange">
-<meta property="og:description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange, low fees, multiple token support.">
+<meta property="og:description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange with low fees and diverse token support.">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
-<meta property="og:url" content="https://funs.world/dex/en.html">
+<meta property="og:url" content="https://funs.world/dex/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="twitter:title" content="FunSwap — Decentralized Exchange">
-<meta property="twitter:description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange, low fees, multiple token support.">
-<link rel="canonical" href="https://funs.world/dex/en.html">
-<link rel="alternate" hreflang="ko" href="https://funs.world/dex/">
+<meta property="twitter:description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange with low fees and diverse token support.">
+<link rel="canonical" href="https://funs.world/dex/">
+<link rel="alternate" hreflang="en" href="https://funs.world/dex/">
 <link rel="alternate" hreflang="en" href="https://funs.world/dex/en.html">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --primary: #FF6B35;
@@ -37,49 +37,157 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 17px; }
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
   background: var(--dark);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* ── NAV ── */
-.dex-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; height: 64px;
-  background: rgba(8,11,20,0.9);
-  backdrop-filter: blur(16px);
+/* ── NAVIGATION ── */
+nav {
+  background: rgba(13, 17, 32, 0.8);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 100;
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-.dex-nav .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.dex-nav .logo img { height: 36px; width: 36px; object-fit: contain; }
-.dex-nav .logo span { font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1rem; color: var(--secondary); letter-spacing: 2px; }
-.dex-nav .logo .sub { font-size: 0.7rem; color: var(--muted); letter-spacing: 1px; margin-left: 4px; }
-.nav-tabs { display: flex; gap: 4px; background: var(--dark3); border-radius: 12px; padding: 4px; }
-.nav-tab {
-  padding: 8px 20px; border-radius: 10px; border: none;
-  background: transparent; color: var(--muted); font-size: 0.85rem; font-weight: 600;
-  cursor: pointer; transition: all .2s; font-family: inherit;
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
-.nav-tab.active { background: var(--card2); color: var(--text); }
-.nav-tab:hover:not(.active) { color: var(--text); }
-.nav-right { display: flex; align-items: center; gap: 12px; }
-.chain-btn {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--dark3); border: 1px solid var(--border); border-radius: 12px;
-  padding: 8px 14px; color: var(--text); font-size: 0.8rem; font-weight: 600;
-  cursor: pointer; transition: border-color .2s; font-family: inherit;
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
-.chain-btn:hover { border-color: var(--primary); }
+
+.nav-logo {
+  height: 40px;
+  width: auto;
+}
+
+.nav-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #FF6B35;
+  letter-spacing: 2px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.back-link {
+  color: #4FC3F7;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 12px;
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: #4FC3F7;
+}
+
 .wallet-btn {
-  background: linear-gradient(135deg, var(--primary), #ff9a00);
-  color: #fff; border: none; padding: 10px 22px; border-radius: 12px;
-  font-weight: 700; font-size: 0.85rem; cursor: pointer;
-  transition: transform .2s, box-shadow .2s; font-family: inherit;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #FF6B35, #ff8c42);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-family: inherit;
 }
-.wallet-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,107,53,.4); }
+
+.wallet-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+}
+
+.lang-switch {
+  display: flex;
+  gap: 2px;
+  background: #141828;
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.lang-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #8892b0;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.lang-btn.active {
+  background: #FF6B35;
+  color: #fff;
+}
+
+.lang-btn:hover:not(.active) {
+  color: #e8eaf0;
+}
+
+/* ── TABS (below nav) ── */
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  background: rgba(20, 24, 40, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 6px;
+  max-width: fit-content;
+  margin: 24px auto 32px;
+  backdrop-filter: blur(8px);
+}
+
+.nav-tab {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.nav-tab.active {
+  background: linear-gradient(135deg, var(--primary), #ff9a00);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.nav-tab:hover:not(.active) {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Wallet button connected state */
 .wallet-btn.connected {
   background: linear-gradient(135deg, #4caf50, #66bb6a);
 }
@@ -318,7 +426,14 @@ body {
 /* ── RESPONSIVE ── */
 
 /* Tablet */
+/* ── RESPONSIVE NAV ── */
 @media(max-width:768px) {
+  .nav-title { font-size: 18px; letter-spacing: 1px; }
+  .nav-right { gap: 12px; }
+  .back-link { padding: 6px 10px; font-size: 12px; }
+  .wallet-btn { padding: 8px 16px; font-size: 0.8rem; }
+  .tab-bar { gap: 4px; padding: 4px; }
+  .nav-tab { padding: 8px 18px; font-size: 0.8rem; }
   .dex-main { padding: 32px 16px 60px; }
   .swap-card, .pool-card { max-width: 100%; }
   .price-ticker { gap: 12px; margin-bottom: 24px; }
@@ -327,15 +442,17 @@ body {
 /* Mobile */
 @media(max-width:600px) {
   html { font-size: 15px; }
-  .dex-nav { padding: 0 10px; height: 56px; }
-  .dex-nav .logo img { height: 28px; width: 28px; }
-  .dex-nav .logo span { font-size: 0.85rem; letter-spacing: 1px; }
-  .dex-nav .logo .sub { display: none; }
-  .nav-tabs { display: none; }
-  .mobile-tabs { display: flex !important; }
+  nav { padding: 10px 0; }
+  .nav-content { padding: 0 10px; }
+  .nav-left { gap: 12px; }
+  .nav-logo { height: 32px; }
+  .nav-title { font-size: 14px; letter-spacing: 1px; }
+  .nav-right { gap: 8px; }
+  .back-link { padding: 5px 8px; font-size: 11px; }
   .wallet-btn { padding: 8px 14px; font-size: 0.75rem; }
-  .chain-btn { padding: 6px 10px; font-size: 0.75rem; }
-  .chain-btn span.chain-name { display: none; }
+  .lang-btn { padding: 3px 8px; font-size: 0.65rem; }
+  .tab-bar { gap: 4px; padding: 4px; flex-wrap: wrap; justify-content: center; max-width: 100%; margin: 16px 12px 24px; }
+  .nav-tab { padding: 8px 16px; font-size: 0.75rem; }
 
   .dex-main { padding: 20px 12px 60px; }
   .price-ticker { gap: 8px; margin-bottom: 20px; }
@@ -379,18 +496,12 @@ body {
 /* Small Mobile */
 @media(max-width:380px) {
   html { font-size: 14px; }
-  .dex-nav { gap: 4px; }
+  .nav-right { gap: 4px; }
+  .connect-btn { padding: 7px 10px; font-size: 0.7rem; }
   .wallet-btn { padding: 7px 10px; font-size: 0.7rem; }
-  .chain-btn { padding: 5px 8px; }
   .token-amount { font-size: 1.2rem; }
   .price-ticker { flex-direction: column; align-items: center; gap: 6px; }
 }
-
-.mobile-tabs {
-  display: none; gap: 4px; background: var(--dark3); border-radius: 12px;
-  padding: 4px; margin-bottom: 20px; width: 100%; max-width: 480px;
-}
-.mobile-tabs .nav-tab { flex: 1; text-align: center; }
 
 /* Token icon placeholder colors */
 .token-icon {
@@ -399,6 +510,12 @@ body {
   font-size: 0.9rem; font-weight: 700; flex-shrink: 0;
 }
 .token-icon.lg { width: 36px; height: 36px; font-size: 1.1rem; }
+.ti-funs { background: linear-gradient(135deg, #FF6B35, #ff9a00); }
+.ti-eth { background: linear-gradient(135deg, #627EEA, #8799f0); }
+.ti-bnb { background: linear-gradient(135deg, #F3BA2F, #f5cb5c); color: #333; }
+.ti-usdt { background: linear-gradient(135deg, #26A17B, #50c9a3); }
+.ti-matic { background: linear-gradient(135deg, #8247E5, #a06ef0); }
+.ti-usdc { background: linear-gradient(135deg, #2775CA, #5a9fe0); }
 
 /* ── PRICE CHART ── */
 .chart-card {
@@ -632,31 +749,22 @@ body {
 <body>
 
 <!-- NAV -->
-<header class="dex-nav">
-  <a href="../en/" class="logo">
-    <img src="../funs-nugi.png" alt="FunS">
-    <span>FunSwap</span>
-    <span class="sub">DEX</span>
-  </a>
-  <div class="nav-tabs">
-    <button class="nav-tab active" data-tab="swap">Swap</button>
-    <button class="nav-tab" data-tab="pool">Liquidity</button>
-  </div>
-  <div class="nav-right">
-    <button class="chain-btn">
-      <span style="font-size:1rem;">🟡</span>
-      <span class="chain-name">BNB Chain</span>
-      <span style="font-size:0.6rem;">▼</span>
-    </button>
-    <a href="../en/wallet/" class="nav-tab" style="text-decoration: none;">Wallet</a>
-    <a href="../en/dashboard/" class="nav-tab" style="text-decoration: none;">Dashboard</a>
-    <div class="lang-switch">
-      <a href="./" class="lang-btn">KR</a>
-      <a href="en.html" class="lang-btn active">EN</a>
+<nav>
+  <div class="nav-content">
+    <div class="nav-left">
+      <img src="../funs-nugi.png" alt="FunS Logo" class="nav-logo">
+      <div class="nav-title">FunSwap DEX</div>
     </div>
-    <button class="wallet-btn" id="walletBtn">Connect Wallet</button>
+    <div class="nav-right">
+      <a href="../en/" class="back-link">← FunS Platform</a>
+      <div class="lang-switch">
+        <a href="./" class="lang-btn">KR</a>
+        <a href="en.html" class="lang-btn active">EN</a>
+      </div>
+      <button class="wallet-btn" id="walletBtn">Connect Wallet</button>
+    </div>
   </div>
-</header>
+</nav>
 
 <!-- MAIN -->
 <main class="dex-main">
@@ -683,10 +791,12 @@ body {
     </div>
   </div>
 
-  <!-- Mobile Tabs -->
-  <div class="mobile-tabs">
+  <!-- Tab Bar -->
+  <div class="tab-bar">
     <button class="nav-tab active" data-tab="swap">Swap</button>
     <button class="nav-tab" data-tab="pool">Liquidity</button>
+    <a href="../en/wallet/" class="nav-tab" style="text-decoration: none;">Wallet</a>
+    <a href="../en/dashboard/" class="nav-tab" style="text-decoration: none;">Dashboard</a>
   </div>
 
   <!-- SWAP CARD -->
@@ -739,7 +849,7 @@ body {
     <div class="swap-details" id="swapDetails" style="display:none;">
       <div class="detail-row">
         <span>Rate</span>
-        <span class="val" id="rateDisplay">1 BNB = 493.55 FUNS</span>
+        <span class="val" id="rateDisplay">1 ETH = 91,476 FUNS</span>
       </div>
       <div class="detail-row">
         <span>Price Impact</span>
@@ -767,7 +877,7 @@ body {
     </div>
     <div class="pool-empty">
       <div class="icon">💧</div>
-      <h3>No liquidity positions found</h3>
+      <h3>No Liquidity Positions</h3>
       <p>Provide liquidity and earn trading fees.<br>Please connect your wallet first.</p>
       <button class="pool-btn" onclick="document.getElementById('walletBtn').click()">Connect Wallet</button>
     </div>
@@ -829,7 +939,7 @@ body {
           <tr>
             <th>Time</th>
             <th>Type</th>
-            <th>Tokens</th>
+            <th>Token</th>
             <th>Amount</th>
             <th>Status</th>
           </tr>
@@ -864,7 +974,7 @@ body {
       <h3>Select Token</h3>
       <button class="modal-close" id="closeTokenModal">✕</button>
     </div>
-    <input type="text" class="modal-search" placeholder="Search by name or address..." id="tokenSearch">
+    <input type="text" class="modal-search" placeholder="Search token name or address..." id="tokenSearch">
     <div class="token-list" id="tokenList"></div>
   </div>
 </div>
@@ -922,6 +1032,7 @@ const swapDetails = document.getElementById('swapDetails');
 document.querySelectorAll('.nav-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    // Activate all tabs with same data-tab value
     document.querySelectorAll(`.nav-tab[data-tab="${tab.dataset.tab}"]`).forEach(t => t.classList.add('active'));
     document.getElementById('swapCard').style.display = tab.dataset.tab === 'swap' ? 'block' : 'none';
     document.getElementById('poolCard').style.display = tab.dataset.tab === 'pool' ? 'block' : 'none';
@@ -1049,7 +1160,7 @@ function updateSwapBtn() {
     swapBtn.textContent = 'Enter an amount';
     swapBtn.className = 'swap-btn disabled';
   } else if (val > fromToken.balance) {
-    swapBtn.textContent = `Insufficient ${fromToken.symbol} balance`;
+    swapBtn.textContent = `${fromToken.symbol} Insufficient balance`;
     swapBtn.className = 'swap-btn disabled';
   } else {
     swapBtn.textContent = 'Swap';
@@ -1285,7 +1396,7 @@ renderPools();
 <div id="test-version-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:24px;cursor:pointer;" onclick="this.style.display='none'">
   <img src="../funs-nugi.png" alt="FunS Logo" style="width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(255,107,53,0.5));animation:tvFloat 2s ease-in-out infinite;">
   <div style="font-family:'Orbitron',monospace;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900;background:linear-gradient(135deg,#FF6B35,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;">TEST VERSION</div>
-  <p style="color:rgba(255,255,255,0.7);font-size:1rem;text-align:center;max-width:400px;line-height:1.6;">현재 테스트 버전입니다.<br>정식 출시를 기대해 주세요!</p>
+  <p style="color:rgba(255,255,255,0.7);font-size:1rem;text-align:center;max-width:400px;line-height:1.6;">This is a test version.<br>Please look forward to the official launch!</p>
   <style>@keyframes tvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
 </div>
 <script>
