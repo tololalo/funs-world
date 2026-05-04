@@ -66,6 +66,11 @@
 
   .nav-links a:hover { color: var(--accent); }
 
+  .lang-switch { display: flex; gap: 2px; background: rgba(255,255,255,0.08); border-radius: 8px; padding: 2px; margin-left: 12px; }
+  .lang-btn { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: var(--text-dim); text-decoration: none; transition: all .2s; }
+  .lang-btn.active { background: var(--accent); color: #fff; }
+  .lang-btn:hover:not(.active) { color: var(--text-bright); }
+
   .nav-right {
     display: flex;
     align-items: center;
@@ -547,9 +552,9 @@
       <li><a href="#roadmap" data-ko="로드맵" data-en="Roadmap">로드맵</a></li>
       <li><a href="https://funs.world/" target="_blank">FUNS World</a></li>
     </ul>
-    <div class="lang-toggle" onclick="toggleLang()">
-      <span class="lang-opt active" id="lang-ko">KO</span>
-      <span class="lang-opt" id="lang-en">EN</span>
+    <div class="lang-switch">
+      <a href="./" class="lang-btn active">KR</a>
+      <a href="en.html" class="lang-btn">EN</a>
     </div>
     <button class="hamburger" onclick="this.classList.toggle('open');document.querySelector('.mobile-menu').classList.toggle('open');" aria-label="메뉴">
       <span></span><span></span><span></span>
