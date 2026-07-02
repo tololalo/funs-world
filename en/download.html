@@ -8,13 +8,14 @@
 <meta property="og:title" content="Download — FunS Platform">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
 <link rel="icon" type="image/png" href="../funs-nugi.png">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/common.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: #0a0a0f;
-    color: #fff;
+    font-family: 'Inter', 'Noto Sans KR', sans-serif;
+    background: var(--dark);
+    color: var(--text);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -31,8 +32,8 @@
     opacity: 0.15;
     pointer-events: none;
   }
-  .bg-glow.a { top: -200px; left: -100px; background: #FF6B35; }
-  .bg-glow.b { bottom: -200px; right: -100px; background: #FFD700; }
+  .bg-glow.a { top: -200px; left: -100px; background: var(--primary); }
+  .bg-glow.b { bottom: -200px; right: -100px; background: var(--secondary); }
   .logo {
     width: 140px; height: 140px;
     object-fit: contain;
@@ -43,7 +44,7 @@
     font-family: 'Orbitron', monospace;
     font-size: clamp(2.5rem, 6vw, 4rem);
     font-weight: 900;
-    background: linear-gradient(135deg, #FF6B35, #FFD700);
+    background: var(--grad-brand);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -51,7 +52,7 @@
     letter-spacing: 4px;
   }
   .sub {
-    color: rgba(255,255,255,0.5);
+    color: var(--muted);
     font-size: 1.1rem;
     text-align: center;
     line-height: 1.8;
@@ -64,14 +65,15 @@
     font-size: 0.9rem;
     font-weight: 700;
     color: #fff;
-    background: linear-gradient(135deg, #FF6B35, #ff9a00);
-    border-radius: 50px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    border-radius: 14px;
     text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+    box-shadow: 0 8px 24px rgba(255,107,53,.25);
   }
   .home-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(255,107,53,0.4);
+    box-shadow: var(--glow-primary);
   }
   @keyframes float {
     0%, 100% { transform: translateY(0); }

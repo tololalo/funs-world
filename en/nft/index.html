@@ -17,33 +17,19 @@
 <link rel="canonical" href="https://funs.world/en/nft/">
 <link rel="alternate" hreflang="ko" href="https://funs.world/nft/">
 <link rel="alternate" hreflang="en" href="https://funs.world/en/nft/">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/common.css">
 <style>
-:root {
-  --primary: #FF6B35;
-  --secondary: #FFD700;
-  --accent: #4FC3F7;
-  --dark: #080B14;
-  --dark2: #0D1120;
-  --dark3: #141828;
-  --border: rgba(255,107,53,0.2);
-  --text: #e8eaf0;
-  --muted: #8892b0;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 17px; }
-body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background: var(--dark);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+/* Design tokens, reset, aurora backdrop, lang-switch: provided by css/common.css */
+body { min-height: 100vh; }
 
 /* ── NAVIGATION ── */
 nav {
-  background: rgba(13, 17, 32, 0.8);
-  backdrop-filter: blur(10px);
+  display: block;
+  height: auto;
+  background: rgba(5,7,15,0.72);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
   border-bottom: 1px solid var(--border);
   padding: 15px 0;
   position: sticky;
@@ -67,16 +53,21 @@ nav {
 }
 
 .nav-logo {
+  display: inline-block;
   height: 40px;
   width: auto;
+  filter: drop-shadow(0 0 14px rgba(255,107,53,.45));
 }
 
 .nav-title {
   font-family: 'Orbitron', sans-serif;
   font-size: 24px;
   font-weight: 700;
-  color: #FF6B35;
   letter-spacing: 2px;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .nav-right {
@@ -86,68 +77,48 @@ nav {
 }
 
 .back-link {
-  color: #4FC3F7;
+  color: var(--accent);
   text-decoration: none;
   font-size: 14px;
   padding: 8px 12px;
-  border: 1px solid rgba(79, 195, 247, 0.3);
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  background: rgba(79,195,247,.06);
+  border: 1px solid rgba(79,195,247,.5);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all .3s var(--ease);
 }
 
 .back-link:hover {
-  background: rgba(79, 195, 247, 0.1);
-  border-color: #4FC3F7;
+  background: rgba(79,195,247,.14);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(79,195,247,.18);
 }
 
 .wallet-btn {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #FF6B35, #ff8c42);
-  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
   font-size: 0.9rem;
   font-family: inherit;
 }
 
 .wallet-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+  box-shadow: var(--glow-primary);
 }
 
 .wallet-btn.connected {
-  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  background: linear-gradient(135deg, #1FA97C, #35E0A1);
 }
 
-.lang-switch {
-  display: flex;
-  gap: 2px;
-  background: #141828;
-  border-radius: 8px;
-  padding: 2px;
-}
-
-.lang-btn {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #8892b0;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.lang-btn.active {
-  background: #FF6B35;
-  color: #fff;
-}
-
-.lang-btn:hover:not(.active) {
-  color: #e8eaf0;
-}
+/* .lang-switch / .lang-btn: provided by css/common.css */
 
 /* ── COMING SOON ── */
 .coming-soon {
@@ -231,7 +202,7 @@ nav {
 
 .countdown-number {
   font-size: 3.5rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: var(--grad-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -255,7 +226,7 @@ nav {
 .cs-badge {
   display: inline-block;
   padding: 8px 24px;
-  background: linear-gradient(135deg, var(--primary), #ff9a00);
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
   color: #fff;
   font-family: 'Orbitron', monospace;
   font-size: 0.7rem;
@@ -278,7 +249,7 @@ nav {
   font-size: 3.5rem;
   font-weight: 900;
   margin-bottom: 12px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
+  background: var(--grad-title);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -329,12 +300,14 @@ nav {
 }
 
 .preview-card {
-  background: linear-gradient(135deg, rgba(20,24,40,.6), rgba(13,17,32,.8));
+  background: var(--glass);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 32px 24px;
   text-align: center;
-  transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease);
   position: relative;
   overflow: hidden;
 }
@@ -355,12 +328,10 @@ nav {
 }
 
 .preview-card:hover {
-  border-color: var(--primary);
-  transform: translateY(-8px) scale(1.02);
-  box-shadow:
-    0 0 40px rgba(255,107,53,.3),
-    0 0 80px rgba(255,107,53,.1),
-    inset 0 0 20px rgba(255,107,53,.05);
+  border-color: var(--border-hot);
+  background: var(--glass-2);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-card), 0 0 40px rgba(255,107,53,.18);
 }
 
 .preview-card .emoji {
@@ -431,20 +402,22 @@ nav {
 .notify-input {
   flex: 1;
   padding: 16px 20px;
-  background: rgba(13,17,32,.8);
+  background: var(--glass);
   border: 1.5px solid var(--border);
-  border-radius: 16px;
+  border-radius: 14px;
   color: var(--text);
   font-size: 0.95rem;
   outline: none;
   font-family: inherit;
-  transition: all .3s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all .3s var(--ease);
 }
 
 .notify-input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 20px rgba(255,107,53,.2);
-  background: rgba(13,17,32,.95);
+  background: var(--glass-2);
 }
 
 .notify-input::placeholder {
@@ -453,14 +426,14 @@ nav {
 
 .notify-btn {
   padding: 16px 32px;
-  background: linear-gradient(135deg, var(--primary), #ff9a00);
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
   color: #fff;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
   font-family: inherit;
   white-space: nowrap;
   font-family: 'Orbitron', monospace;
@@ -479,7 +452,7 @@ nav {
 
 .notify-success {
   display: none;
-  color: #4caf50;
+  color: #35E0A1;
   font-size: 0.95rem;
   font-weight: 600;
   animation: successPop 0.4s ease-out;
@@ -557,7 +530,6 @@ nav {
 }
 
 @media(max-width:600px) {
-  html { font-size: 15px; }
   nav { padding: 10px 0; }
   .nav-content { padding: 0 10px; }
   .nav-left { gap: 12px; }
@@ -566,7 +538,6 @@ nav {
   .nav-right { gap: 8px; }
   .back-link { padding: 5px 8px; font-size: 11px; }
   .wallet-btn { padding: 8px 14px; font-size: 0.75rem; }
-  .lang-btn { padding: 3px 8px; font-size: 0.65rem; }
 
   .coming-soon {
     padding: 50px 16px;
@@ -669,8 +640,6 @@ nav {
 }
 
 @media(max-width:380px) {
-  html { font-size: 14px; }
-
   .cs-title {
     font-size: 1.6rem;
   }
@@ -796,7 +765,7 @@ nav {
 </section>
 
 <!-- FOOTER -->
-<footer style="margin-top: auto; background: var(--dark2); border-top: 1px solid var(--border); padding: 40px 20px;">
+<footer style="margin-top: auto; background: transparent; border-top: 1px solid var(--border); padding: 40px 20px;">
   <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px;">
     <div style="font-family: 'Orbitron', monospace; color: var(--primary); margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
       <a href="../" style="color: var(--primary); text-decoration: none;">FunS Platform</a>

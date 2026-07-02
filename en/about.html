@@ -18,22 +18,15 @@
 <link rel="alternate" hreflang="ko" href="https://funs.world/about.html">
 <link rel="alternate" hreflang="en" href="https://funs.world/en/about.html">
 <link rel="icon" type="image/png" href="../funs-nugi.png">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/common.css">
 <style>
-  /* Hero Section Enhancements */
+  /* Hero Section Enhancements (gradient title/span from common.css) */
   .page-hero {
     padding: 120px 5%;
     text-align: center;
     position: relative;
     overflow: hidden;
-  }
-
-  .page-hero .section-title span {
-    background: linear-gradient(135deg, var(--primary), #ff9a00);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
 
@@ -100,20 +93,27 @@
 
   .timeline-item.completed .timeline-dot {
     background: var(--primary);
-    box-shadow: 0 0 20px rgba(0, 255, 200, 0.6);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
   }
 
   .timeline-content {
     padding: 20px;
-    background: rgba(0, 255, 200, 0.05);
-    border: 1px solid rgba(0, 255, 200, 0.2);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: border-color .3s var(--ease), background .3s var(--ease);
+  }
+
+  .timeline-content:hover {
+    border-color: var(--border-hot);
+    background: var(--glass-2);
   }
 
   .timeline-item.completed .timeline-content {
-    background: rgba(0, 255, 200, 0.1);
-    border-color: rgba(0, 255, 200, 0.4);
+    background: var(--glass-2);
+    border-color: var(--border-hot);
   }
 
   .timeline-quarter {
@@ -145,13 +145,13 @@
   }
 
   .timeline-item.completed .timeline-status {
-    background: rgba(0, 255, 200, 0.2);
+    background: rgba(255, 107, 53, 0.15);
     color: var(--primary);
   }
 
   .timeline-item.in-progress .timeline-status {
-    background: rgba(255, 154, 0, 0.2);
-    color: #ff9a00;
+    background: rgba(255, 154, 61, 0.18);
+    color: var(--primary-2);
   }
 
   .timeline-item.upcoming .timeline-status {
@@ -171,20 +171,22 @@
     }
   }
 
-  /* Mission Card Enhancements */
+  /* Mission Card Enhancements — glass */
   .info-card {
-    background: rgba(0, 255, 200, 0.05);
-    border: 1px solid rgba(0, 255, 200, 0.2);
-    border-radius: 12px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 40px 30px;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
   }
 
   .info-card:hover {
-    background: rgba(0, 255, 200, 0.1);
-    border-color: rgba(0, 255, 200, 0.4);
-    transform: translateY(-5px);
+    background: var(--glass-2);
+    border-color: var(--border-hot);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card);
   }
 
   .info-card .icon {
@@ -217,24 +219,27 @@
 
   .stat-box {
     padding: 30px;
-    background: linear-gradient(135deg, rgba(0, 255, 200, 0.1), rgba(255, 154, 0, 0.05));
-    border: 1px solid rgba(0, 255, 200, 0.2);
-    border-radius: 12px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     text-align: center;
-    transition: all 0.3s ease;
+    transition: transform .3s var(--ease), border-color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
   }
 
   .stat-box:hover {
-    background: linear-gradient(135deg, rgba(0, 255, 200, 0.15), rgba(255, 154, 0, 0.1));
-    border-color: rgba(0, 255, 200, 0.4);
-    transform: translateY(-5px);
+    background: var(--glass-2);
+    border-color: var(--border-hot);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card);
   }
 
   .stat-box .num {
     font-size: 28px;
     font-weight: 900;
     font-family: 'Orbitron', monospace;
-    background: linear-gradient(135deg, var(--primary), #ff9a00);
+    background: var(--grad-brand);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -251,7 +256,7 @@
   .cta-section {
     padding: 80px 5%;
     text-align: center;
-    background: var(--dark2);
+    background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(255,107,53,.10) 0%, transparent 70%);
   }
 
   .cta-title {
@@ -262,21 +267,22 @@
   }
 
   .cta-btn {
-    background: linear-gradient(135deg, var(--primary), #ff9a00);
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
     color: #fff;
     padding: 16px 40px;
-    border-radius: 50px;
+    border-radius: 14px;
     font-weight: 700;
     text-decoration: none;
     display: inline-block;
-    transition: all 0.3s ease;
+    transition: transform .25s var(--ease), box-shadow .25s var(--ease);
     border: none;
     cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255,107,53,.25);
   }
 
   .cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 255, 200, 0.3);
+    transform: translateY(-3px);
+    box-shadow: var(--glow-primary);
   }
 
   /* Responsive Design */
@@ -452,7 +458,7 @@
     .timeline-content {
       padding: 12px;
       border-radius: 8px;
-      background: rgba(0, 255, 200, 0.02) !important;
+      background: var(--glass) !important;
     }
 
     .timeline-quarter {
@@ -512,10 +518,7 @@
     }
   }
 
-  .lang-switch { display: flex; gap: 2px; background: var(--dark3); border-radius: 8px; padding: 2px; }
-  .lang-btn { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: all .2s; }
-  .lang-btn.active { background: var(--primary); color: #fff; }
-  .lang-btn:hover:not(.active) { color: var(--text); }
+  /* .lang-switch / .lang-btn provided by css/common.css */
 </style>
 </head>
 <body>
@@ -554,7 +557,7 @@
 </section>
 
 <!-- MISSION -->
-<section style="padding:100px 5%; background:var(--dark2);">
+<section style="padding:100px 5%; background:transparent;">
   <div class="reveal" style="text-align:center;">
     <span class="section-tag">Mission</span>
     <h2 class="section-title">Our <span>Mission</span></h2>
@@ -690,7 +693,7 @@
 
 <!-- CTA -->
 <section class="cta-section">
-  <h2 class="cta-title">Let's Build the <span style="background:linear-gradient(135deg,var(--primary),#ff9a00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">Future Together</span></h2>
+  <h2 class="cta-title">Let's Build the <span style="background:var(--grad-brand); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">Future Together</span></h2>
   <p style="color:var(--muted); max-width:500px; margin:0 auto 40px;">Get started now and become a part of the FunS community.</p>
   <a href="#" onclick="document.getElementById('coming-soon-modal').style.display='flex';return false;" class="cta-btn">Get Started</a>
 </section>

@@ -19,19 +19,19 @@
 <link rel="alternate" hreflang="en" href="https://funs.world/en/">
 <link rel="icon" type="image/png" href="../funs-nugi.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/common.css">
 <style>
 /* Floating Particle Animation */
 .hero-particle {
   position: absolute;
-  width: 4px;
-  height: 4px;
-  background: radial-gradient(circle, #00ff88, #00aa55);
+  width: 5px;
+  height: 5px;
+  background: radial-gradient(circle, var(--secondary), var(--primary));
   border-radius: 50%;
   pointer-events: none;
   opacity: 0.6;
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 10px rgba(255, 154, 61, 0.5);
 }
 
 .particle-1 {
@@ -43,6 +43,8 @@
 .particle-2 {
   top: 30%;
   right: 15%;
+  background: radial-gradient(circle, var(--accent), #2196c9);
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
   animation: float-particle 10s ease-in-out infinite 1s;
 }
 
@@ -61,6 +63,8 @@
 .particle-5 {
   top: 60%;
   right: 25%;
+  background: radial-gradient(circle, #fff, var(--secondary));
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   animation: float-particle 11s ease-in-out infinite 0.5s;
 }
 
@@ -83,25 +87,10 @@
   }
 }
 
-/* Ecosystem Card Hover Glow */
-.eco-list li {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.eco-list li:hover {
-  box-shadow: 0 0 30px rgba(0, 255, 136, 0.3), 0 0 60px rgba(0, 255, 136, 0.15);
-  border-color: rgba(0, 255, 136, 0.5);
-}
-
 /* Counter Animation */
 .stat-num {
   font-size: 2.5rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #00ff88 0%, #00dd77 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   transition: all 0.3s ease;
 }
 
@@ -140,10 +129,6 @@
   }
 }
 
-.lang-switch { display: flex; gap: 2px; background: var(--dark3); border-radius: 8px; padding: 2px; }
-.lang-btn { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: all .2s; }
-.lang-btn.active { background: var(--primary); color: #fff; }
-.lang-btn:hover:not(.active) { color: var(--text); }
 </style>
 </head>
 <body>
