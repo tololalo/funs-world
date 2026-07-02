@@ -96,7 +96,6 @@
     .nav-links { display: none; }
     .nav-right { gap: 12px; }
     .hamburger { display: flex; }
-    section { padding: 70px 20px; }
   }
 
   /* ── HERO ── */
@@ -207,6 +206,7 @@
 
   /* ── COMMON ── */
   section { padding: 110px 24px; position: relative; }
+  @media (max-width: 768px) { section { padding: 70px 20px; } }
   .container { max-width: 1100px; margin: 0 auto; }
 
   .label {
@@ -549,20 +549,22 @@
     <img src="funs-nugi.png" alt="FUNS" class="nav-logo">
     <div class="nav-brand"><span>FUNS</span> Talk</div>
   </div>
-  <ul class="nav-links">
-    <li><a href="#features">Features</a></li>
-    <li><a href="#how">How to Use</a></li>
-    <li><a href="#token">FunS Token</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="https://funs.world/" target="_blank">FUNS World</a></li>
-  </ul>
-  <div class="lang-switch">
-    <a href="./" class="lang-btn">KR</a>
-    <a href="en.html" class="lang-btn active">EN</a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How to Use</a></li>
+      <li><a href="#token">FunS Token</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="https://funs.world/" target="_blank">FUNS World</a></li>
+    </ul>
+    <div class="lang-switch">
+      <a href="./" class="lang-btn">KR</a>
+      <a href="en.html" class="lang-btn active">EN</a>
+    </div>
+    <button class="hamburger" onclick="this.classList.toggle('open');document.querySelector('.mobile-menu').classList.toggle('open');" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
-  <button class="hamburger" onclick="this.classList.toggle('open');document.querySelector('.mobile-menu').classList.toggle('open');" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
 </nav>
 <div class="mobile-menu">
   <a href="#features" onclick="document.querySelector('.mobile-menu').classList.remove('open');document.querySelector('.hamburger').classList.remove('open');">Features</a>
