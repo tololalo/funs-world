@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FunSwap — Decentralized Exchange</title>
 <meta name="description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange with low fees and diverse token support.">
-<meta name="keywords" content="DEX, decentralized exchange, crypto swap, FunSwap, FUNS token">
+<meta name="keywords" content="DEX, decentralized exchange, crypto swap, FunSwap, FunS token">
 <meta property="og:title" content="FunSwap — Decentralized Exchange">
 <meta property="og:description" content="Swap cryptocurrencies on FunSwap DEX. Decentralized exchange with low fees and diverse token support.">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
@@ -762,7 +762,7 @@ nav {
   <div class="price-ticker">
     <div class="ticker-chip">
       <img src="../funs-nugi.png" style="width:20px;height:20px;border-radius:50%;">
-      <span>FUNS</span>
+      <span>FunS</span>
       <span class="price">$1.24</span>
       <span class="change up">+8.0%</span>
     </div>
@@ -827,7 +827,7 @@ nav {
         <input type="text" class="token-amount" id="toAmount" placeholder="0" inputmode="decimal" readonly>
         <div class="token-select" id="toSelect" data-side="to">
           <img src="../funs-nugi.png" class="token-img" style="width:28px;height:28px;border-radius:50%;">
-          <span class="token-symbol">FUNS</span>
+          <span class="token-symbol">FunS</span>
           <span class="arrow">▼</span>
         </div>
       </div>
@@ -838,7 +838,7 @@ nav {
     <div class="swap-details" id="swapDetails" style="display:none;">
       <div class="detail-row">
         <span>Rate</span>
-        <span class="val" id="rateDisplay">1 ETH = 91,476 FUNS</span>
+        <span class="val" id="rateDisplay">1 ETH = 91,476 FunS</span>
       </div>
       <div class="detail-row">
         <span>Price Impact</span>
@@ -876,7 +876,7 @@ nav {
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title">
-        <h3>FUNS/BNB</h3>
+        <h3>FunS/BNB</h3>
         <div class="chart-price">$1.24</div>
         <div class="chart-change up">+8.0% (24h)</div>
       </div>
@@ -997,7 +997,7 @@ nav {
 // ── Token Data ──
 const TOKENS = [
   { symbol: 'BNB', name: 'BNB', img: 'icons/bnb.svg', price: 612, balance: 2.45 },
-  { symbol: 'FUNS', name: 'FunS Token', img: '../funs-nugi.png', price: 1.24, balance: 1840 },
+  { symbol: 'FunS', name: 'FunS Token', img: '../funs-nugi.png', price: 1.24, balance: 1840 },
   { symbol: 'USDT', name: 'Tether USD (BEP-20)', img: 'icons/usdt.svg', price: 1.00, balance: 500 },
   { symbol: 'USDC', name: 'USD Coin (BEP-20)', img: 'icons/usdc.svg', price: 1.00, balance: 250 },
   { symbol: 'ETH', name: 'Ethereum (BEP-20)', img: 'icons/eth.svg', price: 3842, balance: 0.12 },
@@ -1006,7 +1006,7 @@ const TOKENS = [
 
 // ── State ──
 let fromToken = TOKENS[0]; // BNB
-let toToken = TOKENS[1];   // FUNS
+let toToken = TOKENS[1];   // FunS
 let slippage = 0.5;
 let selectingSide = 'from';
 let walletConnected = false;
@@ -1280,11 +1280,11 @@ function updateChart(period) {
 
 // ── Transactions Data ──
 const transactionsData = [
-  { time: '10m ago', type: 'swap', tokens: 'BNB → FUNS', amount: '2.5 BNB', status: 'Done' },
-  { time: '25m ago', type: 'add', tokens: 'BNB + FUNS', amount: '$1,200', status: 'Done' },
-  { time: '1h ago', type: 'swap', tokens: 'USDT → FUNS', amount: '500 USDT', status: 'Done' },
+  { time: '10m ago', type: 'swap', tokens: 'BNB → FunS', amount: '2.5 BNB', status: 'Done' },
+  { time: '25m ago', type: 'add', tokens: 'BNB + FunS', amount: '$1,200', status: 'Done' },
+  { time: '1h ago', type: 'swap', tokens: 'USDT → FunS', amount: '500 USDT', status: 'Done' },
   { time: '2h ago', type: 'swap', tokens: 'BNB → USDT', amount: '1.2 BNB', status: 'Done' },
-  { time: '5h ago', type: 'add', tokens: 'FUNS + USDT', amount: '$800', status: 'Done' },
+  { time: '5h ago', type: 'add', tokens: 'FunS + USDT', amount: '$800', status: 'Done' },
   { time: '8h ago', type: 'swap', tokens: 'CAKE → BNB', amount: '50 CAKE', status: 'Done' }
 ];
 
@@ -1308,10 +1308,10 @@ function renderTransactions() {
 
 // ── Pools Data ──
 const poolsData = [
-  { pair: 'BNB/FUNS', icons: ['icons/bnb.svg', '../funs-nugi.png'], tvl: '$4.2M', apr: '128%', volume24h: '$1.2M' },
-  { pair: 'FUNS/USDT', icons: ['../funs-nugi.png', 'icons/usdt.svg'], tvl: '$2.8M', apr: '95%', volume24h: '$890K' },
+  { pair: 'BNB/FunS', icons: ['icons/bnb.svg', '../funs-nugi.png'], tvl: '$4.2M', apr: '128%', volume24h: '$1.2M' },
+  { pair: 'FunS/USDT', icons: ['../funs-nugi.png', 'icons/usdt.svg'], tvl: '$2.8M', apr: '95%', volume24h: '$890K' },
   { pair: 'BNB/USDT', icons: ['icons/bnb.svg', 'icons/usdt.svg'], tvl: '$5.6M', apr: '42%', volume24h: '$2.1M' },
-  { pair: 'FUNS/CAKE', icons: ['../funs-nugi.png', 'icons/cake.svg'], tvl: '$1.5M', apr: '156%', volume24h: '$420K' }
+  { pair: 'FunS/CAKE', icons: ['../funs-nugi.png', 'icons/cake.svg'], tvl: '$1.5M', apr: '156%', volume24h: '$420K' }
 ];
 
 function renderPools() {

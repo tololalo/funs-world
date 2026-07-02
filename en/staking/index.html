@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FunS Staking - FUNS Token Staking Platform</title>
-<meta name="description" content="Stake FUNS tokens on FunS Staking and earn rewards. Blockchain-based staking platform.">
-<meta name="keywords" content="FUNS Staking, Token Staking, Blockchain Rewards, DeFi">
-<meta property="og:title" content="FunS Staking - FUNS Token Staking Platform">
-<meta property="og:description" content="Stake FUNS tokens on FunS Staking and earn rewards. Blockchain-based staking platform.">
+    <title>FunS Staking - FunS Token Staking Platform</title>
+<meta name="description" content="Stake FunS tokens on FunS Staking and earn rewards. Blockchain-based staking platform.">
+<meta name="keywords" content="FunS Staking, Token Staking, Blockchain Rewards, DeFi">
+<meta property="og:title" content="FunS Staking - FunS Token Staking Platform">
+<meta property="og:description" content="Stake FunS tokens on FunS Staking and earn rewards. Blockchain-based staking platform.">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
 <meta property="og:url" content="https://funs.world/en/staking/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta property="twitter:title" content="FunS Staking - FUNS Token Staking Platform">
-<meta property="twitter:description" content="Stake FUNS tokens on FunS Staking and earn rewards. Blockchain-based staking platform.">
+<meta property="twitter:title" content="FunS Staking - FunS Token Staking Platform">
+<meta property="twitter:description" content="Stake FunS tokens on FunS Staking and earn rewards. Blockchain-based staking platform.">
 <link rel="canonical" href="https://funs.world/en/staking/">
 <link rel="alternate" hreflang="ko" href="https://funs.world/staking/">
 <link rel="alternate" hreflang="en" href="https://funs.world/en/staking/">
@@ -1239,8 +1239,8 @@
                     <div class="tab-content active" id="staking">
                         <div class="input-group">
                             <div class="input-label">
-                                <span>FUNS Amount</span>
-                                <span class="input-label-balance">Balance: 1,840 FUNS</span>
+                                <span>FunS Amount</span>
+                                <span class="input-label-balance">Balance: 1,840 FunS</span>
                             </div>
                             <div class="input-wrapper">
                                 <input type="number" class="amount-input" id="stakingAmount" placeholder="0" min="0">
@@ -1272,7 +1272,7 @@
 
                         <div class="reward-display">
                             <div class="reward-label">Estimated Daily Reward</div>
-                            <div class="reward-value" id="dailyReward">0 FUNS</div>
+                            <div class="reward-value" id="dailyReward">0 FunS</div>
                         </div>
 
                         <button class="staking-btn">Stake</button>
@@ -1282,8 +1282,8 @@
                     <div class="tab-content" id="unstaking">
                         <div class="input-group">
                             <div class="input-label">
-                                <span>FUNS Amount</span>
-                                <span class="input-label-balance">Staked Amount: 500 FUNS</span>
+                                <span>FunS Amount</span>
+                                <span class="input-label-balance">Staked Amount: 500 FunS</span>
                             </div>
                             <div class="input-wrapper">
                                 <input type="number" class="amount-input" id="unstakingAmount" placeholder="0" min="0">
@@ -1293,7 +1293,7 @@
 
                         <div class="reward-display">
                             <div class="reward-label">Available to Claim</div>
-                            <div class="reward-value" id="claimableReward">125.5 FUNS</div>
+                            <div class="reward-value" id="claimableReward">125.5 FunS</div>
                         </div>
 
                         <button class="staking-btn">Unstake</button>
@@ -1325,21 +1325,21 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="pool-name">FUNS Flex</td>
+                            <td class="pool-name">FunS Flex</td>
                             <td class="pool-period" data-label="Lock Period">Flexible Withdrawal</td>
                             <td class="apr-badge" data-label="APR">45%</td>
                             <td data-label="TVL">$2.1M</td>
                             <td><button class="join-btn">Join</button></td>
                         </tr>
                         <tr>
-                            <td class="pool-name">FUNS Lock 90</td>
+                            <td class="pool-name">FunS Lock 90</td>
                             <td class="pool-period" data-label="Lock Period">90-Day Lock</td>
                             <td class="apr-badge" data-label="APR">85%</td>
                             <td data-label="TVL">$3.4M</td>
                             <td><button class="join-btn">Join</button></td>
                         </tr>
                         <tr>
-                            <td class="pool-name">FUNS Lock 365</td>
+                            <td class="pool-name">FunS Lock 365</td>
                             <td class="pool-period" data-label="Lock Period">365-Day Lock</td>
                             <td class="apr-badge" data-label="APR">180%</td>
                             <td data-label="TVL">$2.7M</td>
@@ -1355,8 +1355,8 @@
                 <div class="steps-grid">
                     <div class="step-card">
                         <div class="step-icon">&#128176;</div>
-                        <div class="step-title">Deposit FUNS</div>
-                        <div class="step-description">Deposit FUNS tokens from your wallet into the staking pool.</div>
+                        <div class="step-title">Deposit FunS</div>
+                        <div class="step-description">Deposit FunS tokens from your wallet into the staking pool.</div>
                     </div>
                     <div class="step-card">
                         <div class="step-icon">&#128197;</div>
@@ -1448,7 +1448,7 @@
         function calculateRewards() {
             const amount = parseFloat(document.getElementById('stakingAmount').value) || 0;
             const dailyReward = (amount * selectedAPR / 100 / 365).toFixed(2);
-            document.getElementById('dailyReward').textContent = `${dailyReward} FUNS`;
+            document.getElementById('dailyReward').textContent = `${dailyReward} FunS`;
         }
 
         document.getElementById('stakingAmount').addEventListener('input', calculateRewards);
@@ -1471,11 +1471,11 @@
                 stakingDetails.innerHTML = `
                     <div class="info-row">
                         <span class="info-label">Staked Amount</span>
-                        <span class="info-value">500 FUNS</span>
+                        <span class="info-value">500 FunS</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Accumulated Rewards</span>
-                        <span class="info-value">125.5 FUNS</span>
+                        <span class="info-value">125.5 FunS</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Remaining Period</span>
@@ -1483,7 +1483,7 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">Daily Reward</span>
-                        <span class="info-value">1.15 FUNS</span>
+                        <span class="info-value">1.15 FunS</span>
                     </div>
                 `;
                 document.getElementById('claimBtn').style.display = 'block';
@@ -1495,7 +1495,7 @@
 
         // Claim rewards
         document.getElementById('claimBtn').addEventListener('click', () => {
-            alert('Successfully claimed 125.5 FUNS rewards!');
+            alert('Successfully claimed 125.5 FunS rewards!');
         });
 
         // Number formatting
