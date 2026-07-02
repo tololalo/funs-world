@@ -17,53 +17,21 @@
 <link rel="canonical" href="https://funs.world/en/staking/">
 <link rel="alternate" hreflang="ko" href="https://funs.world/staking/">
 <link rel="alternate" hreflang="en" href="https://funs.world/en/staking/">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/common.css">
 
     <style>
+        /* Page tokens on top of Design System v2 (css/common.css) */
         :root {
-            --primary: #FF6B35;
-            --secondary: #FFD700;
-            --accent: #4FC3F7;
-            --dark: #080B14;
-            --dark2: #0D1120;
-            --dark3: #141828;
-            --card: #1a1f35;
-            --card2: #222842;
-            --border: rgba(255,107,53,0.2);
-            --text: #e8eaf0;
-            --muted: #8892b0;
-            --green: #4caf50;
-            --font-heading: 'Orbitron', sans-serif;
-            --font-body: 'Noto Sans KR', sans-serif;
-            font-size: 17px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --green: #35E0A1;
+            --font-heading: 'Orbitron', monospace;
+            --font-body: 'Inter', 'Noto Sans KR', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
-            color: var(--text);
             font-family: var(--font-body);
             min-height: 100vh;
             position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(79, 195, 247, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
         }
 
         .container {
@@ -74,21 +42,25 @@
             padding: 0 20px;
         }
 
-        /* Navigation */
+        /* Navigation (page-local sticky bar) */
         nav {
-            background: rgba(13, 17, 32, 0.8);
-            backdrop-filter: blur(10px);
+            display: block;
+            height: auto;
+            background: rgba(5, 7, 15, 0.72);
+            backdrop-filter: blur(24px) saturate(150%);
+            -webkit-backdrop-filter: blur(24px) saturate(150%);
             border-bottom: 1px solid var(--border);
-            padding: 15px 0;
+            padding: 14px 0;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 999;
         }
 
         .nav-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 20px;
@@ -103,14 +75,18 @@
         .nav-logo {
             height: 40px;
             width: auto;
+            filter: drop-shadow(0 0 14px rgba(255,107,53,.45));
         }
 
         .nav-title {
             font-family: var(--font-heading);
             font-size: 24px;
             font-weight: 700;
-            color: var(--primary);
             letter-spacing: 2px;
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .nav-right {
@@ -123,37 +99,43 @@
             color: var(--accent);
             text-decoration: none;
             font-size: 14px;
-            padding: 8px 12px;
-            border: 1px solid rgba(79, 195, 247, 0.3);
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            padding: 8px 14px;
+            background: rgba(79, 195, 247, 0.06);
+            border: 1px solid rgba(79, 195, 247, 0.35);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all .25s var(--ease);
         }
 
         .back-link:hover {
-            background: rgba(79, 195, 247, 0.1);
+            background: rgba(79, 195, 247, 0.14);
             border-color: var(--accent);
+            transform: translateY(-2px);
         }
 
         .wallet-btn {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, var(--primary), #ff8c42);
-            color: white;
+            padding: 10px 22px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-family: var(--font-body);
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform .25s var(--ease), box-shadow .25s var(--ease);
             font-size: 14px;
+            letter-spacing: 0.5px;
         }
 
         .wallet-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+            box-shadow: var(--glow-primary);
         }
 
         .wallet-btn.connected {
-            background: linear-gradient(135deg, var(--green), #66bb6a);
+            background: linear-gradient(135deg, var(--green), #2BC48A);
+            color: #04251B;
         }
 
         /* Main content */
@@ -171,24 +153,31 @@
         }
 
         .stat-card {
-            background: var(--card);
+            background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius);
             padding: 25px 20px;
             text-align: center;
-            transition: all 0.3s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease);
         }
 
         .stat-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
+            border-color: var(--border-hot);
+            background: var(--glass-2);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-card), 0 0 0 1px rgba(255,107,53,.12) inset;
         }
 
         .stat-value {
             font-family: var(--font-heading);
             font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
+            font-weight: 900;
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
             letter-spacing: 1px;
         }
@@ -210,13 +199,21 @@
 
         /* Staking Card */
         .staking-card {
-            background: var(--card);
+            background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: var(--radius);
             padding: 30px;
             width: 100%;
             max-width: 480px;
-            box-shadow: 0 20px 60px rgba(255, 107, 53, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 24px 60px rgba(0,0,0,.35);
+            transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
+        }
+
+        .staking-card:hover {
+            border-color: var(--border-hot);
+            box-shadow: var(--shadow-card), 0 0 40px rgba(255,107,53,.12);
         }
 
         .tabs {
@@ -235,9 +232,13 @@
             font-family: var(--font-body);
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: color .25s var(--ease);
             position: relative;
             font-weight: 600;
+        }
+
+        .tab:hover {
+            color: var(--text);
         }
 
         .tab.active {
@@ -251,7 +252,8 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            background: var(--grad-brand);
         }
 
         .tab-content {
@@ -290,38 +292,39 @@
 
         .amount-input {
             flex: 1;
-            background: rgba(255, 107, 53, 0.05);
+            background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 14px 16px;
             color: var(--text);
             font-family: var(--font-body);
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: border-color .25s var(--ease), background .25s var(--ease), box-shadow .25s var(--ease);
         }
 
         .amount-input:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(255, 107, 53, 0.08);
+            background: var(--glass-2);
             box-shadow: 0 0 20px rgba(255, 107, 53, 0.2);
         }
 
         .max-btn {
             padding: 8px 12px;
-            background: rgba(255, 107, 53, 0.2);
-            border: 1px solid var(--primary);
-            border-radius: 6px;
-            color: var(--primary);
+            background: rgba(255, 107, 53, 0.14);
+            border: 1px solid rgba(255, 107, 53, 0.45);
+            border-radius: 10px;
+            color: var(--primary-2);
             font-family: var(--font-body);
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             font-size: 12px;
-            transition: all 0.3s ease;
+            transition: background .25s var(--ease), border-color .25s var(--ease);
         }
 
         .max-btn:hover {
-            background: rgba(255, 107, 53, 0.3);
+            background: rgba(255, 107, 53, 0.26);
+            border-color: var(--primary);
         }
 
         .duration-selector {
@@ -345,15 +348,15 @@
 
         .duration-btn {
             padding: 12px;
-            background: rgba(255, 107, 53, 0.05);
+            background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
             color: var(--text);
             font-family: var(--font-body);
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: border-color .25s var(--ease), background .25s var(--ease), box-shadow .25s var(--ease);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -361,13 +364,15 @@
         }
 
         .duration-btn:hover {
-            border-color: var(--primary);
+            border-color: var(--border-hot);
+            background: var(--glass-2);
         }
 
         .duration-btn.active {
-            background: linear-gradient(135deg, var(--primary), #ff8c42);
-            border-color: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
         }
 
         .duration-apr {
@@ -376,17 +381,19 @@
         }
 
         .duration-btn.active .duration-apr {
-            color: white;
+            color: #fff;
         }
 
         .reward-display {
-            background: rgba(79, 195, 247, 0.05);
-            border: 1px solid rgba(79, 195, 247, 0.2);
-            border-radius: 8px;
+            background: rgba(79, 195, 247, 0.06);
+            border: 1px solid rgba(79, 195, 247, 0.22);
+            border-radius: 12px;
             padding: 15px;
             margin-bottom: 25px;
             font-size: 13px;
             color: var(--muted);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .reward-label {
@@ -398,29 +405,33 @@
         .reward-value {
             font-family: var(--font-heading);
             font-size: 20px;
-            color: var(--accent);
             font-weight: 700;
+            display: inline-block;
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .staking-btn {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, var(--primary), #ff8c42);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-family: var(--font-body);
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform .25s var(--ease), box-shadow .25s var(--ease);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .staking-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(255, 107, 53, 0.3);
+            box-shadow: var(--glow-primary);
         }
 
         .staking-btn:active {
@@ -429,12 +440,20 @@
 
         /* My Staking Info */
         .staking-info {
-            background: var(--card);
+            background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius);
             padding: 25px;
             width: 100%;
             max-width: 480px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
+        }
+
+        .staking-info:hover {
+            border-color: var(--border-hot);
+            box-shadow: var(--shadow-card), 0 0 40px rgba(255,107,53,.1);
         }
 
         .info-title {
@@ -442,15 +461,19 @@
             font-size: 18px;
             font-weight: 700;
             margin-bottom: 20px;
-            color: var(--primary);
             letter-spacing: 1px;
+            display: inline-block;
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 107, 53, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             font-size: 13px;
         }
 
@@ -472,21 +495,21 @@
         .claim-btn {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, var(--green), #66bb6a);
-            color: white;
+            background: linear-gradient(135deg, var(--green), #2BC48A);
+            color: #04251B;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-family: var(--font-body);
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             margin-top: 20px;
-            transition: all 0.3s ease;
+            transition: transform .25s var(--ease), box-shadow .25s var(--ease);
         }
 
         .claim-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 12px 30px rgba(53, 224, 161, 0.3);
         }
 
         .not-connected {
@@ -505,23 +528,28 @@
         .section-title {
             font-family: var(--font-heading);
             font-size: 24px;
-            font-weight: 700;
+            font-weight: 900;
             margin-bottom: 25px;
-            color: var(--primary);
             letter-spacing: 1px;
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .pools-table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--card);
+            background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius);
             overflow: hidden;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .pools-table thead {
-            background: rgba(255, 107, 53, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid var(--border);
         }
 
@@ -531,16 +559,24 @@
             font-family: var(--font-heading);
             font-size: 12px;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--primary-2);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .pools-table td {
             padding: 18px;
-            border-bottom: 1px solid rgba(255, 107, 53, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             color: var(--text);
             font-size: 14px;
+        }
+
+        .pools-table tbody tr {
+            transition: background .25s var(--ease);
+        }
+
+        .pools-table tbody tr:hover {
+            background: rgba(255, 107, 53, 0.05);
         }
 
         .pools-table tr:last-child td {
@@ -550,7 +586,7 @@
         .pool-name {
             font-weight: 700;
             font-family: var(--font-heading);
-            color: var(--primary);
+            color: var(--primary-2);
         }
 
         .pool-period {
@@ -559,22 +595,25 @@
         }
 
         .apr-badge {
-            color: var(--green);
             font-weight: 700;
             font-family: var(--font-heading);
+            background: var(--grad-brand);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .join-btn {
             padding: 8px 16px;
-            background: linear-gradient(135deg, var(--primary), #ff8c42);
-            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-2));
+            color: #fff;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             font-family: var(--font-body);
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             font-size: 12px;
-            transition: all 0.3s ease;
+            transition: transform .25s var(--ease), box-shadow .25s var(--ease);
         }
 
         .join-btn:hover {
@@ -596,17 +635,21 @@
         }
 
         .step-card {
-            background: var(--card);
+            background: var(--glass);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius);
             padding: 30px 20px;
             text-align: center;
-            transition: all 0.3s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease);
         }
 
         .step-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
+            border-color: var(--border-hot);
+            background: var(--glass-2);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-card);
         }
 
         .step-icon {
@@ -616,13 +659,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            filter: drop-shadow(0 4px 14px rgba(255, 107, 53, 0.3));
         }
 
         .step-title {
             font-family: var(--font-heading);
             font-size: 16px;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--secondary);
             margin-bottom: 10px;
             letter-spacing: 1px;
         }
@@ -638,6 +682,7 @@
             margin-top: 80px;
             padding: 40px 0 60px;
             border-top: 1px solid var(--border);
+            background: transparent;
         }
 
         .footer-content {
@@ -649,7 +694,7 @@
 
         .footer-section h3 {
             font-family: var(--font-heading);
-            color: var(--primary);
+            color: var(--secondary);
             margin-bottom: 15px;
             font-size: 14px;
             text-transform: uppercase;
@@ -662,7 +707,7 @@
             text-decoration: none;
             font-size: 13px;
             margin-bottom: 10px;
-            transition: all 0.3s ease;
+            transition: color .2s var(--ease), padding-left .2s var(--ease);
         }
 
         .footer-link:hover {
@@ -671,9 +716,10 @@
         }
 
         .footer-bottom {
+            display: block;
             text-align: center;
             padding-top: 30px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
             color: var(--muted);
             font-size: 12px;
         }
@@ -760,6 +806,7 @@
 
             .stat-card {
                 padding: 15px 12px;
+                border-radius: 14px;
             }
 
             .stat-value {
@@ -836,10 +883,6 @@
         }
 
         @media (max-width: 380px) {
-            :root {
-                font-size: 14px;
-            }
-
             .container {
                 padding: 0 10px;
             }
@@ -911,11 +954,13 @@
             .staking-card {
                 max-width: 100%;
                 padding: 16px;
+                border-radius: 14px;
             }
 
             .staking-info {
                 max-width: 100%;
                 padding: 16px;
+                border-radius: 14px;
             }
 
             .tabs {
@@ -1023,7 +1068,7 @@
 
             .pools-table {
                 font-size: 11px;
-                border-radius: 8px;
+                border-radius: 12px;
                 overflow-x: auto;
                 display: block;
             }
@@ -1042,7 +1087,7 @@
             .pools-table tr {
                 margin-bottom: 12px;
                 border: 1px solid var(--border);
-                border-radius: 8px;
+                border-radius: 12px;
                 padding: 0;
             }
 
@@ -1060,7 +1105,7 @@
                 left: 10px;
                 font-weight: 700;
                 font-size: 10px;
-                color: var(--primary);
+                color: var(--primary-2);
                 text-transform: uppercase;
             }
 
@@ -1094,7 +1139,7 @@
 
             .step-card {
                 padding: 16px 12px;
-                border-radius: 10px;
+                border-radius: 12px;
             }
 
             .step-icon {
@@ -1137,11 +1182,6 @@
                 padding-top: 20px;
             }
         }
-
-        .lang-switch { display: flex; gap: 2px; background: var(--dark3); border-radius: 8px; padding: 2px; }
-        .lang-btn { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; color: var(--muted); text-decoration: none; transition: all .2s; }
-        .lang-btn.active { background: var(--primary); color: #fff; }
-        .lang-btn:hover:not(.active) { color: var(--text); }
     </style>
 </head>
 <body>
