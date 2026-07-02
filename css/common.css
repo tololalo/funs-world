@@ -1001,29 +1001,28 @@ footer::before {
   margin-top: 4px;
 }
 
-/* ── BACK LINK (unified: sub-page → FunS Platform) ── */
+/* ── BACK LINK (unified: sub-page → FunS Platform, matches talk CTA feel) ── */
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
-  color: var(--accent);
+  color: #fff;
   text-decoration: none;
-  font-size: 14px; font-weight: 600;
-  padding: 8px 14px;
-  background: rgba(79,195,247,.06);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  transition: all .25s var(--ease);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(255,107,53,.22);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
   white-space: nowrap;
 }
 .back-link:hover {
-  background: rgba(79,195,247,.14);
-  border-color: var(--accent);
   color: #fff;
-  transform: translateX(-3px);
-  box-shadow: 0 8px 22px rgba(79,195,247,.18);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(255,107,53,.4);
 }
 @media(max-width:600px) {
-  .back-link { font-size: 12px; padding: 6px 10px; }
+  .back-link { font-size: 12px; padding: 7px 12px; }
 }
 
 /* ── MOBILE NAV OPEN ── */
