@@ -1001,6 +1001,31 @@ footer::before {
   margin-top: 4px;
 }
 
+/* ── BACK LINK (unified: sub-page → FunS Platform) ── */
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px; font-weight: 600;
+  padding: 8px 14px;
+  background: rgba(79,195,247,.06);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: all .25s var(--ease);
+  white-space: nowrap;
+}
+.back-link:hover {
+  background: rgba(79,195,247,.14);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateX(-3px);
+  box-shadow: 0 8px 22px rgba(79,195,247,.18);
+}
+@media(max-width:600px) {
+  .back-link { font-size: 12px; padding: 6px 10px; }
+}
+
 /* ── MOBILE NAV OPEN ── */
 @media(max-width:900px) {
   .nav-links.open {
