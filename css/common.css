@@ -1039,3 +1039,15 @@ footer::before {
     border-bottom: 1px solid var(--border);
   }
 }
+
+/* ── OFFICIAL STORE BADGES ── */
+.store-badge { display: inline-flex; align-items: center; text-decoration: none; transition: transform .25s var(--ease), filter .25s var(--ease); }
+.store-badge:hover { transform: translateY(-3px); filter: drop-shadow(0 10px 24px rgba(255,107,53,.25)); }
+.store-badge img { display: block; width: auto; }
+.store-badge.gp img { height: 78px; }
+.store-badge.as img { height: 53px; }
+.store-badge.disabled { opacity: .45; filter: grayscale(35%); cursor: default; pointer-events: none; }
+@media(max-width:600px) {
+  .store-badge.gp img { height: 62px; }
+  .store-badge.as img { height: 42px; }
+}

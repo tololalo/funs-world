@@ -44,7 +44,6 @@
   opacity: 0; transition: opacity .35s var(--ease);
 }
 .platform-card:hover::before { opacity: 1; }
-.platform-icon { font-size: 3.4rem; display: block; margin-bottom: 16px; filter: drop-shadow(0 6px 18px rgba(255,107,53,.3)); }
 .platform-card h2 { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: #fff; margin-bottom: 8px; }
 .platform-card .pd { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 26px; }
 .soon-badge {
@@ -53,17 +52,6 @@
   padding: 4px 14px; border-radius: 50px; font-size: .72rem; font-weight: 700;
   letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px;
 }
-.store-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem;
-  padding: 15px 34px; border-radius: 14px; border: none; cursor: pointer;
-  box-shadow: 0 8px 24px rgba(255,107,53,.25);
-  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
-}
-.store-btn:hover { transform: translateY(-3px); box-shadow: 0 18px 46px rgba(255,107,53,.45); }
-.store-btn .small { display: block; font-size: .68rem; font-weight: 500; opacity: .85; letter-spacing: 1px; text-transform: uppercase; text-align: left; }
-.store-btn .big { display: block; font-size: 1.02rem; line-height: 1.2; text-align: left; }
 
 .wait-form { display: flex; gap: 10px; max-width: 340px; margin: 0 auto; }
 .wait-input {
@@ -119,22 +107,17 @@
 <section class="platform-wrap">
   <div class="platform-grid">
     <div class="platform-card">
-      <span class="platform-icon">🤖</span>
       <h2>Android</h2>
       <p class="pd">Available now on<br>Google Play.</p>
-      <a class="store-btn" href="https://play.google.com/store/apps/details?id=com.funstalk.app">
-        <span style="font-size:1.5rem;">▶</span>
-        <span>
-          <span class="small">Get it on</span>
-          <span class="big">Google Play</span>
-        </span>
+      <a class="store-badge gp" href="https://play.google.com/store/apps/details?id=com.funstalk.app">
+        <img src="../../images/badges/google-play-en.png" alt="Get it on Google Play">
       </a>
     </div>
     <div class="platform-card">
-      <span class="platform-icon">🍎</span>
       <h2>iOS</h2>
       <div><span class="soon-badge">✦ Coming Soon</span></div>
       <p class="pd">The App Store version is in the works.<br>Be the first to know when it launches.</p>
+      <div style="margin-bottom:20px;"><span class="store-badge as disabled"><img src="../../images/badges/app-store-en.svg" alt="Download on the App Store"></span></div>
       <form class="wait-form" id="waitForm">
         <input type="email" class="wait-input" id="waitEmail" placeholder="Enter your email" required>
         <button type="submit" class="wait-btn">Join Waitlist</button>
