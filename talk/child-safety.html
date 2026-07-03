@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Child Safety Standards · FUNS Talk</title>
+<meta name="description" content="FUNS Talk Child Safety Standards — our zero-tolerance policy against child sexual abuse and exploitation (CSAE), reporting channels, and enforcement.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root{
+    --bg:#0a0a0f; --card:#12121a; --accent:#F0B90B; --accent-dim:rgba(240,185,11,.12);
+    --text:#d8d8e8; --dim:#7a7a96; --bright:#fff; --border:rgba(255,255,255,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 22px 96px;}
+  header{display:flex;align-items:center;gap:12px;padding-bottom:22px;margin-bottom:30px;border-bottom:1px solid var(--border);}
+  .logo{width:42px;height:42px;border-radius:11px;background:var(--accent);color:#0a0a0f;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;}
+  .brand{font-weight:700;font-size:18px;color:var(--bright);}
+  .brand small{display:block;font-weight:500;color:var(--dim);font-size:12px;}
+  h1{font-size:32px;font-weight:800;letter-spacing:-.7px;margin:6px 0 6px;color:var(--bright);}
+  .meta{color:var(--dim);font-size:14px;}
+  .note{background:var(--accent-dim);border:1px solid rgba(240,185,11,.25);border-radius:10px;padding:13px 16px;font-size:14px;color:#e9d8a8;margin:22px 0 30px;}
+  h2{font-size:20px;font-weight:700;margin:38px 0 10px;letter-spacing:-.3px;color:var(--bright);}
+  p{margin:10px 0;color:var(--text);}
+  strong{color:var(--bright);font-weight:600;}
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:7px 0;}
+  a{color:var(--accent);text-decoration:none;font-weight:600;}
+  a:hover{text-decoration:underline;}
+  footer{margin-top:58px;padding-top:22px;border-top:1px solid var(--border);color:var(--dim);font-size:13px;}
+  .nav{display:flex;gap:18px;margin-bottom:8px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">F</div>
+    <div class="brand">FUNS Talk<small>funs.world/talk</small></div>
+  </header>
+
+  <h1>Child Safety Standards</h1>
+  <div class="meta">Last updated: June 6, 2026 · Version 0.1 (Beta)</div>
+  <div class="note">These standards describe how FUNS Talk prevents and responds to child sexual abuse and exploitation (CSAE), consistent with Google Play's Child Safety Standards policy and applicable law.</div>
+
+  <p>FUNS Talk ("the Service") maintains a <strong>zero-tolerance</strong> stance toward child sexual abuse and exploitation (CSAE), including child sexual abuse material (CSAM). The Service is intended for adults aged 18 and over and is not directed to children. We are committed to keeping the platform free of any content or conduct that endangers minors.</p>
+
+  <h2>1. Prohibited Conduct</h2>
+  <p>The following are strictly prohibited and result in immediate enforcement:</p>
+  <ul>
+    <li>Creating, sharing, requesting, storing, or promoting child sexual abuse material (CSAM) in any form.</li>
+    <li>Grooming, sextortion, or any attempt to sexualize, exploit, or endanger a minor.</li>
+    <li>Soliciting, facilitating, advertising, or funding CSAE — including via cryptocurrency transfers.</li>
+    <li>Trafficking of minors, or enabling it in any way.</li>
+  </ul>
+
+  <h2>2. How to Report CSAE</h2>
+  <p>Anyone — whether or not they use the Service — can report suspected CSAE or any content that endangers a child. We review and act on every report.</p>
+  <ul>
+    <li><strong>Email (primary channel):</strong> <a href="mailto:funsxofficial@gmail.com">funsxofficial@gmail.com</a>. Include the <strong>wallet address</strong> of the reported party and a short description. You do <strong>not</strong> need to attach or forward any unlawful material — an address and context are enough.</li>
+    <li><strong>In-app:</strong> Open the conversation menu (•••). In-app blocking and reporting controls are currently being rolled out; until they ship, please use the email channel above — it is actively monitored and actioned.</li>
+  </ul>
+  <p>We aim to acknowledge reports within 24 hours and to action confirmed CSAE without delay.</p>
+
+  <h2>3. Our Response &amp; Enforcement</h2>
+  <p>FUNS Talk is a <strong>non-custodial, end-to-end encrypted</strong> service built on a decentralized messaging network: we do not hold user funds, we cannot read message content, and messages are relayed by a network we do not solely control. Within that architecture, when CSAE is confirmed or credibly reported we take the actions genuinely available to us:</p>
+  <ul>
+    <li><strong>Ban</strong> the reported wallet address(es) from <strong>our app and authentication service</strong>, revoking their access to FUNS Talk.</li>
+    <li><strong>Share</strong> the limited information we actually hold — primarily the reported <strong>public</strong> wallet address and any publicly recorded on-chain data (e.g. transaction hashes) — with law enforcement under valid legal process. We cannot provide message content, because it is end-to-end encrypted.</li>
+    <li><strong>Report</strong> credible CSAE to the appropriate child-protection authority for the relevant jurisdiction, including NCMEC where US reporting obligations apply.</li>
+    <li><strong>Cooperate</strong> with valid legal requests from child-protection agencies and law enforcement.</li>
+  </ul>
+
+  <h2>4. End-to-End Encryption &amp; Our Safety Model</h2>
+  <p>One-to-one messages are end-to-end encrypted, so the Service cannot read message content. Our safety model therefore relies on <strong>user reports</strong> and <strong>address-level enforcement</strong>: a reported wallet address can be banned from the Service, and associated on-chain / metadata records can be provided to authorities under valid legal process. Encryption protects ordinary users' privacy — it does not shield offenders from being removed and reported.</p>
+
+  <h2>5. Compliance with Child-Safety Laws</h2>
+  <p>We comply with applicable child-safety laws in the jurisdictions where the Service is available, and we report apparent CSAM to the appropriate authority — for example, NCMEC where United States reporting obligations apply, or the equivalent body in other jurisdictions. Because the Service is end-to-end encrypted, we <strong>cannot proactively scan content</strong>; our compliance is therefore based on acting promptly on user reports and on valid legal requests, rather than on automated content monitoring. We review these standards regularly and update them as our service and obligations evolve.</p>
+
+  <h2>6. Child Safety Point of Contact</h2>
+  <p>For child-safety matters, reports, or questions from authorities: <a href="mailto:funsxofficial@gmail.com">funsxofficial@gmail.com</a></p>
+
+  <footer>
+    <div class="nav"><a href="index.html">FUNS Talk</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
+    <p>FUNS Talk · funs.world · These standards apply to all users of the Service.</p>
+  </footer>
+</div>
+</body>
+</html>

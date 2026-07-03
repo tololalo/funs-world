@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy · FUNS Talk</title>
+<meta name="description" content="FUNS Talk Privacy Policy — end-to-end encrypted messenger with non-custodial wallet connection on BNB Chain.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root{
+    --bg:#0a0a0f; --card:#12121a; --accent:#F0B90B; --accent-dim:rgba(240,185,11,.12);
+    --text:#d8d8e8; --dim:#7a7a96; --bright:#fff; --border:rgba(255,255,255,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 22px 96px;}
+  header{display:flex;align-items:center;gap:12px;padding-bottom:22px;margin-bottom:30px;border-bottom:1px solid var(--border);}
+  .logo{width:42px;height:42px;border-radius:11px;background:var(--accent);color:#0a0a0f;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;}
+  .brand{font-weight:700;font-size:18px;color:var(--bright);}
+  .brand small{display:block;font-weight:500;color:var(--dim);font-size:12px;}
+  h1{font-size:32px;font-weight:800;letter-spacing:-.7px;margin:6px 0 6px;color:var(--bright);}
+  .meta{color:var(--dim);font-size:14px;}
+  .note{background:var(--accent-dim);border:1px solid rgba(240,185,11,.25);border-radius:10px;padding:13px 16px;font-size:14px;color:#e9d8a8;margin:22px 0 30px;}
+  h2{font-size:20px;font-weight:700;margin:38px 0 10px;letter-spacing:-.3px;color:var(--bright);}
+  p{margin:10px 0;color:var(--text);}
+  strong{color:var(--bright);font-weight:600;}
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:7px 0;}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+  th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:top;}
+  th{color:var(--bright);font-weight:700;background:var(--card);}
+  a{color:var(--accent);text-decoration:none;font-weight:600;}
+  a:hover{text-decoration:underline;}
+  footer{margin-top:58px;padding-top:22px;border-top:1px solid var(--border);color:var(--dim);font-size:13px;}
+  .nav{display:flex;gap:18px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">F</div>
+    <div class="brand">FUNS Talk<small>funs.world/talk</small></div>
+  </header>
+
+  <h1>Privacy Policy</h1>
+  <div class="meta">Last updated: June 5, 2026 · Version 0.1 (Beta)</div>
+  <div class="note">This is a beta-stage draft for internal testing. It will be reviewed and updated by legal counsel before public release.</div>
+
+  <p>FUNS Talk ("the Service") is an end-to-end (E2E) encrypted messenger built on BNB Chain. We collect the minimum information necessary and protect it carefully. This policy explains what information the Service handles and how.</p>
+
+  <h2>1. Information We Collect</h2>
+  <table>
+    <tr><th>Item</th><th>Collected</th><th>Details</th></tr>
+    <tr><td>Message content</td><td>Yes (encrypted)</td><td>Stored and transmitted with end-to-end encryption. <strong>No one — including the Service operator — can decrypt it.</strong></td></tr>
+    <tr><td>Wallet address (public)</td><td>Yes</td><td>Used to identify conversation partners and to send transfers. A public blockchain address, not identity information.</td></tr>
+    <tr><td>Name / email / phone</td><td>No</td><td>There is no sign-up.</td></tr>
+    <tr><td>Location</td><td>No</td><td></td></tr>
+    <tr><td>Contacts / photos / device IDs</td><td>No</td><td></td></tr>
+  </table>
+  <p>The Service has no account registration. You use it simply by connecting a wallet.</p>
+
+  <h2>2. How We Use Information</h2>
+  <ul>
+    <li>Providing messaging (send/receive) functionality</li>
+    <li>Sending cryptocurrency to a wallet address you enter — executed directly from your own wallet</li>
+    <li>Maintaining service stability and diagnosing errors</li>
+  </ul>
+
+  <h2>3. End-to-End Encryption</h2>
+  <p>All 1:1 messages are encrypted on your device before transmission (X25519 key exchange + ChaCha20-Poly1305). Decryption keys exist only on your device and connected wallet. Neither our servers nor operators can access message plaintext.</p>
+
+  <h2>4. Non-Custodial Design</h2>
+  <p>The Service <strong>does not hold</strong> your private keys or assets. Wallet connection is performed through an external wallet app (such as FunS Wallet, via the WalletConnect standard), and all signatures and transfers are approved by you directly in your wallet app. The Service is not an exchange and does not provide buying, selling, swapping, or custody of cryptocurrency.</p>
+
+  <h2>5. Third Parties &amp; Sharing</h2>
+  <ul>
+    <li>We do <strong>not sell or share</strong> your personal information with third parties.</li>
+    <li>Messages are relayed over a decentralized messaging network (XMTP); only encrypted messages are passed to it.</li>
+    <li>Blockchain transactions are, by nature, recorded on a public ledger (public wallet addresses and transaction hashes).</li>
+  </ul>
+
+  <h2>6. Data Retention &amp; Deletion</h2>
+  <ul>
+    <li>Conversation data is stored primarily on your device.</li>
+    <li>You can delete local data by <strong>disconnecting your wallet</strong> in Settings.</li>
+    <li>Uninstalling the app removes on-device local data.</li>
+  </ul>
+
+  <h2>7. Security</h2>
+  <ul>
+    <li>Transport encryption (TLS) and message-level end-to-end encryption are applied.</li>
+    <li>Authentication tokens are stored in the device's secure storage (Secure Store).</li>
+  </ul>
+
+  <h2>8. Children</h2>
+  <p>The Service is intended for users aged 18 and over. It is not directed to anyone under 18.</p>
+
+  <h2>9. Beta Notice</h2>
+  <p>The Service is currently in internal beta and operates on a <strong>test network (BSC testnet)</strong>. Cryptocurrency handled at this stage is test coin with no real monetary value.</p>
+
+  <h2>10. Changes to This Policy</h2>
+  <p>This policy may be updated to reflect service or legal changes. We will announce changes through the app or this page.</p>
+
+  <h2>11. Contact</h2>
+  <p>Privacy inquiries: <a href="mailto:funsxofficial@gmail.com">funsxofficial@gmail.com</a></p>
+
+  <footer>
+    <div class="nav"><a href="index.html">FUNS Talk</a><a href="terms.html">Terms of Service</a></div>
+    <p>FUNS Talk · funs.world</p>
+  </footer>
+</div>
+</body>
+</html>
