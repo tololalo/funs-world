@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download FunS Talk — Encrypted Messenger</title>
+<meta name="description" content="Download the FunS Talk app — get it now on Google Play for Android, or join the iOS waitlist.">
+<meta property="og:title" content="Download FunS Talk">
+<meta property="og:description" content="An encrypted messenger powered by one wallet. Get FunS Talk today.">
+<meta property="og:image" content="https://funs.world/funs-nugi.png">
+<meta property="og:url" content="https://funs.world/talk/download/en.html">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://funs.world/talk/download/en.html">
+<link rel="alternate" hreflang="ko" href="https://funs.world/talk/download/">
+<link rel="alternate" hreflang="en" href="https://funs.world/talk/download/en.html">
+<link rel="icon" type="image/png" href="../funs-nugi.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/common.css">
+<style>
+.dl-hero { padding: 150px 5% 40px; text-align: center; position: relative; }
+.dl-hero .hero-logo { width: 110px; height: 110px; object-fit: contain; filter: drop-shadow(0 0 34px rgba(255,107,53,.55)); margin-bottom: 24px; animation: floatLogo 4s ease-in-out infinite; }
+.dl-title {
+  font-family: 'Orbitron', monospace; font-weight: 900; letter-spacing: -0.5px;
+  font-size: clamp(1.9rem, 5vw, 3.2rem); line-height: 1.15; margin-bottom: 14px;
+  background: var(--grad-title);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.dl-sub { color: var(--muted); font-size: clamp(.95rem, 2vw, 1.1rem); max-width: 520px; margin: 0 auto; }
+
+.platform-wrap { padding: 40px 5% 110px; }
+.platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 860px; margin: 0 auto; }
+.platform-card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 44px 32px;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  text-align: center; position: relative; overflow: hidden;
+  transition: transform .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);
+}
+.platform-card:hover { transform: translateY(-6px); border-color: var(--border-hot); box-shadow: var(--shadow-card); }
+.platform-card::before {
+  content: ''; position: absolute; top: 0; left: 12%; right: 12%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary) 35%, var(--secondary) 65%, transparent);
+  opacity: 0; transition: opacity .35s var(--ease);
+}
+.platform-card:hover::before { opacity: 1; }
+.platform-icon { font-size: 3.4rem; display: block; margin-bottom: 16px; filter: drop-shadow(0 6px 18px rgba(255,107,53,.3)); }
+.platform-card h2 { font-family: 'Orbitron', monospace; font-size: 1.3rem; color: #fff; margin-bottom: 8px; }
+.platform-card .pd { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 26px; }
+.soon-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,215,0,.08); border: 1px solid rgba(255,215,0,.3); color: var(--secondary);
+  padding: 4px 14px; border-radius: 50px; font-size: .72rem; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px;
+}
+.store-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem;
+  padding: 15px 34px; border-radius: 14px; border: none; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255,107,53,.25);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.store-btn:hover { transform: translateY(-3px); box-shadow: 0 18px 46px rgba(255,107,53,.45); }
+.store-btn .small { display: block; font-size: .68rem; font-weight: 500; opacity: .85; letter-spacing: 1px; text-transform: uppercase; text-align: left; }
+.store-btn .big { display: block; font-size: 1.02rem; line-height: 1.2; text-align: left; }
+
+.wait-form { display: flex; gap: 10px; max-width: 340px; margin: 0 auto; }
+.wait-input {
+  flex: 1; min-width: 0;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 16px; color: var(--text);
+  font-size: .9rem; font-family: inherit; outline: none;
+  transition: border-color .25s var(--ease), background .25s var(--ease);
+}
+.wait-input:focus { border-color: var(--border-hot); background: rgba(255,255,255,.07); }
+.wait-input::placeholder { color: var(--muted); }
+.wait-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #fff; border: none; border-radius: 12px; padding: 13px 20px;
+  font-weight: 700; font-size: .88rem; cursor: pointer; white-space: nowrap; font-family: inherit;
+  box-shadow: 0 6px 18px rgba(255,107,53,.22);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.wait-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(255,107,53,.4); }
+.wait-success { display: none; color: #35E0A1; font-size: .88rem; font-weight: 600; margin-top: 14px; }
+.wait-note { color: var(--muted); font-size: .75rem; margin-top: 12px; }
+
+.dl-back { text-align: center; padding: 0 5% 90px; }
+@media (max-width: 600px) {
+  .dl-hero { padding: 120px 4% 24px; }
+  .platform-card { padding: 32px 20px; }
+  .wait-form { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../en.html" class="nav-logo">
+    <img src="../funs-nugi.png" alt="FunS Talk">
+    <span>FunS Talk</span>
+  </a>
+  <div class="lang-switch">
+    <a href="./" class="lang-btn">KR</a>
+    <a href="en.html" class="lang-btn active">EN</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="dl-hero">
+  <img src="../funs-nugi.png" alt="FunS Talk" class="hero-logo">
+  <h1 class="dl-title">Download FunS Talk</h1>
+  <p class="dl-sub">An encrypted messenger powered by one wallet.<br>Get it today.</p>
+</section>
+
+<!-- PLATFORMS -->
+<section class="platform-wrap">
+  <div class="platform-grid">
+    <div class="platform-card">
+      <span class="platform-icon">🤖</span>
+      <h2>Android</h2>
+      <p class="pd">Available now on<br>Google Play.</p>
+      <a class="store-btn" href="https://play.google.com/store/apps/details?id=com.funstalk.app">
+        <span style="font-size:1.5rem;">▶</span>
+        <span>
+          <span class="small">Get it on</span>
+          <span class="big">Google Play</span>
+        </span>
+      </a>
+    </div>
+    <div class="platform-card">
+      <span class="platform-icon">🍎</span>
+      <h2>iOS</h2>
+      <div><span class="soon-badge">✦ Coming Soon</span></div>
+      <p class="pd">The App Store version is in the works.<br>Be the first to know when it launches.</p>
+      <form class="wait-form" id="waitForm">
+        <input type="email" class="wait-input" id="waitEmail" placeholder="Enter your email" required>
+        <button type="submit" class="wait-btn">Join Waitlist</button>
+      </form>
+      <div class="wait-success" id="waitSuccess">✓ When your mail app opens, just hit send. We'll let you know at launch!</div>
+      <p class="wait-note">Join the waitlist to get the iOS launch announcement by email.</p>
+    </div>
+  </div>
+</section>
+
+<div class="dl-back">
+  <a href="../en.html" class="back-link">← Back to FunS Talk</a>
+</div>
+
+<!-- FOOTER -->
+<footer style="text-align:center; padding: 32px 5%;">
+  <p style="color:var(--muted); font-size:.8rem;">© 2026 FunS Talk · <a href="../../en/" style="color:var(--muted);">funs.world</a></p>
+</footer>
+
+<script>
+document.getElementById('waitForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const input = document.getElementById('waitEmail');
+  const email = input.value.trim();
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    input.style.borderColor = 'var(--primary)';
+    setTimeout(() => { input.style.borderColor = ''; }, 2000);
+    return;
+  }
+  const subject = encodeURIComponent('FunS Talk iOS Waitlist');
+  const body = encodeURIComponent('Please add me to the iOS launch waitlist.\n\nEmail: ' + email + '\n');
+  window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
+  this.style.display = 'none';
+  document.getElementById('waitSuccess').style.display = 'block';
+});
+</script>
+</body>
+</html>
