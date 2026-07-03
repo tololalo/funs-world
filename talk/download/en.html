@@ -138,20 +138,34 @@
 </footer>
 
 <script>
+// Google Sheets collection endpoint (Apps Script /exec URL). Falls back to mail when empty.
+const WAITLIST_ENDPOINT = '';
+
 document.getElementById('waitForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const input = document.getElementById('waitEmail');
+  const success = document.getElementById('waitSuccess');
   const email = input.value.trim();
   if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
     input.style.borderColor = 'var(--primary)';
     setTimeout(() => { input.style.borderColor = ''; }, 2000);
     return;
   }
-  const subject = encodeURIComponent('FunS Talk iOS Waitlist');
-  const body = encodeURIComponent('Please add me to the iOS launch waitlist.\n\nEmail: ' + email + '\n');
-  window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
+  if (WAITLIST_ENDPOINT) {
+    fetch(WAITLIST_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'email=' + encodeURIComponent(email) + '&lang=en&page=talk/download'
+    });
+    success.textContent = "✓ You're on the list! We'll email you at launch.";
+  } else {
+    const subject = encodeURIComponent('FunS Talk iOS Waitlist');
+    const body = encodeURIComponent('Please add me to the iOS launch waitlist.\n\nEmail: ' + email + '\n');
+    window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
+  }
   this.style.display = 'none';
-  document.getElementById('waitSuccess').style.display = 'block';
+  success.style.display = 'block';
 });
 </script>
 </body>

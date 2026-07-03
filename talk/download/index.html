@@ -138,20 +138,34 @@
 </footer>
 
 <script>
+// Google Sheets 자동 수집 엔드포인트 (Apps Script /exec URL). 비어 있으면 메일 방식으로 폴백.
+const WAITLIST_ENDPOINT = '';
+
 document.getElementById('waitForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const input = document.getElementById('waitEmail');
+  const success = document.getElementById('waitSuccess');
   const email = input.value.trim();
   if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
     input.style.borderColor = 'var(--primary)';
     setTimeout(() => { input.style.borderColor = ''; }, 2000);
     return;
   }
-  const subject = encodeURIComponent('FunS Talk iOS 웨이트리스트 신청');
-  const body = encodeURIComponent('iOS 버전 출시 알림을 신청합니다.\n\n이메일: ' + email + '\n');
-  window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
+  if (WAITLIST_ENDPOINT) {
+    fetch(WAITLIST_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'email=' + encodeURIComponent(email) + '&lang=ko&page=talk/download'
+    });
+    success.textContent = '✓ 등록 완료! iOS 출시 소식을 이메일로 보내드릴게요.';
+  } else {
+    const subject = encodeURIComponent('FunS Talk iOS 웨이트리스트 신청');
+    const body = encodeURIComponent('iOS 버전 출시 알림을 신청합니다.\n\n이메일: ' + email + '\n');
+    window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
+  }
   this.style.display = 'none';
-  document.getElementById('waitSuccess').style.display = 'block';
+  success.style.display = 'block';
 });
 </script>
 </body>
