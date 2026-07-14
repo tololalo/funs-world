@@ -1,19 +1,28 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FunS Wallet 다운로드 — 멀티체인 지갑</title>
-<meta name="description" content="FunS Wallet 앱 다운로드 — Android는 Google Play에서 바로, iOS는 웨이트리스트로 출시 소식을 받아보세요.">
-<meta property="og:title" content="FunS Wallet 다운로드">
-<meta property="og:description" content="비트코인부터 FUNS까지, 6개 체인 자산을 한 곳에서. FunS Wallet을 지금 만나보세요.">
+<title>Download FunS Wallet — Multi-chain Wallet</title>
+<meta name="description" content="Download the FunS Wallet app — get it now on Google Play for Android, or join the iOS waitlist.">
+<meta property="og:title" content="Download FunS Wallet — Multi-chain Wallet">
+<meta property="og:description" content="From Bitcoin to FUNS — assets across 6 chains in one place. Get FunS Wallet today.">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
 <meta property="og:url" content="https://funs.world/wallet/download/">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://funs.world/wallet/download/">
-<link rel="alternate" hreflang="ko" href="https://funs.world/wallet/download/">
-<link rel="alternate" hreflang="en" href="https://funs.world/wallet/download/en.html">
-<link rel="icon" type="image/png" href="../../funs-nugi.png">
+<link rel="alternate" hreflang="en" href="https://funs.world/wallet/download/">
+<link rel="alternate" hreflang="ko" href="https://funs.world/ko/wallet/download/">
+<link rel="alternate" hreflang="zh" href="https://funs.world/zh/wallet/download/">
+<link rel="alternate" hreflang="ja" href="https://funs.world/ja/wallet/download/">
+<link rel="alternate" hreflang="es" href="https://funs.world/es/wallet/download/">
+<link rel="alternate" hreflang="vi" href="https://funs.world/vi/wallet/download/">
+<link rel="alternate" hreflang="ru" href="https://funs.world/ru/wallet/download/">
+<link rel="alternate" hreflang="id" href="https://funs.world/id/wallet/download/">
+<link rel="alternate" hreflang="pt" href="https://funs.world/pt/wallet/download/">
+<link rel="alternate" hreflang="tr" href="https://funs.world/tr/wallet/download/">
+<link rel="alternate" hreflang="x-default" href="https://funs.world/wallet/download/">
+<link rel="icon" type="image/png" href="../../images/funs-nugi.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -38,17 +47,10 @@ img{max-width:100%}
   radial-gradient(ellipse 50% 40% at 55% 90%,rgba(255,215,0,.18),transparent 60%),
   radial-gradient(ellipse 35% 30% at 5% 75%,rgba(255,107,53,.16),transparent 55%)}
 .glass{background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-
-/* ─ Nav ─ */
 .nav-wrap{position:sticky;top:18px;z-index:60;display:flex;justify-content:center;padding:0 20px}
 .nav{display:flex;align-items:center;gap:28px;border-radius:50px;padding:10px 18px 10px 22px;box-shadow:var(--shadow-md)}
 .nav-logo{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk','Pretendard Variable',sans-serif;font-weight:700;font-size:16px}
 .nav-logo img{width:30px;height:30px;object-fit:contain}
-.lang-switch{display:flex;gap:2px;font-size:12px;font-weight:700}
-.lang-btn{padding:5px 10px;border-radius:20px;color:var(--muted)}
-.lang-btn.active{background:rgba(34,30,26,.08);color:var(--ink)}
-
-/* ─ Hero ─ */
 .dl-hero{padding:64px 5% 32px;text-align:center;position:relative}
 .dl-hero .hero-logo{width:110px;height:110px;object-fit:contain;filter:drop-shadow(0 18px 34px rgba(255,107,53,.25));margin-bottom:24px;animation:floatLogo 4s ease-in-out infinite}
 .dl-title{
@@ -59,8 +61,6 @@ img{max-width:100%}
 }
 .dl-sub{color:var(--muted);font-size:clamp(.95rem,2vw,1.1rem);line-height:1.8;max-width:520px;margin:0 auto}
 @keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-
-/* ─ Platform cards ─ */
 .platform-wrap{padding:40px 5% 90px}
 .platform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:860px;margin:0 auto}
 .platform-card{
@@ -79,16 +79,12 @@ img{max-width:100%}
   padding:4px 14px;border-radius:50px;font-size:.72rem;font-weight:700;
   letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;
 }
-
-/* ─ Store badges ─ */
 .store-badge{display:inline-flex;align-items:center;transition:transform .2s ease,filter .2s ease}
 .store-badge:hover{transform:translateY(-3px);filter:drop-shadow(0 10px 24px rgba(255,107,53,.25))}
 .store-badge img{display:block;width:auto;border-radius:9px}
 .store-badge.gp img{height:56px}
 .store-badge.as img{height:56px}
 .store-badge.disabled{opacity:.45;filter:grayscale(35%);cursor:default;pointer-events:none}
-
-/* ─ Waitlist form ─ */
 .wait-form{display:flex;gap:10px;max-width:340px;margin:0 auto}
 .wait-input{
   flex:1;min-width:0;
@@ -109,8 +105,6 @@ img{max-width:100%}
 .wait-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(255,107,53,.45)}
 .wait-success{display:none;color:var(--green);font-size:.88rem;font-weight:600;margin-top:14px}
 .wait-note{color:var(--muted);font-size:.75rem;margin-top:12px}
-
-/* ─ Back link ─ */
 .dl-back{text-align:center;padding:0 5% 72px}
 .back-link{
   display:inline-block;background:var(--glass);border:1px solid var(--glass-border);
@@ -119,10 +113,7 @@ img{max-width:100%}
   transition:transform .15s ease,box-shadow .15s ease;
 }
 .back-link:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
-
-/* ─ Footer ─ */
 footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-
 @media (max-width:600px){
   .dl-hero{padding:48px 4% 24px}
   .platform-card{padding:32px 20px}
@@ -133,6 +124,16 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important;transition:none !important}
 }
+.lang-dd{position:relative}
+.lang-dd summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:12.5px;font-weight:700;color:var(--ink);background:rgba(34,30,26,.06);white-space:nowrap}
+.lang-dd summary::-webkit-details-marker{display:none}
+.lang-dd summary .car{font-size:9px;color:var(--muted);transition:transform .15s ease}
+.lang-dd[open] summary .car{transform:rotate(180deg)}
+.lang-menu{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid rgba(34,30,26,.08);border-radius:16px;box-shadow:var(--shadow-lg);padding:8px;min-width:200px;max-height:320px;overflow-y:auto;z-index:80}
+.lang-menu a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--ink)}
+.lang-menu a:hover{background:rgba(255,107,53,.08)}
+.lang-menu a.on{background:rgba(255,107,53,.12);color:var(--accent-deep)}
+.lang-menu .flag{font-size:16px}
 </style>
 </head>
 <body>
@@ -140,23 +141,34 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
 
 <!-- NAV -->
 <div class="nav-wrap">
-  <nav class="nav glass" aria-label="주 메뉴">
-    <a href="../" class="nav-logo">
-      <img src="../../funs-nugi.png" alt="FunS Wallet">
+  <nav class="nav glass" aria-label="Main menu">
+    <a href="../../wallet/" class="nav-logo">
+      <img src="../../images/funs-nugi.png" alt="FunS Wallet">
       <span>FunS Wallet</span>
     </a>
-    <div class="lang-switch" aria-label="언어 선택">
-      <a href="./" class="lang-btn active" aria-current="true">KR</a>
-      <a href="en.html" class="lang-btn">EN</a>
-    </div>
+    <details class="lang-dd" aria-label="Language">
+      <summary>🇺🇸 EN <span class="car">▾</span></summary>
+      <div class="lang-menu">
+      <a href="./" class="on" aria-current="true"><span class="flag">🇺🇸</span> English</a>
+      <a href="../../ko/wallet/download/"><span class="flag">🇰🇷</span> 한국어</a>
+      <a href="../../zh/wallet/download/"><span class="flag">🇨🇳</span> 中文</a>
+      <a href="../../ja/wallet/download/"><span class="flag">🇯🇵</span> 日本語</a>
+      <a href="../../es/wallet/download/"><span class="flag">🇪🇸</span> Español</a>
+      <a href="../../vi/wallet/download/"><span class="flag">🇻🇳</span> Tiếng Việt</a>
+      <a href="../../ru/wallet/download/"><span class="flag">🇷🇺</span> Русский</a>
+      <a href="../../id/wallet/download/"><span class="flag">🇮🇩</span> Bahasa Indonesia</a>
+      <a href="../../pt/wallet/download/"><span class="flag">🇧🇷</span> Português</a>
+      <a href="../../tr/wallet/download/"><span class="flag">🇹🇷</span> Türkçe</a>
+      </div>
+    </details>
   </nav>
 </div>
 
 <!-- HERO -->
 <section class="dl-hero">
-  <img src="../../funs-nugi.png" alt="FunS Wallet" class="hero-logo">
-  <h1 class="dl-title">FunS Wallet 다운로드</h1>
-  <p class="dl-sub">비트코인부터 FUNS까지, 6개 체인의 자산을 한 곳에서.<br>지금 바로 만나보세요.</p>
+  <img src="../../images/funs-nugi.png" alt="FunS Wallet" class="hero-logo">
+  <h1 class="dl-title">Download FunS Wallet</h1>
+  <p class="dl-sub">From Bitcoin to FUNS — assets across 6 chains in one place.<br>Get it today.</p>
 </section>
 
 <!-- PLATFORMS -->
@@ -164,28 +176,28 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
   <div class="platform-grid">
     <div class="platform-card">
       <h2>Android</h2>
-      <p class="pd">Google Play에서 지금 바로<br>다운로드할 수 있습니다.</p>
+      <p class="pd">Available now on<br>Google Play.</p>
       <a class="store-badge gp" href="https://play.google.com/store/apps/details?id=world.funs.wallet">
-        <img src="../../images/badges/google-play-ko.png" alt="Google Play에서 다운로드">
+        <img src="../../images/badges/google-play-en.png" alt="Get it on Google Play">
       </a>
     </div>
     <div class="platform-card">
       <h2>iOS</h2>
-      <div><span class="soon-badge">✦ 곧 출시 예정</span></div>
-      <p class="pd">App Store 버전을 준비하고 있습니다.<br>출시되면 가장 먼저 알려드릴게요.</p>
+      <div><span class="soon-badge">✦ Coming Soon</span></div>
+      <p class="pd">The App Store version is in the works.<br>Be the first to know when it launches.</p>
       <div style="margin-bottom:20px;"><span class="store-badge as disabled"><img src="../../images/badges/app-store-en.svg" alt="Download on the App Store"></span></div>
       <form class="wait-form" id="waitForm">
-        <input type="email" class="wait-input" id="waitEmail" placeholder="이메일을 입력하세요" required>
-        <button type="submit" class="wait-btn">웨이트리스트 신청</button>
+        <input type="email" class="wait-input" id="waitEmail" placeholder="Enter your email" required>
+        <button type="submit" class="wait-btn">Join Waitlist</button>
       </form>
-      <div class="wait-success" id="waitSuccess">✓ 메일 앱이 열리면 전송 버튼만 눌러주세요. 출시 소식을 보내드리겠습니다!</div>
-      <p class="wait-note">신청하시면 iOS 버전 출시 소식을 이메일로 받아보실 수 있어요.</p>
+      <div class="wait-success" id="waitSuccess">✓ You're on the list! We'll email you at launch.</div>
+      <p class="wait-note">Join the waitlist to get the iOS launch announcement by email.</p>
     </div>
   </div>
 </section>
 
 <div class="dl-back">
-  <a href="../" class="back-link">← FunS Wallet으로 돌아가기</a>
+  <a href="../../wallet/" class="back-link">← Back to FunS Wallet</a>
 </div>
 
 <!-- FOOTER -->
@@ -193,10 +205,9 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
   <p style="color:var(--muted); font-size:.8rem;">© 2026 FunS Wallet · <a href="../../" style="color:var(--muted);">funs.world</a></p>
 </footer>
 
+<script>document.addEventListener('click',function(e){document.querySelectorAll('.lang-dd[open]').forEach(function(d){if(!d.contains(e.target))d.removeAttribute('open')})});</script>
 <script>
-// Google Sheets 자동 수집 엔드포인트 (Apps Script /exec URL). 비어 있으면 메일 방식으로 폴백.
 const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzooUoNiLsqEOrZVrxqw69hBVwUlakuIOd3n2BocYjHFWir3E10hKd5uROPS0ubMbE/exec';
-
 document.getElementById('waitForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const input = document.getElementById('waitEmail');
@@ -207,19 +218,11 @@ document.getElementById('waitForm').addEventListener('submit', function(e) {
     setTimeout(() => { input.style.borderColor = ''; }, 2000);
     return;
   }
-  if (WAITLIST_ENDPOINT) {
-    fetch(WAITLIST_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'email=' + encodeURIComponent(email) + '&lang=ko&page=wallet/download'
-    });
-    success.textContent = '✓ 등록 완료! iOS 출시 소식을 이메일로 보내드릴게요.';
-  } else {
-    const subject = encodeURIComponent('FunS Wallet iOS 웨이트리스트 신청');
-    const body = encodeURIComponent('iOS 버전 출시 알림을 신청합니다.\n\n이메일: ' + email + '\n');
-    window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
-  }
+  fetch(WAITLIST_ENDPOINT, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'email=' + encodeURIComponent(email) + '&lang=en&page=wallet/download'
+  });
   this.style.display = 'none';
   success.style.display = 'block';
 });
