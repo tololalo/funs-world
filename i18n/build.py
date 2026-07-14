@@ -93,14 +93,14 @@ def build_lang_dropdown(lang, ptype, aria_label='Language'):
         items.append(f'      <a href="{href}"{cls}{cur}><span class="flag">{flag}</span> {name}</a>')
     items_html = '\n'.join(items)
     return f'''<details class="lang-dd" aria-label="{aria_label}">
-      <summary>{cur_flag} {lang.upper()} <span class="car">▾</span></summary>
+      <summary>{cur_flag} {cur_name} <span class="car">▾</span></summary>
       <div class="lang-menu">
 {items_html}
       </div>
     </details>'''
 
 LANG_DD_CSS = '''.lang-dd{position:relative}
-.lang-dd summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:12.5px;font-weight:700;color:var(--ink);background:rgba(34,30,26,.06);white-space:nowrap}
+.lang-dd summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:14.5px;font-weight:700;color:var(--ink);background:rgba(34,30,26,.06);white-space:nowrap}
 .lang-dd summary::-webkit-details-marker{display:none}
 .lang-dd summary .car{font-size:9px;color:var(--muted);transition:transform .15s ease}
 .lang-dd[open] summary .car{transform:rotate(180deg)}
