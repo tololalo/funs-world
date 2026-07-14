@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Download FunS Talk — Encrypted Messenger</title>
-<meta name="description" content="Download the FunS Talk app — get it now on Google Play for Android, or join the iOS waitlist.">
-<meta property="og:title" content="Download FunS Talk">
-<meta property="og:description" content="An encrypted messenger powered by one wallet. Get FunS Talk today.">
+<title>FunS 앱 다운로드</title>
+<meta name="description" content="FunS 앱 다운로드 — Talk과 Wallet, 출시 소식을 가장 먼저 받아보세요.">
+<meta property="og:title" content="FunS 앱 다운로드">
+<meta property="og:description" content="암호화 메신저 FunS Talk와 멀티체인 지갑 FunS Wallet. 출시되면 가장 먼저 알려드립니다.">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
-<meta property="og:url" content="https://funs.world/talk/download/en.html">
+<meta property="og:url" content="https://funs.world/download-app/">
 <meta property="og:type" content="website">
-<link rel="canonical" href="https://funs.world/talk/download/en.html">
-<link rel="alternate" hreflang="ko" href="https://funs.world/talk/download/">
-<link rel="alternate" hreflang="en" href="https://funs.world/talk/download/en.html">
+<link rel="canonical" href="https://funs.world/download-app/">
+<link rel="alternate" hreflang="ko" href="https://funs.world/download-app/">
+<link rel="alternate" hreflang="en" href="https://funs.world/en/download-app/">
 <link rel="icon" type="image/png" href="../funs-nugi.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,8 +60,20 @@ img{max-width:100%}
 .dl-sub{color:var(--muted);font-size:clamp(.95rem,2vw,1.1rem);line-height:1.8;max-width:520px;margin:0 auto}
 @keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
+/* ─ Product picker ─ */
+.pick-wrap{padding:8px 5% 24px}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:640px;margin:0 auto}
+.pick-card{
+  background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;
+  padding:20px 22px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:var(--shadow-sm);text-align:left;transition:transform .2s ease,box-shadow .2s ease;
+}
+.pick-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.pick-card b{display:block;font-size:14.5px}
+.pick-card span{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+
 /* ─ Platform cards ─ */
-.platform-wrap{padding:40px 5% 90px}
+.platform-wrap{padding:24px 5% 90px}
 .platform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:860px;margin:0 auto}
 .platform-card{
   background:var(--glass);border:1px solid var(--glass-border);
@@ -140,23 +152,23 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
 
 <!-- NAV -->
 <div class="nav-wrap">
-  <nav class="nav glass" aria-label="Main menu">
-    <a href="../en.html" class="nav-logo">
-      <img src="../funs-nugi.png" alt="FunS Talk">
-      <span>FunS Talk</span>
+  <nav class="nav glass" aria-label="주 메뉴">
+    <a href="../" class="nav-logo">
+      <img src="../funs-nugi.png" alt="FunS">
+      <span>FunS</span>
     </a>
-    <div class="lang-switch" aria-label="Language">
-      <a href="./" class="lang-btn">KR</a>
-      <a href="en.html" class="lang-btn active" aria-current="true">EN</a>
+    <div class="lang-switch" aria-label="언어 선택">
+      <a href="./" class="lang-btn active" aria-current="true">KR</a>
+      <a href="../en/download-app/" class="lang-btn">EN</a>
     </div>
   </nav>
 </div>
 
 <!-- HERO -->
 <section class="dl-hero">
-  <img src="../funs-nugi.png" alt="FunS Talk" class="hero-logo">
-  <h1 class="dl-title">Download FunS Talk</h1>
-  <p class="dl-sub">An encrypted messenger powered by one wallet.<br>Get it today.</p>
+  <img src="../funs-nugi.png" alt="FunS" class="hero-logo">
+  <h1 class="dl-title">FunS 앱 다운로드</h1>
+  <p class="dl-sub">암호화 메신저 FunS Talk와 멀티체인 지갑 FunS Wallet.<br>출시 소식을 가장 먼저 받아보세요.</p>
 </section>
 
 <!-- PLATFORMS -->
@@ -164,65 +176,74 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
   <div class="platform-grid">
     <div class="platform-card">
       <h2>Android</h2>
-      <p class="pd">Available now on<br>Google Play.</p>
-      <a class="store-badge gp" href="https://play.google.com/store/apps/details?id=com.funstalk.app">
-        <img src="../../images/badges/google-play-en.png" alt="Get it on Google Play">
-      </a>
+      <div><span class="soon-badge">✦ 곧 출시 예정</span></div>
+      <p class="pd">FunS Talk과 FunS Wallet 모두<br>Android 버전을 준비하고 있습니다.</p>
+      <div style="margin-bottom:20px;"><span class="store-badge gp disabled"><img src="../images/badges/google-play-ko.png" alt="Google Play — 곧 출시"></span></div>
+      <form class="wait-form" id="waitFormGp">
+        <input type="email" class="wait-input" placeholder="이메일을 입력하세요" required>
+        <button type="submit" class="wait-btn">웨이트리스트 신청</button>
+      </form>
+      <div class="wait-success">✓ 등록 완료! 출시 소식을 이메일로 보내드릴게요.</div>
+      <p class="wait-note">신청하시면 Android 버전 출시 소식을 이메일로 받아보실 수 있어요.</p>
     </div>
     <div class="platform-card">
       <h2>iOS</h2>
-      <div><span class="soon-badge">✦ Coming Soon</span></div>
-      <p class="pd">The App Store version is in the works.<br>Be the first to know when it launches.</p>
-      <div style="margin-bottom:20px;"><span class="store-badge as disabled"><img src="../../images/badges/app-store-en.svg" alt="Download on the App Store"></span></div>
-      <form class="wait-form" id="waitForm">
-        <input type="email" class="wait-input" id="waitEmail" placeholder="Enter your email" required>
-        <button type="submit" class="wait-btn">Join Waitlist</button>
+      <div><span class="soon-badge">✦ 곧 출시 예정</span></div>
+      <p class="pd">App Store 버전을 준비하고 있습니다.<br>출시되면 가장 먼저 알려드릴게요.</p>
+      <div style="margin-bottom:20px;"><span class="store-badge as disabled"><img src="../images/badges/app-store-en.svg" alt="Download on the App Store"></span></div>
+      <form class="wait-form" id="waitFormAs">
+        <input type="email" class="wait-input" placeholder="이메일을 입력하세요" required>
+        <button type="submit" class="wait-btn">웨이트리스트 신청</button>
       </form>
-      <div class="wait-success" id="waitSuccess">✓ When your mail app opens, just hit send. We'll let you know at launch!</div>
-      <p class="wait-note">Join the waitlist to get the iOS launch announcement by email.</p>
+      <div class="wait-success">✓ 등록 완료! 출시 소식을 이메일로 보내드릴게요.</div>
+      <p class="wait-note">신청하시면 iOS 버전 출시 소식을 이메일로 받아보실 수 있어요.</p>
     </div>
   </div>
 </section>
 
 <div class="dl-back">
-  <a href="../en.html" class="back-link">← Back to FunS Talk</a>
+  <a href="../" class="back-link">← FunS Platform으로 돌아가기</a>
 </div>
 
 <!-- FOOTER -->
 <footer style="text-align:center; padding: 32px 5%;">
-  <p style="color:var(--muted); font-size:.8rem;">© 2026 FunS Talk · <a href="../../en/" style="color:var(--muted);">funs.world</a></p>
+  <p style="color:var(--muted); font-size:.8rem;">© 2026 FunS Platform · <a href="../" style="color:var(--muted);">funs.world</a></p>
 </footer>
 
 <script>
-// Google Sheets collection endpoint (Apps Script /exec URL). Falls back to mail when empty.
+// Google Sheets 자동 수집 엔드포인트 (Apps Script /exec URL). 비어 있으면 메일 방식으로 폴백.
 const WAITLIST_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzooUoNiLsqEOrZVrxqw69hBVwUlakuIOd3n2BocYjHFWir3E10hKd5uROPS0ubMbE/exec';
 
-document.getElementById('waitForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const input = document.getElementById('waitEmail');
-  const success = document.getElementById('waitSuccess');
-  const email = input.value.trim();
-  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-    input.style.borderColor = 'var(--primary)';
-    setTimeout(() => { input.style.borderColor = ''; }, 2000);
-    return;
-  }
-  if (WAITLIST_ENDPOINT) {
-    fetch(WAITLIST_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'email=' + encodeURIComponent(email) + '&lang=en&page=talk/download'
-    });
-    success.textContent = "✓ You're on the list! We'll email you at launch.";
-  } else {
-    const subject = encodeURIComponent('FunS Talk iOS Waitlist');
-    const body = encodeURIComponent('Please add me to the iOS launch waitlist.\n\nEmail: ' + email + '\n');
-    window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
-  }
-  this.style.display = 'none';
-  success.style.display = 'block';
-});
+function bindWaitForm(formEl) {
+  formEl.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = this.querySelector('.wait-input');
+    const success = this.parentElement.querySelector('.wait-success');
+    const email = input.value.trim();
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      input.style.borderColor = 'var(--primary)';
+      setTimeout(() => { input.style.borderColor = ''; }, 2000);
+      return;
+    }
+    if (WAITLIST_ENDPOINT) {
+      fetch(WAITLIST_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'email=' + encodeURIComponent(email) + '&lang=ko&page=home'
+      });
+      success.textContent = '✓ 등록 완료! 출시 소식을 이메일로 보내드릴게요.';
+    } else {
+      const subject = encodeURIComponent('FunS 앱 웨이트리스트 신청');
+      const body = encodeURIComponent('앱 출시 알림을 신청합니다.\n\n이메일: ' + email + '\n');
+      window.location.href = 'mailto:funsxofficial@gmail.com?subject=' + subject + '&body=' + body;
+    }
+    this.style.display = 'none';
+    success.style.display = 'block';
+  });
+}
+bindWaitForm(document.getElementById('waitFormGp'));
+bindWaitForm(document.getElementById('waitFormAs'));
 </script>
 </body>
 </html>
