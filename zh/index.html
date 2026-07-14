@@ -236,8 +236,10 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
 @media (max-width:1120px){
   .hero{grid-template-columns:1fr;padding-top:56px !important}
   .hero-visual{margin:24px auto 0;width:560px;max-width:100%}
-  .product{grid-template-columns:1fr;gap:40px}
-  .product .panel{order:2}
+  .product{grid-template-columns:minmax(0,1fr);gap:40px}
+  .product .panel{order:2;padding:24px}
+  .wallet-stack{width:100%;max-width:300px}
+  .mini-phone{max-width:100%}
   .road-grid{grid-template-columns:1fr 1fr;gap:36px 24px}
   .road-line{display:none}
   .foot-grid{grid-template-columns:1fr 1fr}
