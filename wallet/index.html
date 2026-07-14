@@ -101,10 +101,11 @@ img{max-width:100%}
 .w-row .nm{flex:1;min-width:0}
 .w-row .nm b{display:block;font-size:12.5px}
 .w-row .nm span{font-size:10.5px;color:var(--muted)}
-.w-row .val{text-align:right}
+.w-row .val{text-align:right;white-space:nowrap;padding-left:6px}
 .w-row .val b{display:block;font-size:12.5px}
 .w-row .val .up{font-size:10.5px;color:var(--green)}
 .w-row .val .dn{font-size:10.5px;color:var(--red)}
+.w-row .val .soon{display:inline-block;font-size:10px;font-weight:700;color:#B07E00;background:rgba(255,201,61,.18);border:1px solid rgba(255,201,61,.45);padding:3px 8px;border-radius:20px;white-space:nowrap}
 .wallet-stack{position:absolute;right:0;top:88px;z-index:2;width:300px;display:flex;flex-direction:column;gap:14px;animation:floatY 5.5s ease-in-out infinite}
 .w-card{background:linear-gradient(135deg,#FF6B35 0%,#FF9A3D 60%,#FFC93D 130%);border-radius:20px;padding:22px;position:relative;overflow:hidden;color:#fff;box-shadow:0 24px 50px rgba(255,107,53,.3)}
 .w-card .bubble{position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.16)}
@@ -284,7 +285,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
         <div class="w-assets">
           <span class="lbl">ASSETS</span>
           <div class="w-rows">
-            <div class="w-row"><img src="../images/funs-nugi.png" alt=""><div class="nm"><b>FunS</b><span>1,250 FUNS</span></div><div class="val"><b>$312.50</b><span class="up">+12.4%</span></div></div>
+            <div class="w-row"><img src="../images/funs-nugi.png" alt=""><div class="nm"><b>FunS</b><span>1,250 FUNS</span></div><div class="val"><span class="soon">Pre-launch</span></div></div>
             <div class="w-row"><img src="../images/coins/btc.svg" alt=""><div class="nm"><b>Bitcoin</b><span>0.012 BTC</span></div><div class="val"><b>$824.10</b><span class="up">+1.2%</span></div></div>
             <div class="w-row"><img src="../images/coins/eth.svg" alt=""><div class="nm"><b>Ethereum</b><span>0.21 ETH</span></div><div class="val"><b>$486.20</b><span class="dn">-0.8%</span></div></div>
             <div class="w-row"><img src="../images/coins/bnb.svg" alt=""><div class="nm"><b>BNB</b><span>0.35 BNB</span></div><div class="val"><b>$201.75</b><span class="up">+3.1%</span></div></div>
