@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy · FunS Wallet</title>
+<meta name="description" content="FunS Wallet Privacy Policy — no account, no tracking, keys never leave your device.">
+<link rel="canonical" href="https://funs.world/wallet/privacy.html">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root{
+    --bg:#0a0a0f; --card:#12121a; --accent:#F0B90B; --accent-dim:rgba(240,185,11,.12);
+    --text:#d8d8e8; --dim:#7a7a96; --bright:#fff; --border:rgba(255,255,255,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 22px 96px;}
+  header{display:flex;align-items:center;gap:12px;padding-bottom:22px;margin-bottom:30px;border-bottom:1px solid var(--border);}
+  .logo{width:42px;height:42px;border-radius:11px;background:var(--accent);color:#0a0a0f;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;}
+  .brand{font-weight:700;font-size:18px;color:var(--bright);}
+  .brand small{display:block;font-weight:500;color:var(--dim);font-size:12px;}
+  h1{font-size:32px;font-weight:800;letter-spacing:-.7px;margin:6px 0 6px;color:var(--bright);}
+  .meta{color:var(--dim);font-size:14px;}
+  .note{background:var(--accent-dim);border:1px solid rgba(240,185,11,.25);border-radius:10px;padding:13px 16px;font-size:14px;color:#e9d8a8;margin:22px 0 30px;}
+  h2{font-size:20px;font-weight:700;margin:38px 0 10px;letter-spacing:-.3px;color:var(--bright);}
+  p{margin:10px 0;color:var(--text);}
+  strong{color:var(--bright);font-weight:600;}
+  ul{margin:10px 0;padding-left:22px;}
+  li{margin:7px 0;}
+  a{color:var(--accent);text-decoration:none;font-weight:600;}
+  a:hover{text-decoration:underline;}
+  footer{margin-top:58px;padding-top:22px;border-top:1px solid var(--border);color:var(--dim);font-size:13px;}
+  .nav{display:flex;gap:18px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">F</div>
+    <div class="brand">FunS Wallet<small>funs.world/wallet</small></div>
+  </header>
+
+  <h1>Privacy Policy</h1>
+  <div class="meta">Last updated: August 27, 2026 · Version 1.0</div>
+  <div class="note"><strong>No account. No sign-up. No tracking.</strong> FunS Wallet does not ask for your name, email, phone number, or identity documents. Your recovery phrase and private keys never leave your device.</div>
+
+  <p>This Policy explains what FunS Wallet ("the App") does and does not do with information. It applies to the FunS Wallet mobile app.</p>
+
+  <h2>1. What We Do Not Collect</h2>
+  <ul>
+    <li><strong>No account.</strong> There is no registration, login, email, phone number, or KYC.</li>
+    <li><strong>No keys.</strong> Your recovery phrase and private keys are generated on your device and stored there in encrypted form. They are never transmitted to us and we have no way to obtain them.</li>
+    <li><strong>No PIN.</strong> Your app PIN is stored on your device only, in the platform's secure storage (iOS Keychain / Android encrypted storage).</li>
+    <li><strong>No advertising, no analytics profiles, no cross-app tracking.</strong> We do not sell or share data with data brokers or advertisers.</li>
+  </ul>
+
+  <h2>2. What Leaves Your Device</h2>
+  <p>The App is a blockchain client, so some information necessarily goes to third-party services in order to work. We do not operate these services and this data does not come to us:</p>
+  <ul>
+    <li><strong>Your public wallet address</strong> is sent to blockchain node and indexer providers to read your balances and transaction history. Providers currently used include NodeReal, Etherscan, and public BNB Smart Chain / Ethereum RPC nodes. As with any blockchain wallet, these providers can see the address you are querying and the IP address making the request.</li>
+    <li><strong>Signed transactions</strong> are broadcast to blockchain nodes. Everything on a public blockchain — addresses, amounts, timestamps — is permanently public by design and is not private.</li>
+    <li><strong>Token identifiers</strong> (not your address) are sent to a price service (CoinGecko) to display fiat values.</li>
+    <li><strong>Sites you open in the in-app dApp browser</strong> receive whatever a website normally receives, and — only when you connect and approve — your public wallet address. We do not log your browsing.</li>
+  </ul>
+
+  <h2>3. Crash and Error Reporting</h2>
+  <p>To find and fix defects, the App sends crash and error reports to <strong>Sentry</strong>, a third-party error-monitoring service. A report may include: the error and stack trace, app version, device model, operating system version, and a device-generated identifier used to group reports.</p>
+  <p><strong>Before a report leaves your device, the App removes sensitive values.</strong> Any hexadecimal string of 40 characters or more — which covers wallet addresses, transaction hashes, private keys, and signatures — is masked, as are recovery phrases and PINs. Reports are not used to build a user profile and are not linked to an identity, because the App has no identity to link to.</p>
+  <p>This is the only data collection in the App. Crash data is retained by Sentry under its own retention schedule and is deleted thereafter.</p>
+
+  <h2>4. Data Stored on Your Device</h2>
+  <ul>
+    <li>Encrypted recovery phrase and private keys, protected by your PIN and (optionally) device biometrics.</li>
+    <li>Your settings, language, selected network, custom tokens, and a cache of transaction history.</li>
+    <li>None of this is synced to us. Whether it is included in your device's own encrypted backup depends on your operating system's backup settings.</li>
+  </ul>
+
+  <h2>5. Biometrics</h2>
+  <p>If you enable Face ID, Touch ID, or fingerprint unlock, authentication is performed entirely by your operating system. <strong>The App never receives your biometric data</strong> — it only receives a yes/no result from the system.</p>
+
+  <h2>6. Camera</h2>
+  <p>The App uses the camera only to scan QR codes (wallet addresses and WalletConnect pairing codes). Scanning happens on your device; images are not stored, uploaded, or transmitted.</p>
+
+  <h2>7. Children</h2>
+  <p>The App is not directed to children and is intended for users 18 and older. We do not knowingly collect information from children.</p>
+
+  <h2>8. Your Choices</h2>
+  <ul>
+    <li>You can delete the App at any time. Because we hold no account, there is no server-side data to delete.</li>
+    <li>Deleting the App without your recovery phrase permanently removes access to those funds — nobody can restore them.</li>
+    <li>You can decline the camera and biometric permissions; the App remains usable through manual address entry and your PIN.</li>
+  </ul>
+
+  <h2>9. Changes to This Policy</h2>
+  <p>We may update this Policy as the App changes. The "Last updated" date above will change. Material changes will be reflected in the App's release notes.</p>
+
+  <h2>10. Contact</h2>
+  <p>Questions or privacy requests: <a href="mailto:funsxofficial@gmail.com">funsxofficial@gmail.com</a></p>
+
+  <footer>
+    <div class="nav"><a href="index.html">FunS Wallet</a><a href="terms.html">Terms of Service</a></div>
+    <p>FunS Wallet · funs.world</p>
+  </footer>
+</div>
+</body>
+</html>
