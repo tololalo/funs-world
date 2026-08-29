@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FunS Wallet — 多链钱包</title>
-<meta name="description" content="从比特币到 FUNS,6条链的资产集中管理。QR 支付、P2E 奖励、自我托管 — FunS Wallet。">
+<meta name="description" content="支持 BNB Smart Chain 与以太坊的自我托管钱包,密钥只保存在你的设备上。多链、QR 支付与 P2E 奖励即将推出。">
 <meta property="og:title" content="FunS Wallet — 多链钱包">
-<meta property="og:description" content="从比特币到 FUNS,6条链的资产集中管理。密钥只属于你 — 坚守自我托管原则。">
+<meta property="og:description" content="BNB Smart Chain 与以太坊,一个钱包全搞定。密钥只属于你。">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
 <meta property="og:url" content="https://funs.world/wallet/">
 <meta property="og:type" content="website">
@@ -151,6 +151,7 @@ img{max-width:100%}
 .chain-row{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
 .chain{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-size:14.56px;font-weight:600;box-shadow:var(--shadow-sm)}
 .chain img{width:20px;height:20px;display:block}
+.mock-note{margin:10px auto 0;max-width:520px;text-align:center;font-size:12px;line-height:1.5;opacity:.62}
 .soon-chip{display:inline-flex;align-items:center;margin-left:10px;padding:4px 12px;border-radius:20px;font-size:11.76px;font-weight:700;letter-spacing:1.5px;color:#B07E00;background:rgba(255,201,61,.18);border:1px solid rgba(255,201,61,.45);vertical-align:middle}
 
 /* ─ Roadmap ─ */
@@ -264,7 +265,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
   <div>
     <span class="eyebrow glass">FUNS WALLET</span>
     <h1>Multi-chain<br><span class="grad">Wallet</span></h1>
-    <p class="lede">从比特币到 FUNS,<strong>6条链</strong>的资产集中管理。密钥只属于你 — 坚守<strong>自我托管</strong>原则。</p>
+    <p class="lede">现在就可在一处管理 <strong>BNB Smart Chain</strong> 与<strong>以太坊</strong>资产。密钥只属于你 — 坚守<strong>自我托管</strong>原则。<em>更多链的支持即将推出。</em></p>
     <div class="hero-ctas">
       <a class="btn btn-dark" href="#download">📱 下载应用</a>
       <a class="btn btn-ghost" href="#features">了解功能 ↓</a>
@@ -308,10 +309,11 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
       </div>
       <div class="qr-tile glass">
         <span class="qr-mini"><span class="k"></span><span class="k"></span><span></span><span></span><span class="k"></span><span class="k"></span><span class="k"></span><span></span><span class="k"></span></span>
-        <div class="tx"><b>QR 支付</b><span>扫一次码,线下支付也能搞定</span></div>
+        <div class="tx"><b>QR 支付</b><span>即将推出 — 扫一次码完成线下支付</span></div>
       </div>
     </div>
   </div>
+  <p class="mock-note">此为示意模型,其中包含仍在开发中的功能 — 目前已可使用的功能请参见下方标签。</p>
 </header>
 
 <!-- Features -->
@@ -329,13 +331,13 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
     </div>
     <div class="fcard glass">
       <span class="ico">📱</span>
-      <b>QR 支付</b>
-      <p>扫一次码即可完成支付。无论线上还是线下门店,一个钱包轻松搞定支付。</p>
+      <b>QR 支付<span class="soon">即将推出</span></b>
+      <p>扫一次码即可完成支付。我们正在打造线上与线下门店都能使用的支付功能。<em>目前应用内的 QR 扫描用于读取收款地址。</em></p>
     </div>
     <div class="fcard glass">
       <span class="ico">🎮</span>
-      <b>P2E 奖励管理</b>
-      <p>游戏中获得的奖励直接进入钱包。玩得越多,累积的价值一目了然。</p>
+      <b>P2E 奖励管理<span class="soon">即将推出</span></b>
+      <p>游戏中获得的奖励将直接进入钱包。该功能正在开发中。</p>
     </div>
     <div class="fcard glass">
       <span class="ico">⛓️</span>
@@ -350,7 +352,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
     <div class="fcard glass">
       <span class="ico">🛟</span>
       <b>轻松备份与恢复</b>
-      <p>无需记忆冗长的助记词。几次点击即可安全备份,更换手机也能轻松找回。</p>
+      <p>只需几次点击即可备份你的 12 个单词助记词,更换手机时用它即可恢复。<strong>请妥善保管 — 它是找回钱包的唯一方式。</strong></p>
     </div>
   </div>
 </section>
