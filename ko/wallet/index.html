@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FunS Wallet — 멀티체인 지갑</title>
-<meta name="description" content="비트코인부터 FUNS까지 6개 체인의 자산을 한 곳에서. QR 결제, P2E 보상, 자가 보관 — FunS Wallet.">
+<meta name="description" content="BNB 스마트 체인과 이더리움을 위한 자가 보관 지갑. 열쇠는 내 기기에만 남습니다. 멀티체인·QR 결제·P2E 보상은 출시 예정입니다.">
 <meta property="og:title" content="FunS Wallet — 멀티체인 지갑">
-<meta property="og:description" content="비트코인부터 FUNS까지 6개 체인의 자산을 한 곳에서. 열쇠는 오직 나에게만 — 자가 보관 원칙을 지킵니다.">
+<meta property="og:description" content="BNB 스마트 체인과 이더리움을 지갑 하나에. 열쇠는 오직 나에게만 — 자가 보관 원칙을 지킵니다.">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
 <meta property="og:url" content="https://funs.world/wallet/">
 <meta property="og:type" content="website">
@@ -151,6 +151,7 @@ img{max-width:100%}
 .chain-row{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
 .chain{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-size:14.56px;font-weight:600;box-shadow:var(--shadow-sm)}
 .chain img{width:20px;height:20px;display:block}
+.mock-note{margin:10px auto 0;max-width:520px;text-align:center;font-size:12px;line-height:1.5;opacity:.62}
 .soon-chip{display:inline-flex;align-items:center;margin-left:10px;padding:4px 12px;border-radius:20px;font-size:11.76px;font-weight:700;letter-spacing:1.5px;color:#B07E00;background:rgba(255,201,61,.18);border:1px solid rgba(255,201,61,.45);vertical-align:middle}
 
 /* ─ Roadmap ─ */
@@ -264,7 +265,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
   <div>
     <span class="eyebrow glass">FUNS WALLET</span>
     <h1>Multi-chain<br><span class="grad">Wallet</span></h1>
-    <p class="lede">비트코인부터 FUNS까지 <strong>6개 체인</strong>의 자산을 한 곳에서. 열쇠는 오직 나에게만 — <strong>자가 보관</strong> 원칙을 지킵니다.</p>
+    <p class="lede">지금은 <strong>BNB 스마트 체인</strong>과 <strong>이더리움</strong> 자산을 한 곳에서. 열쇠는 오직 나에게만 — <strong>자가 보관</strong> 원칙을 지킵니다. <em>더 많은 체인 지원은 출시 예정입니다.</em></p>
     <div class="hero-ctas">
       <a class="btn btn-dark" href="#download">📱 앱 다운로드</a>
       <a class="btn btn-ghost" href="#features">기능 알아보기 ↓</a>
@@ -308,10 +309,11 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
       </div>
       <div class="qr-tile glass">
         <span class="qr-mini"><span class="k"></span><span class="k"></span><span></span><span></span><span class="k"></span><span class="k"></span><span class="k"></span><span></span><span class="k"></span></span>
-        <div class="tx"><b>QR 결제</b><span>스캔 한 번으로 오프라인 결제까지</span></div>
+        <div class="tx"><b>QR 결제</b><span>출시 예정 — 스캔 한 번으로 오프라인 결제까지</span></div>
       </div>
     </div>
   </div>
+  <p class="mock-note">예시 목업이며 개발 중인 기능이 포함돼 있습니다. 현재 제공되는 기능은 아래 배지를 확인하세요.</p>
 </header>
 
 <!-- Features -->
@@ -329,13 +331,13 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
     </div>
     <div class="fcard glass">
       <span class="ico">📱</span>
-      <b>QR 결제</b>
-      <p>스캔 한 번이면 결제 끝. 온라인은 물론 오프라인 매장에서도 지갑 하나로 간편하게 결제하세요.</p>
+      <b>QR 결제<span class="soon">예정</span></b>
+      <p>스캔 한 번이면 결제 끝 — 온라인은 물론 오프라인 매장에서도 쓸 수 있는 결제를 준비하고 있습니다. <em>현재 앱의 QR 스캔은 받는 주소를 읽는 용도입니다.</em></p>
     </div>
     <div class="fcard glass">
       <span class="ico">🎮</span>
-      <b>P2E 보상 관리</b>
-      <p>게임에서 얻은 보상이 지갑으로 바로 들어옵니다. 플레이할수록 쌓이는 가치를 한눈에 확인하세요.</p>
+      <b>P2E 보상 관리<span class="soon">예정</span></b>
+      <p>게임에서 얻은 보상이 지갑으로 바로 들어오게 됩니다. 준비 중입니다.</p>
     </div>
     <div class="fcard glass">
       <span class="ico">⛓️</span>
@@ -350,7 +352,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
     <div class="fcard glass">
       <span class="ico">🛟</span>
       <b>간편 백업·복구</b>
-      <p>긴 암호 문장을 외울 필요 없어요. 몇 번의 터치로 안전하게 백업하고, 폰을 바꿔도 쉽게 되찾으세요.</p>
+      <p>12단어 복구 구문을 몇 번의 터치로 안전하게 백업하고, 폰을 바꿔도 그 구문으로 복구하세요. <strong>복구 구문은 꼭 안전하게 보관하세요 — 지갑을 되찾을 수 있는 유일한 수단입니다.</strong></p>
     </div>
   </div>
 </section>

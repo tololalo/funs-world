@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FunS Wallet — Ví đa chuỗi</title>
-<meta name="description" content="Từ Bitcoin đến FUNS, tài sản của 6 chuỗi ở cùng một nơi. Thanh toán QR, thưởng P2E, tự quản lý tài sản — FunS Wallet.">
+<meta name="description" content="Ví tự quản lý tài sản cho BNB Smart Chain và Ethereum. Khóa riêng luôn nằm trên thiết bị của bạn. Đa chuỗi, thanh toán QR và thưởng P2E sắp ra mắt.">
 <meta property="og:title" content="FunS Wallet — Ví đa chuỗi">
-<meta property="og:description" content="Từ Bitcoin đến FUNS, tài sản của 6 chuỗi ở cùng một nơi. Chìa khóa chỉ mình bạn nắm giữ — tuân thủ nguyên tắc tự quản lý tài sản.">
+<meta property="og:description" content="BNB Smart Chain và Ethereum trong cùng một chiếc ví. Chìa khóa chỉ mình bạn nắm giữ.">
 <meta property="og:image" content="https://funs.world/funs-nugi.png">
 <meta property="og:url" content="https://funs.world/wallet/">
 <meta property="og:type" content="website">
@@ -151,6 +151,7 @@ img{max-width:100%}
 .chain-row{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
 .chain{display:inline-flex;align-items:center;gap:9px;padding:10px 20px;border-radius:50px;font-size:14.56px;font-weight:600;box-shadow:var(--shadow-sm)}
 .chain img{width:20px;height:20px;display:block}
+.mock-note{margin:10px auto 0;max-width:520px;text-align:center;font-size:12px;line-height:1.5;opacity:.62}
 .soon-chip{display:inline-flex;align-items:center;margin-left:10px;padding:4px 12px;border-radius:20px;font-size:11.76px;font-weight:700;letter-spacing:1.5px;color:#B07E00;background:rgba(255,201,61,.18);border:1px solid rgba(255,201,61,.45);vertical-align:middle}
 
 /* ─ Roadmap ─ */
@@ -264,7 +265,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
   <div>
     <span class="eyebrow glass">FUNS WALLET</span>
     <h1>Multi-chain<br><span class="grad">Wallet</span></h1>
-    <p class="lede">Từ Bitcoin đến FUNS, tài sản của <strong>6 chuỗi</strong> ở cùng một nơi. Chìa khóa chỉ mình bạn nắm giữ — tuân thủ nguyên tắc <strong>tự quản lý tài sản</strong>.</p>
+    <p class="lede">Ngay hôm nay, tài sản trên <strong>BNB Smart Chain</strong> và <strong>Ethereum</strong> ở cùng một nơi. Chìa khóa chỉ mình bạn nắm giữ — tuân thủ nguyên tắc <strong>tự quản lý tài sản</strong>. <em>Hỗ trợ thêm nhiều chuỗi sẽ sớm ra mắt.</em></p>
     <div class="hero-ctas">
       <a class="btn btn-dark" href="#download">📱 Tải ứng dụng</a>
       <a class="btn btn-ghost" href="#features">Khám phá tính năng ↓</a>
@@ -312,6 +313,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
       </div>
     </div>
   </div>
+  <p class="mock-note">Ảnh mô phỏng minh họa. Trong đó có những tính năng vẫn đang được phát triển — hãy xem các nhãn bên dưới để biết tính năng nào đã dùng được ngay hôm nay.</p>
 </header>
 
 <!-- Features -->
@@ -329,13 +331,13 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
     </div>
     <div class="fcard glass">
       <span class="ico">📱</span>
-      <b>Thanh toán QR</b>
-      <p>Chỉ một lần quét là thanh toán xong. Dùng một chiếc ví để thanh toán dễ dàng cả online lẫn tại cửa hàng offline.</p>
+      <b>Thanh toán QR<span class="soon">Sắp có</span></b>
+      <p>Chỉ một lần quét là thanh toán xong. Chúng tôi đang phát triển tính năng thanh toán dùng được cả online lẫn tại cửa hàng offline. <em>Hiện tại, trình quét QR trong ứng dụng dùng để đọc địa chỉ người nhận.</em></p>
     </div>
     <div class="fcard glass">
       <span class="ico">🎮</span>
-      <b>Quản lý thưởng P2E</b>
-      <p>Phần thưởng nhận được từ game vào thẳng ví của bạn. Theo dõi giá trị tích lũy càng chơi càng nhiều chỉ trong một cái nhìn.</p>
+      <b>Quản lý thưởng P2E<span class="soon">Sắp có</span></b>
+      <p>Phần thưởng nhận được từ game sẽ vào thẳng ví của bạn. Chúng tôi đang phát triển tính năng này.</p>
     </div>
     <div class="fcard glass">
       <span class="ico">⛓️</span>
@@ -350,7 +352,7 @@ footer{border-top:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.42
     <div class="fcard glass">
       <span class="ico">🛟</span>
       <b>Sao lưu &amp; khôi phục dễ dàng</b>
-      <p>Không cần ghi nhớ cụm mật khẩu dài. Sao lưu an toàn chỉ với vài lần chạm, và khôi phục dễ dàng dù đổi điện thoại.</p>
+      <p>Sao lưu cụm từ khôi phục 12 từ chỉ với vài lần chạm, và dùng nó để khôi phục ví trên điện thoại mới. <strong>Hãy giữ thật an toàn — đó là cách duy nhất để khôi phục ví của bạn.</strong></p>
     </div>
   </div>
 </section>
