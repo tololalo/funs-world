@@ -3,3 +3,15 @@ funs_landing.pdf
 download_backup.html
 verify-pages.sh
 _audit.html
+
+# internal working files - keep on disk, never publish
+CLAUDE.md
+PROJECT_HANDOFF.md
+FunS_디자인_프롬프트.md
+clean_funs_world.sh
+superpowers-cowork.skill
+.claude/
+talk/.paperclip/
+talk/funstalk-cowork-prompt.md
+__pycache__/
+*.pyc
