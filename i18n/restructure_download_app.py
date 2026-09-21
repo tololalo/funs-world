@@ -24,7 +24,7 @@ TEXT = {
         success="✓ You're on the list! We'll email you at launch.",
         note_android='Join the waitlist to get the Android launch announcement by email.',
         note_ios='Join the waitlist to get the iOS launch announcement by email.',
-        back='← Back to FunS Platform', badge_gp='google-play-en.png'),
+        back='← Back to FunS', badge_gp='google-play-en.png'),
     'ko': dict(title_meta='FunS 앱 다운로드', desc='FunS Talk와 FunS Wallet 다운로드 — 출시 소식을 가장 먼저 받아보세요.',
         og_desc='암호화 메신저 FunS Talk와 멀티체인 지갑 FunS Wallet. 출시 소식을 받아보세요.',
         h1='FunS 앱 다운로드', lede='암호화 메신저 FunS Talk와 멀티체인 지갑 FunS Wallet.<br>출시 소식을 가장 먼저 받아보세요.',
@@ -34,7 +34,7 @@ TEXT = {
         success='✓ 등록 완료! 출시 소식을 이메일로 보내드릴게요.',
         note_android='신청하시면 Android 버전 출시 소식을 이메일로 받아보실 수 있어요.',
         note_ios='신청하시면 iOS 버전 출시 소식을 이메일로 받아보실 수 있어요.',
-        back='← FunS Platform으로 돌아가기', badge_gp='google-play-ko.png'),
+        back='← FunS로 돌아가기', badge_gp='google-play-ko.png'),
 }
 for code, name, flag in B.LANGS:
     if code not in TEXT:
@@ -124,7 +124,7 @@ def build_page(lang):
 </div>
 
 <footer style="text-align:center; padding: 32px 5%;">
-  <p style="color:var(--muted); font-size:.8rem;">© 2026 FunS Platform · <a href="{back_href}" style="color:var(--muted);">funs.world</a></p>
+  <p style="color:var(--muted); font-size:.8rem;">© 2026 AZEND PTE. LTD. · <a href="{back_href}" style="color:var(--muted);">funs.world</a></p>
 </footer>
 
 <script>{B.LANG_DD_JS}</script>
