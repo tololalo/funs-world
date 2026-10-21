@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Policy · FunS Wallet</title>
-<meta name="description" content="FunS Wallet Privacy Policy — no account, no tracking, keys never leave your device.">
+<meta name="description" content="FunS Wallet Privacy Policy — no account, no advertising tracking, keys never leave your device.">
 <link rel="canonical" href="https://funs.world/wallet/privacy.html">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -42,8 +42,8 @@
   </header>
 
   <h1>Privacy Policy</h1>
-  <div class="meta">Last updated: September 15, 2026 · Version 1.1</div>
-  <div class="note"><strong>No account. No sign-up. No tracking.</strong> FunS Wallet does not ask for your name, email, phone number, or identity documents. Your recovery phrase and private keys never leave your device.</div>
+  <div class="meta">Last updated: October 21, 2026 · Version 1.2</div>
+  <div class="note"><strong>No account. No sign-up. No advertising tracking.</strong> FunS Wallet does not ask for your name, email, phone number, or identity documents. Your recovery phrase and private keys never leave your device. To keep the App working and stable, some technical data is sent to the third-party services listed below.</div>
 
   <p>This Policy explains what FunS Wallet ("the App") does and does not do with information. It applies to the FunS Wallet mobile app.</p>
 
@@ -54,27 +54,32 @@
     <li><strong>No account.</strong> There is no registration, login, email, phone number, or KYC.</li>
     <li><strong>No keys.</strong> Your recovery phrase and private keys are generated on your device and stored there in encrypted form. They are never transmitted to us and we have no way to obtain them.</li>
     <li><strong>No PIN.</strong> Your app PIN is stored on your device only, in the platform's secure storage (iOS Keychain / Android encrypted storage).</li>
-    <li><strong>No advertising, no analytics profiles, no cross-app tracking.</strong> We do not sell or share data with data brokers or advertisers.</li>
+    <li><strong>No advertising, no advertising or behavioural analytics profiles, no cross-app tracking.</strong> We do not sell or share data with data brokers or advertisers.</li>
+    <li><strong>No account server.</strong> We do not operate a server that stores your wallet address, keys, balances, or transaction history.</li>
   </ul>
 
   <h2>2. What Leaves Your Device</h2>
-  <p>The App is a blockchain client, so some information necessarily goes to third-party services in order to work. We do not operate these services and this data does not come to us:</p>
+  <p>The App is a blockchain client, so some information necessarily goes to third-party services in order to work. Each service below receives only what its function requires:</p>
   <ul>
-    <li><strong>Your public wallet address</strong> is sent to blockchain node and indexer providers to read your balances and transaction history. Providers currently used include NodeReal, Etherscan, and public BNB Smart Chain / Ethereum RPC nodes. As with any blockchain wallet, these providers can see the address you are querying and the IP address making the request.</li>
+    <li><strong>Blockchain node (RPC) providers.</strong> To read balances, token prices, and network state and to send transactions, the App sends requests that include your public wallet address to node providers for the network you select. Providers currently used include NodeReal and public BNB Smart Chain / Ethereum RPC nodes. These providers can see the address being queried and the IP address making the request.</li>
+    <li><strong>Transaction history providers.</strong> To show your transaction history, your public wallet address is sent to NodeReal (BNB Smart Chain) and Etherscan (Ethereum).</li>
+    <li><strong>Prices.</strong> Token prices are read from Chainlink price feeds on the blockchain, through the node providers above. No separate price service receives your address.</li>
+    <li><strong>Token icons.</strong> To display token logos, the App downloads images from CoinGecko and CoinMarketCap image servers. These requests do not include your wallet address, but those servers can see the requesting IP address.</li>
     <li><strong>Signed transactions</strong> are broadcast to blockchain nodes. Everything on a public blockchain — addresses, amounts, timestamps — is permanently public by design and is not private.</li>
-    <li><strong>Token identifiers</strong> (not your address) are sent to a price service (CoinGecko) to display fiat values.</li>
-    <li><strong>Sites you open in the in-app dApp browser</strong> receive whatever a website normally receives, and — only when you connect and approve — your public wallet address. We do not log your browsing.</li>
+    <li><strong>Sites you open in the in-app dApp browser</strong> receive whatever a website normally receives (such as your IP address), and — only when you connect and approve — your public wallet address. We do not log your browsing.</li>
+    <li><strong>WalletConnect.</strong> When you connect to a dApp with WalletConnect, session messages are relayed through the WalletConnect network. When you approve a connection, the selected public wallet address is shared with that dApp. The WalletConnect SDK's own usage telemetry is turned off in the App.</li>
+    <li><strong>Error and performance diagnostics</strong> are sent to Sentry, as described in Section 3.</li>
   </ul>
 
-  <h2>3. Crash and Error Reporting</h2>
-  <p>To find and fix defects, the App sends crash and error reports to <strong>Sentry</strong>, a third-party error-monitoring service. A report may include: the error and stack trace, app version, device model, operating system version, and a device-generated identifier used to group reports.</p>
-  <p><strong>Before a report leaves your device, the App removes sensitive values.</strong> Any hexadecimal string of 40 characters or more — which covers wallet addresses, transaction hashes, private keys, and signatures — is masked, as are recovery phrases and PINs. Reports are not used to build a user profile and are not linked to an identity, because the App has no identity to link to.</p>
-  <p>This is the only data collection in the App. Crash data is retained by Sentry under its own retention schedule and is deleted thereafter.</p>
+  <h2>3. Error, Crash, and Performance Diagnostics</h2>
+  <p>To find and fix defects and improve stability, the App sends diagnostic data to <strong>Sentry</strong>, a third-party error-monitoring service. This includes crash and error reports and, for a sample of app sessions, performance measurements (for example, how long app start-up, screens, and network requests take). A report may include: the error and stack trace, app version, device model, operating system version, and a device-generated identifier used to group reports. Performance measurements may include the addresses (URLs) of network requests the App makes to the services in Section 2, which can contain your public wallet address. As with any internet request, Sentry can also see the IP address that sends the report.</p>
+  <p><strong>Before a report leaves your device, the App masks certain values.</strong> In error messages and exception text, long hexadecimal strings (such as wallet addresses, transaction hashes, private keys, and signatures), long numbers, and word sequences resembling a recovery phrase are replaced. Request URLs are removed from error reports. This masking does not apply to performance measurements, and is a safeguard, not a guarantee that every field of every report is free of sensitive values. Reports are not used to build a user profile, advertise to you, or track you across apps, and they are not linked to an identity, because the App has no account to link them to.</p>
+  <p>Diagnostic data is retained by Sentry for a limited period under the retention settings of our Sentry account and Sentry's own policies, and is deleted after that period.</p>
 
   <h2>4. Data Stored on Your Device</h2>
   <ul>
     <li>Encrypted recovery phrase and private keys, protected by your PIN and (optionally) device biometrics.</li>
-    <li>Your settings, language, selected network, custom tokens, and a cache of transaction history.</li>
+    <li>Your settings, language, selected network, custom tokens, dApp bookmarks, WalletConnect session information, and cached transaction history and price data.</li>
     <li>None of this is synced to us. Whether it is included in your device's own encrypted backup depends on your operating system's backup settings.</li>
   </ul>
 
@@ -87,9 +92,11 @@
   <h2>7. Children</h2>
   <p>The App is not directed to children and is intended for users 18 and older. We do not knowingly collect information from children.</p>
 
-  <h2>8. Your Choices</h2>
+  <h2>8. Your Choices and Deletion</h2>
   <ul>
-    <li>You can delete the App at any time. Because we hold no account, there is no server-side data to delete.</li>
+    <li>You can delete the App at any time. Deleting the App removes the App's data stored on your device. We hold no account, so there is no account to close.</li>
+    <li>Diagnostic data already sent to Sentry is kept only for the limited retention period described in Section 3 and is then deleted. Because reports are not linked to an identity, we may not be able to tell which reports came from your device; if you send a deletion request to the contact address below, we will take reasonable steps to locate and delete matching data.</li>
+    <li>Information recorded on a public blockchain cannot be deleted by anyone, including us.</li>
     <li>Deleting the App without your recovery phrase permanently removes access to those funds — nobody can restore them.</li>
     <li>You can decline the camera and biometric permissions; the App remains usable through manual address entry and your PIN.</li>
   </ul>
