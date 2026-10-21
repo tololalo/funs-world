@@ -66,20 +66,21 @@
     <li><strong>Prices.</strong> Token prices are read from Chainlink price feeds on the blockchain, through the node providers above. No separate price service receives your address.</li>
     <li><strong>Token icons.</strong> To display token logos, the App downloads images from CoinGecko and CoinMarketCap image servers. These requests do not include your wallet address, but those servers can see the requesting IP address.</li>
     <li><strong>Signed transactions</strong> are broadcast to blockchain nodes. Everything on a public blockchain — addresses, amounts, timestamps — is permanently public by design and is not private.</li>
-    <li><strong>Sites you open in the in-app dApp browser</strong> receive whatever a website normally receives (such as your IP address), and — only when you connect and approve — your public wallet address. We do not log your browsing.</li>
+    <li><strong>Sites you open in the in-app dApp browser</strong> receive whatever a website normally receives (such as your IP address), and — only when you connect and approve — your public wallet address. We do not send your browsing history to us; connection records kept on your device are described in Section 4.</li>
     <li><strong>WalletConnect.</strong> When you connect to a dApp with WalletConnect, session messages are relayed through the WalletConnect network. When you approve a connection, the selected public wallet address is shared with that dApp. The WalletConnect SDK's own usage telemetry is turned off in the App.</li>
+    <li><strong>App updates (Android).</strong> On supported Android devices, the App uses Google Play&rsquo;s in-app update service to check whether a new version is available. Google Play processes device metadata, the App version, and installed module information for this purpose, under Google&rsquo;s own terms and practices.</li>
     <li><strong>Error and performance diagnostics</strong> are sent to Sentry, as described in Section 3.</li>
   </ul>
 
   <h2>3. Error, Crash, and Performance Diagnostics</h2>
   <p>To find and fix defects and improve stability, the App sends diagnostic data to <strong>Sentry</strong>, a third-party error-monitoring service. This includes crash and error reports and, for a sample of app sessions, performance measurements (for example, how long app start-up, screens, and network requests take). A report may include: the error and stack trace, app version, device model, operating system version, and a device-generated identifier used to group reports. Performance measurements may include the addresses (URLs) of network requests the App makes to the services in Section 2, which can contain your public wallet address. As with any internet request, Sentry can also see the IP address that sends the report.</p>
-  <p><strong>Before a report leaves your device, the App masks certain values.</strong> In error messages and exception text, long hexadecimal strings (such as wallet addresses, transaction hashes, private keys, and signatures), long numbers, and word sequences resembling a recovery phrase are replaced. Request URLs are removed from error reports. This masking does not apply to performance measurements, and is a safeguard, not a guarantee that every field of every report is free of sensitive values. Reports are not used to build a user profile, advertise to you, or track you across apps, and they are not linked to an identity, because the App has no account to link them to.</p>
+  <p><strong>Before an error report leaves your device, the App filters some values.</strong> For JavaScript error reports, the App removes the request URL field, drops JavaScript network-request records, and masks certain patterns in error messages and exception text, such as &ldquo;0x&rdquo;-prefixed hexadecimal strings of 40 or more characters (for example wallet addresses, transaction hashes, private keys, and signatures), long numbers, and word sequences resembling a recovery phrase. This filtering does not cover every field, native crash reports, or performance measurements, and it is a safeguard rather than a guarantee. Error and performance diagnostics may therefore include network request URLs, query parameters, and your public wallet address. Reports are not used to build a user profile, advertise to you, or track you across apps.</p>
   <p>Diagnostic data is retained by Sentry for a limited period under the retention settings of our Sentry account and Sentry's own policies, and is deleted after that period.</p>
 
   <h2>4. Data Stored on Your Device</h2>
   <ul>
     <li>Encrypted recovery phrase and private keys, protected by your PIN and (optionally) device biometrics.</li>
-    <li>Your settings, language, selected network, custom tokens, dApp bookmarks, WalletConnect session information, and cached transaction history and price data.</li>
+    <li>Your settings, language, selected network, custom tokens, dApp bookmarks, WalletConnect session information, records of dApp sites you have approved (the site origin, the connected wallet address and network, and connection and last-visit times, which you can remove under Connected Sites), and cached transaction history and price data.</li>
     <li>None of this is synced to us. Whether it is included in your device's own encrypted backup depends on your operating system's backup settings.</li>
   </ul>
 
@@ -94,10 +95,10 @@
 
   <h2>8. Your Choices and Deletion</h2>
   <ul>
-    <li>You can delete the App at any time. Deleting the App removes the App's data stored on your device. We hold no account, so there is no account to close.</li>
+    <li>You can delete the App at any time. Deleting the App removes the App&rsquo;s app-storage data, but on iOS some secure-storage (Keychain) items and any existing device backups may remain. We hold no account, so there is no account to close.</li>
     <li>Diagnostic data already sent to Sentry is kept only for the limited retention period described in Section 3 and is then deleted. Because reports are not linked to an identity, we may not be able to tell which reports came from your device; if you send a deletion request to the contact address below, we will take reasonable steps to locate and delete matching data.</li>
     <li>Information recorded on a public blockchain cannot be deleted by anyone, including us.</li>
-    <li>Deleting the App without your recovery phrase permanently removes access to those funds — nobody can restore them.</li>
+    <li>Keep a secure backup of your recovery phrase or private key before deleting the App. Without a usable backup, you may permanently lose access to your wallet — nobody, including us, can restore it.</li>
     <li>You can decline the camera and biometric permissions; the App remains usable through manual address entry and your PIN.</li>
   </ul>
 
